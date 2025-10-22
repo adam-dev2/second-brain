@@ -2,14 +2,13 @@ import express from 'express';
 import jwt from 'jsonwebtoken'
 import User from './models/User.js'
 import Content from './models/Content.js';
-import Tags from './models/Tags.js';
-import Link from './models/Link.js';
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
 import ConnectDB from './utils/db.js';
 import { signupSchema,loginSchema } from './validations/AuthSchema.js';
 import { ZodError } from 'zod';
 import { AuthMiddleware } from './middlewares/auth.js';
+import { nanoid } from 'nanoid';
 
 const app = express();
 dotenv.config();
@@ -19,7 +18,7 @@ interface CookieOptions {
     httpOnly: boolean;
     secure: boolean;
     maxAge: number;
-    samesite: string;
+    sameSite: 'strict'|'lax'|'none';
 }
 app.use(express.json());
 app.post('/api/v1/signup',async (req,res) => {
@@ -77,15 +76,15 @@ app.post('/api/v1/login',async (req,res) => {
             },
             process.env.JWT_SECRET,
             {expiresIn:'1h'}
-        )  
+        )
         const cookieOptions:CookieOptions = {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             maxAge: 60*60*1000,
-            samesite:process.env.NODE_ENV === 'production'?'strict':'lax'
+            sameSite:process.env.NODE_ENV === 'production'?'strict':'lax'
         }
         res.cookie('token',token,cookieOptions);
-        res.status(200).json({message:'Logged in successfully'});
+        res.status(200).json({message:'Logged in successfully',token});
     }catch (err) {
         if (err instanceof ZodError) {
         return res.status(422).json({
@@ -101,42 +100,121 @@ app.post('/api/v1/login',async (req,res) => {
     }
 })
 
-app.post('/api/v1/card',AuthMiddleware,(req,res) => {
-    const {link,title,type,tags} = req.body;
+app.post('/api/v1/card',AuthMiddleware,async(req,res) => {
+    const {link,title,type,share} = req.body;
+    const tags = req.body.tags;
+    if(!tags || !link || !title || !type) {
+        return res.status(400).json({message:"All fields are important"});
+    }
     try{
-        let newCard = new Content({link,title,type,tags})
+        const userID = req.user?.id;
+        if(!userID) {
+            return res.status(401).json({message:"Unauthorized"});
+        }
+        console.log(tags);
+        
+        const newCard = new Content({
+            userId:userID,
+            link,
+            title,
+            type,
+            tags,
+            share,
+            createdAt:Date.now(),
+            updatedAt:Date.now()
+        })
+        await newCard.save();
+        return res.status(201).json({message:'Card created successfully',card:newCard});
     }catch(err){
         return res.status(500).json({error: 'Internal Server Error',err})
     }
 })
 
-app.get('/api/v1/cards',(req,res) => {
+app.put('/api/v1/editCard/:id',AuthMiddleware,async(req,res) => {
     try{
+        const {id} = req.params;
+        const {link,title,share,tags} = req.body;
+        const findCard = await Content.findById(id)
+        if(!findCard) {
+            return res.status(404).json({message: 'Card with that id not found'});
+        }
+        const updateCard = await Content.findByIdAndUpdate(id,{
+            link,
+            title,
+            share,
+            tags,
+            updatedAt:Date.now()
+        })
 
+        return res.status(200).json({message:"Updated card successfully",updateCard});
+    }catch(err) {
+        return res.status(500).json({message:'Internal Server Error'});
+    }
+})
+
+app.get('/api/v1/cards',AuthMiddleware,async(req,res) => {
+    try{
+        const userID = req.user?.id;
+        if (!userID) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const FetchContent = await Content.find({userId:userID});
+        if(!FetchContent) {
+            return res.status(404).json({message:"no cards to show"});
+        }
+        return res.status(200).json({message:"Fetched cards successfully",cards:FetchContent});
     }catch(err){
         return res.status(500).json({error: 'Internal Server Error',err})
     }
 })
 
-app.post('/api/v1/brain/share',(req,res) => {
+app.get('/api/v1/brain/share',AuthMiddleware,async(req,res) => {
     try{
-
+        const userID = req.user?.id;
+        if(!userID) {
+            return res.status(401).json({message:'Unauthorized'});
+        }
+        if(!process.env.JWT_SECRET) {
+            return res.status(500).json({message:'jwt secret not found'});
+        }
+        const shareHash = nanoid();
+        const updateUser = await User.findByIdAndUpdate(userID,{
+            sharelink:`${shareHash}`
+        })
+        console.log(updateUser);
+        
+        return res.status(200).json({message:'Sharelink Generated Successfully',ShareableLink:`/api/v1/brain/${shareHash}`})
     }catch(err){
         return res.status(500).json({error: 'Internal Server Error',err})
     }
 })
 
-app.get('/api/v1/brain/:shareLink',(req,res) => {
+app.get('/api/v1/brain/:shareLink',async(req,res) => {
     try{
-
+        const {shareLink} = req.params;
+        if(!shareLink) {
+            return res.status(400).json({message:"sharelink is required"});
+        }
+        const findUser = await User.findOne({sharelink:shareLink})
+        if(!findUser) {
+            return res.status(404).json({message:"Can't find user"});
+        }
+        const findCards = await Content.find({userId:findUser.id,share:true})
+        return res.status(200).json({ShareableCards: findCards});
     }catch(err){
         return res.status(500).json({error: 'Internal Server Error',err})
     }
 })
 
-app.delete('/api/v1/content/:id',(req,res) => {
+app.delete('/api/v1/content/:id',async(req,res) => {
+    const {id} = req.params;
     try{
-
+        const findCard = await Content.findByIdAndDelete(id);
+        if(!findCard) {
+            return res.status(404).json({message:"There's no card to delete"});
+        }
+        return res.status(200).json({message:"Card delete Successfilly"});
     }catch(err){
         return res.status(500).json({error: 'Internal Server Error',err})
     }
@@ -144,7 +222,12 @@ app.delete('/api/v1/content/:id',(req,res) => {
 
 app.post('/api/v1/logout',(req,res) => {
     try{
-
+       res.clearCookie('token',{
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', 
+            sameSite: 'strict',
+        })
+        return res.status(200).json({ message: 'Logged out successfully' });
     }catch(err){
         return res.status(500).json({error: 'Internal Server Error',err})
     }
