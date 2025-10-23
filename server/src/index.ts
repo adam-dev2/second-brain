@@ -9,10 +9,15 @@ import { signupSchema,loginSchema } from './validations/AuthSchema.js';
 import { ZodError } from 'zod';
 import { AuthMiddleware } from './middlewares/auth.js';
 import { nanoid } from 'nanoid';
+import { ConnectQdrant } from './config/QdrantConfig.js';
+import { getEmbedding } from './config/embeddings.js';
+import { COLLECTION_NAME, qdrantClient } from './utils/qDrant.js';
+import {v4 as uuidv4} from 'uuid'
 
 const app = express();
 dotenv.config();
 ConnectDB();
+ConnectQdrant();
 
 interface CookieOptions {
     httpOnly: boolean;
@@ -103,6 +108,7 @@ app.post('/api/v1/login',async (req,res) => {
 app.post('/api/v1/card',AuthMiddleware,async(req,res) => {
     const {link,title,type,share} = req.body;
     const tags = req.body.tags;
+    const qdrantID = uuidv4();
     if(!tags || !link || !title || !type) {
         return res.status(400).json({message:"All fields are important"});
     }
@@ -120,10 +126,30 @@ app.post('/api/v1/card',AuthMiddleware,async(req,res) => {
             type,
             tags,
             share,
-            createdAt:Date.now(),
-            updatedAt:Date.now()
+            createdAt:new Date().toISOString(),
+            updatedAt:new Date().toISOString()
         })
         await newCard.save();
+        console.log(`Storing Card title: ${newCard.title}`);
+        const embeddings = await getEmbedding(newCard.title);
+        console.log(embeddings);
+        await qdrantClient.upsert(COLLECTION_NAME,{
+            wait: true,
+            points:[
+                {
+                    id:qdrantID,
+                    vector:embeddings,
+                    payload:{
+                        userId: newCard.userId,
+                        title:newCard.title,
+                        link:newCard.title,
+                        type:newCard.type,
+                        createdAt: new Date().toISOString()
+                    },
+                },
+            ],
+        });
+        console.log(`Card Stored successfully with ID: ${newCard.id}`);
         return res.status(201).json({message:'Card created successfully',card:newCard});
     }catch(err){
         return res.status(500).json({error: 'Internal Server Error',err})
@@ -233,6 +259,32 @@ app.post('/api/v1/logout',(req,res) => {
     }
 })
 
+app.post('/api/v1/query',AuthMiddleware,async(req,res) => {
+    const {query} = req.body
+    if(!query) {
+        return res.status(400).json({message: "query shouldn't be empty"})
+    }
+    try {
+        const queryEmbeddings = await getEmbedding(query);
+        const searchResutls = await qdrantClient.search(COLLECTION_NAME,{
+            vector: queryEmbeddings,
+            limit:3
+        });
+
+        console.log(`Nearest Cards: ${searchResutls}`);
+        searchResutls.forEach((res) =>{
+            console.log({
+                id:res.id,
+                score:res.score,
+                payload:res.payload
+            });
+            
+        })
+        return res.status(200).json({searchResutls})
+    }catch(err){
+        return res.status(500).json({error: 'Internal Server Error',err})
+    }
+})
 
 app.listen(process.env.PORT,() => {
     console.log(`Listening on port: ${process.env.PORT}`);
