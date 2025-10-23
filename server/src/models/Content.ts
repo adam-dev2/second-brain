@@ -5,10 +5,12 @@ export interface IContent extends Document {
     link: string;
     title: string;
     type: string;
-    tags:[string];
+    tags:string[];
     share:boolean;
-    createdAt:Date,
-    updatedAt:Date
+    embedding?:number[];
+    chromaId?:string;
+    createdAt:Date;
+    updatedAt:Date;
 } 
 
 const contentSchema = new Schema<IContent>({
@@ -18,6 +20,8 @@ const contentSchema = new Schema<IContent>({
     type: {type:String,required: true},
     tags: {type:[String],required: true},
     share:{type:Boolean,required:true},
+    embedding:{type:[Number]},
+    chromaId:{type:String},
     createdAt:{type:Date,required:true},
     updatedAt:{type:Date,required:true}
 })

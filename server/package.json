@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "node --loader ts-node/esm src/index.ts",
-    "build":"tsc -b"
+    "build": "tsc -b"
   },
   "keywords": [],
   "author": "",
@@ -22,7 +22,9 @@
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
+    "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
+    "chromadb": "^3.0.17",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
