@@ -1,12 +1,12 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useState, type FormEvent } from 'react';
 import { Mail, Lock, User, ArrowRight } from 'lucide-react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
-    useEffect(()=>{
-
-    },[])
-  const [isLogin, setIsLogin] = useState(true);
+  const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(false);
     const [formData,setFormData] = useState({
         username: "",
         email: "",
@@ -19,22 +19,51 @@ const Signup = () => {
   };
 const handleSignup = async(e: FormEvent<HTMLFormElement>) =>{
       e.preventDefault();
-      console.log("FormData: ",formData);
-    const response = await axios.post('http://localhost:5000/api/v1/signup',
-        {
-            username: formData.username,
-            email:formData.email,
-            password:formData.password
-        },
-        {
-            headers:{
-                'Content-Type':'application/json'
-            }
-        }
-    );
-    console.log(response.data);
-    if(!response) {
+    if(!isLogin) {
         
+        try{
+            const response:any = await axios.post('http://localhost:5000/api/v1/signup',
+            {
+                username: formData.username,
+                email:formData.email,
+                password:formData.password
+            },
+            {
+                headers:{
+                    'Content-Type':'application/json'
+                }
+            },
+            );
+            toast.success(response.data)
+            
+        }catch(err:any) {
+            console.log(err);
+            toast.error(err?.response?.data?.message)
+        }
+        
+    } else {
+        try{
+            const response = await axios.post('http://localhost:5000/api/v1/login',
+            {
+                email:formData.email,
+                password:formData.password
+            },
+            {
+              withCredentials:true,
+                headers:{
+                    'Content-Type':'application/json'
+                }
+            }
+            );
+            console.log(response.data);
+            toast.success('Login Successfull')
+            setTimeout(()=>{
+              navigate('/home/dashboard')
+            },1000)
+        }catch(err:any) {
+            console.log(err);
+            toast.error(err?.response?.data?.message)
+        }
     }
   }
 
@@ -52,12 +81,12 @@ const handleSignup = async(e: FormEvent<HTMLFormElement>) =>{
             <div className="relative z-10 text-center">
               <div className="mb-8">
                 <h2 className="text-4xl font-bold mb-4">
-                  {isLogin ? 'Hello, Friend!' : 'Welcome Aboard!'}
+                  {isLogin ? 'Hello, Friend!' : 'Welcome !!!!'}
                 </h2>
                 <p className="text-lg text-white/90 max-w-md mx-auto leading-relaxed">
                   {isLogin 
-                    ? 'Start your journey with us today. Access powerful features designed for success.' 
-                    : 'Join thousands of users who trust us. Your adventure begins here.'}
+                    ? 'Reconnect with your thoughts, bookmarks, and ideas.' 
+                    : 'Stop DM’ing yourself links. I got you this.. heheh'}
                 </p>
               </div>
 
@@ -73,15 +102,15 @@ const handleSignup = async(e: FormEvent<HTMLFormElement>) =>{
               <div className="mt-12 space-y-3">
                 <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4">
                   <div className="w-3 h-3 bg-green-400 rounded-full"></div>
-                  <span className="text-sm">Secure & Encrypted</span>
+                  <span className="text-sm">Bookmark your tweet,yt links etc...</span>
                 </div>
                 <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4">
                   <div className="w-3 h-3 bg-blue-400 rounded-full"></div>
-                  <span className="text-sm">24/7 Support</span>
+                  <span className="text-sm">Clean Ui Minimalistic vibes</span>
                 </div>
                 <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-xl p-4">
                   <div className="w-3 h-3 bg-purple-400 rounded-full"></div>
-                  <span className="text-sm">Fast & Reliable</span>
+                  <span className="text-sm">Implemented Elastic search</span>
                 </div>
               </div>
             </div>
@@ -144,7 +173,7 @@ const handleSignup = async(e: FormEvent<HTMLFormElement>) =>{
               {isLogin && (
                 <div className="flex items-center justify-between text-sm">
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-gray-600 focus:ring-gray-500" />
+                    <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-gray-600 focus:ring-gray-500 accent-gray-900" />
                     <span className="text-gray-600">Remember me</span>
                   </label>
                   <a href="#" className="text-gray-600 hover:text-gray-700 font-medium">

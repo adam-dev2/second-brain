@@ -1,6 +1,25 @@
-import { NavLink } from "react-router-dom"
+import { NavLink, useNavigate } from "react-router-dom"
 import {LogOut} from 'lucide-react'
+import axios from "axios"
+import toast from "react-hot-toast"
 const Sidebar = () => {
+    const navigate = useNavigate()
+    const handleLogout = async() => {
+        try{
+            const res = await axios.get('http://localhost:5000/api/v1/logout',{
+                withCredentials:true,
+            headers:{
+                'Content-Type':'application/json'
+            }
+            })
+            console.log(res?.data);
+            navigate('/')
+            toast.success('Logged out successfully')
+        }catch(err) {
+            console.log(err);
+            toast.error('Failed to logout')
+        }
+    }
     const links = [
         {path: "/home/dashboard", label: "Dashboard"},
         {path: "/home/cards", label: "Cards"},
@@ -28,7 +47,7 @@ const Sidebar = () => {
             ))}
         </nav>
         <div className="fixed bottom-4 w-56">
-            <button className="flex gap-3 justify-center px-5 text-gray-100 p-3 rounded-2xl border border-gray-600 text-md w-full cursor-pointer hover:scale-102 transition">
+            <button onClick={handleLogout} className="flex gap-3 justify-center px-5 text-gray-100 p-3 rounded-2xl border border-gray-600 text-md w-full cursor-pointer hover:scale-102 transition">
                 <span className="p-0">Logout</span>
                 <LogOut className="my-auto" />
             </button>

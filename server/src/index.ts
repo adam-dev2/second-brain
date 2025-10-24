@@ -13,6 +13,7 @@ import { ConnectQdrant } from './config/QdrantConfig.js';
 import { getEmbedding } from './config/embeddings.js';
 import { COLLECTION_NAME, qdrantClient } from './utils/qDrant.js';
 import {v4 as uuidv4} from 'uuid'
+import cors from 'cors'
 
 const app = express();
 dotenv.config();
@@ -26,12 +27,22 @@ interface CookieOptions {
     sameSite: 'strict'|'lax'|'none';
 }
 app.use(express.json());
+app.use(cors({
+    origin:"http://localhost:5173",
+    credentials:true
+}))
 app.post('/api/v1/signup',async (req,res) => {
-    const {username,email,password} = signupSchema.parse(req.body);
-    
+    const validation = signupSchema.safeParse(req.body);
+    if(!validation) {
+        return res.status(400)
+    }
+    const username = validation.data?.username;
+    const email = validation.data?.email;
+    const password = validation.data?.password;
     if(!username || !email || !password) {
         return res.status(411).json({message: 'All feilds are required'});
     }
+    
     try{
         let findUser = await User.findOne({email});
         if(findUser) {
@@ -57,7 +68,12 @@ app.post('/api/v1/signup',async (req,res) => {
 })
 
 app.post('/api/v1/login',async (req,res) => {
-    const {email,password} = loginSchema.parse(req.body);
+    const validation = loginSchema.safeParse(req.body);
+    if(!validation) {
+        return res.status(400)
+    }
+    const email = validation.data?.email;
+    const password = validation.data?.password;
     if(!email || !password) {
         return res.status(411).json({message: 'All Fields are required'});
     }
@@ -83,10 +99,10 @@ app.post('/api/v1/login',async (req,res) => {
             {expiresIn:'1h'}
         )
         const cookieOptions:CookieOptions = {
-            httpOnly: true,
+            httpOnly: false,
             secure: process.env.NODE_ENV === 'production',
             maxAge: 60*60*1000,
-            sameSite:process.env.NODE_ENV === 'production'?'strict':'lax'
+            sameSite:process.env.NODE_ENV === 'production'?'none':'lax'
         }
         res.cookie('token',token,cookieOptions);
         res.status(200).json({message:'Logged in successfully',token});
@@ -108,7 +124,6 @@ app.post('/api/v1/login',async (req,res) => {
 app.post('/api/v1/card',AuthMiddleware,async(req,res) => {
     const {link,title,type,share} = req.body;
     const tags = req.body.tags;
-    const qdrantID = uuidv4();
     if(!tags || !link || !title || !type) {
         return res.status(400).json({message:"All fields are important"});
     }
@@ -117,10 +132,30 @@ app.post('/api/v1/card',AuthMiddleware,async(req,res) => {
         if(!userID) {
             return res.status(401).json({message:"Unauthorized"});
         }
-        console.log(tags);
+        const qdrantID = uuidv4();
+        const embeddings = await getEmbedding(title);
+
+        await qdrantClient.upsert(COLLECTION_NAME,{
+            wait: true,
+            points:[
+                {
+                    id:qdrantID,
+                    vector:embeddings,
+                    payload:{
+                        userId: userID,
+                        title:title,
+                        link:title,
+                        type:type,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    },
+                },
+            ],
+        });
         
         const newCard = new Content({
             userId:userID,
+            cardId:qdrantID,
             link,
             title,
             type,
@@ -131,25 +166,8 @@ app.post('/api/v1/card',AuthMiddleware,async(req,res) => {
         })
         await newCard.save();
         console.log(`Storing Card title: ${newCard.title}`);
-        const embeddings = await getEmbedding(newCard.title);
-        console.log(embeddings);
-        await qdrantClient.upsert(COLLECTION_NAME,{
-            wait: true,
-            points:[
-                {
-                    id:qdrantID,
-                    vector:embeddings,
-                    payload:{
-                        userId: newCard.userId,
-                        title:newCard.title,
-                        link:newCard.title,
-                        type:newCard.type,
-                        createdAt: new Date().toISOString()
-                    },
-                },
-            ],
-        });
         console.log(`Card Stored successfully with ID: ${newCard.id}`);
+        
         return res.status(201).json({message:'Card created successfully',card:newCard});
     }catch(err){
         return res.status(500).json({error: 'Internal Server Error',err})
@@ -164,6 +182,38 @@ app.put('/api/v1/editCard/:id',AuthMiddleware,async(req,res) => {
         if(!findCard) {
             return res.status(404).json({message: 'Card with that id not found'});
         }
+        if(findCard.title != title){
+            const cardId: any = findCard.cardId;
+            const newTitleEmbeddings = await getEmbedding(title);
+            const updateExisting = await qdrantClient.retrieve(COLLECTION_NAME,{
+                ids:[cardId],
+                with_payload:true
+            })
+
+            if(updateExisting.length === 0) {
+                return res.status(404).json({message: 'Card not found'});
+            }
+
+            const updatePayload = updateExisting[0]?.payload;
+            await qdrantClient.upsert(COLLECTION_NAME,{
+                wait:true,
+                points:[
+                    {
+                        id:cardId,
+                        vector: newTitleEmbeddings,
+                        payload: {
+                            ...updatePayload,
+                            title,
+                            link,
+                            tags,
+                            updatedAt: new Date().toISOString()
+                        }
+                    }
+                ]
+            });
+
+            console.log(`Card updated Successfully ${cardId}`);
+        }
         const updateCard = await Content.findByIdAndUpdate(id,{
             link,
             title,
@@ -175,6 +225,33 @@ app.put('/api/v1/editCard/:id',AuthMiddleware,async(req,res) => {
         return res.status(200).json({message:"Updated card successfully",updateCard});
     }catch(err) {
         return res.status(500).json({message:'Internal Server Error'});
+    }
+})
+
+app.post('/api/v1/query',AuthMiddleware,async(req,res) => {
+    const {query} = req.body
+    if(!query) {
+        return res.status(400).json({message: "query shouldn't be empty"})
+    }
+    try {
+        const queryEmbeddings = await getEmbedding(query);
+        const searchResutls = await qdrantClient.search(COLLECTION_NAME,{
+            vector: queryEmbeddings,
+            limit:3
+        });
+
+        console.log(`Nearest Cards: ${searchResutls}`);
+        searchResutls.forEach((res) =>{
+            console.log({
+                id:res.id,
+                score:res.score,
+                payload:res.payload
+            });
+            
+        })
+        return res.status(200).json({searchResutls})
+    }catch(err){
+        return res.status(500).json({error: 'Internal Server Error',err})
     }
 })
 
@@ -246,12 +323,12 @@ app.delete('/api/v1/content/:id',async(req,res) => {
     }
 })
 
-app.post('/api/v1/logout',(req,res) => {
+app.get('/api/v1/logout',(req,res) => {
     try{
        res.clearCookie('token',{
-            httpOnly: true,
+            httpOnly: false,
             secure: process.env.NODE_ENV === 'production', 
-            sameSite: 'strict',
+            sameSite: 'none',
         })
         return res.status(200).json({ message: 'Logged out successfully' });
     }catch(err){
@@ -259,32 +336,7 @@ app.post('/api/v1/logout',(req,res) => {
     }
 })
 
-app.post('/api/v1/query',AuthMiddleware,async(req,res) => {
-    const {query} = req.body
-    if(!query) {
-        return res.status(400).json({message: "query shouldn't be empty"})
-    }
-    try {
-        const queryEmbeddings = await getEmbedding(query);
-        const searchResutls = await qdrantClient.search(COLLECTION_NAME,{
-            vector: queryEmbeddings,
-            limit:3
-        });
 
-        console.log(`Nearest Cards: ${searchResutls}`);
-        searchResutls.forEach((res) =>{
-            console.log({
-                id:res.id,
-                score:res.score,
-                payload:res.payload
-            });
-            
-        })
-        return res.status(200).json({searchResutls})
-    }catch(err){
-        return res.status(500).json({error: 'Internal Server Error',err})
-    }
-})
 
 app.listen(process.env.PORT,() => {
     console.log(`Listening on port: ${process.env.PORT}`);

@@ -7,7 +7,6 @@ export const ConnectQdrant = async() => {
         const exists = collections.collections.some((col) => {
             col.name === COLLECTION_NAME
         });
-        console.log(exists);
         
         if(!exists) {
             console.log(`Collection ${COLLECTION_NAME} already exists`);

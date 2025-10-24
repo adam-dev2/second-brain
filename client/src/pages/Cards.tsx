@@ -1,8 +1,37 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Card from "../components/Card"
 import {Share2,Plus} from'lucide-react'
+import axios from "axios"
+import toast from "react-hot-toast"
+import Cookies from 'js-cookie'
 
 const Cards = () => {
+  const [allCards,setAllCards] = useState<any>([]);
+  useEffect(()=>{
+    const fetchCards = async() => {
+      try{
+        const token = Cookies.get('token');
+        console.log(token);
+        
+        if(!token) {
+          toast.error('Token not found')
+          return;
+        }
+        let res = await axios.get('http://localhost:5000/api/v1/cards',{
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type':'application/json'
+          }
+        });
+        setAllCards(res.data);
+        toast.success('Fetched all cards successfully');
+      }catch(err) {
+        console.error(err);
+        toast.error('Failed to fetch cards')
+      }
+    }
+    fetchCards();
+  },[])
   const content =[
     {
       "link": "https://google.com",
