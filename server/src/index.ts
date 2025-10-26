@@ -258,6 +258,8 @@ app.post('/api/v1/query',AuthMiddleware,async(req,res) => {
 app.get('/api/v1/cards',AuthMiddleware,async(req,res) => {
     try{
         const userID = req.user?.id;
+        console.log(userID);
+        
         if (!userID) {
             return res.status(401).json({ message: "Unauthorized" });
         }
@@ -310,7 +312,7 @@ app.get('/api/v1/brain/:shareLink',async(req,res) => {
     }
 })
 
-app.delete('/api/v1/content/:id',async(req,res) => {
+app.delete('/api/v1/content/:id',AuthMiddleware,async(req,res) => {
     const {id} = req.params;
     try{
         const findCard = await Content.findByIdAndDelete(id);

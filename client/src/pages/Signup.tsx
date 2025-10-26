@@ -1,18 +1,21 @@
 import { useState, type FormEvent } from 'react';
-import { Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight,EyeOff,Eye } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [toggle,setToggle] = useState(false)
   const [isLogin, setIsLogin] = useState(false);
     const [formData,setFormData] = useState({
         username: "",
         email: "",
         password: ""
     })
-
+    const handleToggle = () => {
+      setToggle(toggle => !toggle)
+    }
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -164,10 +167,17 @@ const handleSignup = async(e: FormEvent<HTMLFormElement>) =>{
                     value={formData.password}
                     name='password'
                     onChange={handleChange}
-                    type="password"
+                    type={toggle?'text':'password'}
                     placeholder="Password"
                     className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl focus:border-gray-500 focus:bg-white transition-all outline-none text-gray-900 placeholder:text-gray-400"
                 />
+                <button
+                  type="button"
+                  onClick={handleToggle}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                >
+                  {toggle ? <EyeOff className="w-5 h-5 cursor-pointer" /> : <Eye className="w-5 h-5 cursor-pointer" />}
+                </button>
               </div>
 
               {isLogin && (

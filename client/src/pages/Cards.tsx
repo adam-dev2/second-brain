@@ -4,14 +4,25 @@ import {Share2,Plus} from'lucide-react'
 import axios from "axios"
 import toast from "react-hot-toast"
 import Cookies from 'js-cookie'
+import AddCard from "../components/AddCard"
+import { useRecoilValue, useSetRecoilState } from "recoil"
+import { modalAtom } from "../store/atoms/modal"
+import { allcardsAtom } from "../store/atoms/allcards"
 
 const Cards = () => {
-  const [allCards,setAllCards] = useState<any>([]);
+  const allCards = useRecoilValue(allcardsAtom)
+  const setAllCards = useSetRecoilState(allcardsAtom)
+  const modal = useRecoilValue(modalAtom);
+  const setModal = useSetRecoilState(modalAtom);
+  
+  const handleClick = () => {
+    setModal(prev=>!prev)
+  }
+  
   useEffect(()=>{
     const fetchCards = async() => {
       try{
         const token = Cookies.get('token');
-        console.log(token);
         
         if(!token) {
           toast.error('Token not found')
@@ -23,7 +34,11 @@ const Cards = () => {
             'Content-Type':'application/json'
           }
         });
-        setAllCards(res.data);
+        
+        setAllCards(res.data.cards);
+        // Log the fetched data directly instead of state
+        // console.log(res.data.cards);
+        
         toast.success('Fetched all cards successfully');
       }catch(err) {
         console.error(err);
@@ -31,193 +46,13 @@ const Cards = () => {
       }
     }
     fetchCards();
-  },[])
-  const content =[
-    {
-      "link": "https://google.com",
-      "title": "How to train a neural network from scratch",
-      "type": "google",
-      "tags": [
-      "engine",
-      "google",
-      "search"
-      ],
-      "share": true,
-      "embedding": [],
-      "createdAt": {
-      "date": "2025-10-23 12:40"
-      },
-      "updatedAt": {
-      "date": "2025-10-23 12:40"
-      }
-      },
-      {
-      "link": "https://google.com",
-      "title": "Understanding deep learning and backpropagation",
-      "type": "google",
-      "tags": [
-      "engine",
-      "google",
-      "search"
-      ],
-      "share": true,
-      "embedding": [],
-      "createdAt": {
-      "date": "2025-10-23 12:40" 
-      },
-      "updatedAt": {
-      "date": "2025-10-23 12:40" 
-      }
-      },
-      {
-      "link": "https://google.com",
-      "title": "Tips for improving your JavaScript performance",
-      "type": "google",
-      "tags": [
-      "engine",
-      "google",
-      "search"
-      ],
-      "share": true,
-      "embedding": [],
-      "createdAt": {
-      "date": "2025-10-23 12:40" 
-      },
-      "updatedAt": {
-      "date": "2025-10-23 12:40" 
-      }
-      },
-      {
-      "link": "https://google.com",
-      "title": "How to debug a React application effectively",
-      "type": "google",
-      "tags": [
-      "engine",
-      "google",
-      "search"
-      ],
-      "share": true,
-      "embedding": [],
-      "createdAt": {
-      "date": "2025-10-23 12:40" 
-      },
-      "updatedAt": {
-      "date": "2025-10-23 12:40" 
-      }
-      },
-      {
-      "link": "https://google.com",
-      "title": "The best techniques for semantic text search",
-      "type": "google",
-      "tags": [
-      "engine",
-      "google",
-      "search"
-      ],
-      "share": true,
-      "embedding": [],
-      "createdAt": {
-      "date": "2025-10-23 12:40"
-      },
-      "updatedAt": {
-      "date": "2025-10-23 12:40"
-      }
-      },
-      {
-      "link": "https://google.com",
-      "title": "Difference between supervised and unsupervised learning",
-      "type": "google",
-      "tags": [
-      "engine",
-      "google",
-      "search"
-      ],
-      "share": true,
-      "embedding": [],
-      "createdAt": {
-      "date": "2025-10-23 12:40" 
-      },
-      "updatedAt": {
-      "date": "2025-10-23 12:40" 
-      }
-      },
-      {
-      "link": "https://google.com",
-      "title": "Building a REST API using Node.js and Express",
-      "type": "google",
-      "tags": [
-      "engine",
-      "google",
-      "search"
-      ],
-      "share": true,
-      "embedding": [],
-      "createdAt": {
-      "date": "2025-10-23 12:40" 
-      },
-      "updatedAt": {
-      "date": "2025-10-23 12:40" 
-      }
-      },
-      {
-      "link": "https://google.com",
-      "title": "Introduction to vector databases and embeddings",
-      "type": "google",
-      "tags": [
-      "engine",
-      "google",
-      "search"
-      ],
-      "share": true,
-      "embedding": [],
-      "createdAt": {
-      "date": "2025-10-23 12:40" 
-      },
-      "updatedAt": {
-      "date": "2025-10-23 12:40" 
-      }
-      },
-      {
-      "link": "https://google.com",
-      "title": "How to blueuce memory usage in Python applications",
-      "type": "google",
-      "tags": [
-      "engine",
-      "google",
-      "search"
-      ],
-      "share": true,
-      "embedding": [],
-      "createdAt": {
-      "date": "2025-10-23 12:40"
-      },
-      "updatedAt": {
-      "date": "2025-10-23 12:40"
-      }
-      },
-      {
-      "link": "https://google.com",
-      "title": "A guide to scaling MongoDB for large datasets",
-      "type": "google",
-      "tags": [
-      "engine",
-      "google",
-      "search"
-      ],
-      "share": true,
-      "embedding": [],
-      "createdAt": {
-      "date": "2025-10-23 12:40"
-      },
-      "updatedAt": {
-      "date": "2025-10-23 12:40"
-      }
-      }
-  ]
+  },[setAllCards]) // Added setAllCards to dependencies
+
   const [search,setSearch] = useState('');
   const handleSearch = (e: any) => {
     setSearch(e.target.value)
   }
+  
   return (
     <>
       <div className="h-full w-full p-9">
@@ -228,7 +63,7 @@ const Cards = () => {
           <div className="flex items-center gap-3">
             <input value={search} type="text" className="border rounded-2xl bg-gray-50 p-2 outline-none placeholder:opacity-45 w-xs focus-within:scale-103 transition" placeholder="eg: Title" onChange={handleSearch}/>
             <button className="p-2 bg-gray-700 text-lg font-semibold text-gray-50 hover:scale-104 transition cursor-pointer rounded-2xl z-10">Search</button>
-            <button className="cursor-pointer flex items-center gap-2 bg-blue-100 text-blue-700 font-medium rounded-full py-2 px-4 hover:bg-blue-200 hover:scale-[1.03] transition-all duration-200">
+            <button onClick={handleClick} className="cursor-pointer flex items-center gap-2 bg-blue-100 text-blue-700 font-medium rounded-full py-2 px-4 hover:bg-blue-200 hover:scale-[1.03] transition-all duration-200">
               <Plus size={20} />
               <span>Add Card</span>
             </button>
@@ -239,20 +74,22 @@ const Cards = () => {
           </div>
         </div>
         <div className="grid lg:grid-cols-2 grid-cols-3 sm:grid-cols-1 gap-3">
-          {content.map((item)=>{
+          {Array.isArray(allCards) && allCards.map((item,idx)=>{
               return (
               <Card 
+                key={idx} 
                 title={item.title} 
                 link={item.link} 
                 tags={item.tags} 
                 share={item.share} 
-                createdAt={item.createdAt.date} 
-                updatedAt={item.updatedAt.date}
+                createdAt={item.createdAt} 
+                updatedAt={item.updatedAt}
+                id={item._id}
               />
             )
           })}
         </div>
-
+        {modal && <AddCard />}
       </div>
     </>
   )
