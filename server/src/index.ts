@@ -86,7 +86,6 @@ app.post('/api/v1/login',async (req,res) => {
         if(!comparePassword) {
             return res.status(401).json({message: 'Invalid Credentials'});
         }
-        console.log(process.env.JWT_SECRET);
         if(!process.env.JWT_SECRET || !process.env.NODE_ENV) {
             return res.status(500).json({message:"There's a missing env objects"})
         }
@@ -105,7 +104,7 @@ app.post('/api/v1/login',async (req,res) => {
             sameSite:process.env.NODE_ENV === 'production'?'none':'lax'
         }
         res.cookie('token',token,cookieOptions);
-        res.status(200).json({message:'Logged in successfully',token});
+        res.status(200).json({message:'Logged in successfully'});
     }catch (err) {
         if (err instanceof ZodError) {
         return res.status(422).json({
@@ -124,8 +123,11 @@ app.post('/api/v1/login',async (req,res) => {
 app.post('/api/v1/card',AuthMiddleware,async(req,res) => {
     const {link,title,type,share} = req.body;
     const tags = req.body.tags;
-    if(!tags || !link || !title || !type) {
-        return res.status(400).json({message:"All fields are important"});
+    if(!link || !title || !type) {
+        return res.status(400).json({message:"All fields are required"});
+    }
+    if(tags.size === 0) {
+        return res.status(400).json({message: 'All fields are required'})
     }
     try{
         const userID = req.user?.id;
@@ -179,6 +181,8 @@ app.put('/api/v1/editCard/:id',AuthMiddleware,async(req,res) => {
         const {id} = req.params;
         const {link,title,share,tags} = req.body;
         const findCard = await Content.findById(id)
+        console.log(findCard,"tesing ");
+        
         if(!findCard) {
             return res.status(404).json({message: 'Card with that id not found'});
         }
@@ -289,7 +293,7 @@ app.get('/api/v1/brain/share',AuthMiddleware,async(req,res) => {
         })
         console.log(updateUser);
         
-        return res.status(200).json({message:'Sharelink Generated Successfully',ShareableLink:`/api/v1/brain/${shareHash}`})
+        return res.status(200).json({message:'Sharelink Generated Successfully',ShareableLink:`${shareHash}`})
     }catch(err){
         return res.status(500).json({error: 'Internal Server Error',err})
     }
@@ -306,6 +310,11 @@ app.get('/api/v1/brain/:shareLink',async(req,res) => {
             return res.status(404).json({message:"Can't find user"});
         }
         const findCards = await Content.find({userId:findUser.id,share:true})
+        res.clearCookie('token',{
+            httpOnly: false,
+            secure: process.env.NODE_ENV === 'production', 
+            sameSite: 'none',
+        })
         return res.status(200).json({ShareableCards: findCards});
     }catch(err){
         return res.status(500).json({error: 'Internal Server Error',err})

@@ -4,6 +4,10 @@ import Cookies from 'js-cookie'
 import toast from 'react-hot-toast'
 import { useRecoilValue, useSetRecoilState } from 'recoil'
 import { allcardsAtom } from '../store/atoms/allcards'
+import { formdataAtom } from '../store/atoms/formData'
+import { modalAtom } from '../store/atoms/modal'
+import { editCardAtom } from '../store/atoms/editcard'
+import { loadingAtom } from "../store/atoms/loading";
 
 interface Iprops {
     title:string
@@ -17,11 +21,38 @@ interface Iprops {
 const Card = (props:Iprops) => {
   const allCards = useRecoilValue(allcardsAtom);
   const setAllCards = useSetRecoilState(allcardsAtom);
+  const setFormdata = useSetRecoilState(formdataAtom);
+  const setModal = useSetRecoilState(modalAtom);
+  const setEditCardId = useSetRecoilState(editCardAtom);
+   const loading = useRecoilValue(loadingAtom)
+    const setLoading = useSetRecoilState(loadingAtom)
+
   const handleEdit = async() => {
+    const findCard = allCards.find(item => item._id === props.id);
+    if (findCard) {
+      setFormdata(prev => ({
+        ...prev,
+        title: findCard.title,
+        link: findCard.link,
+        tags: findCard.tags,
+        type:findCard.type,
+        share: findCard.share,
+        heading:'Edit Card',
+        button:'Save Details'
+      }));
+    }
     
+    setModal(prev => !prev);
+    setEditCardId(props.id)
   }
+
   const handleDelete = async() => {
     const token = Cookies.get('token')
+    if(!token) {
+      toast.error('No Token Found');
+      return;
+    }
+    setLoading(true)
     try{
       await axios.delete(`http://localhost:5000/api/v1/content/${props.id}`,{
       withCredentials:true,
@@ -35,6 +66,8 @@ const Card = (props:Iprops) => {
     }catch(err:any) {
       console.log(err.response.message);
       toast.error(err.response.message)
+    } finally {
+      setLoading(false)
     }
   }
   return (
@@ -81,11 +114,11 @@ const Card = (props:Iprops) => {
       <div className="flex justify-between items-center text-xs text-gray-500 pt-3 border-t border-gray-100">
         <span className="flex items-center gap-1.5">
           <span className="font-medium">Created:</span>
-          <span>{props.createdAt.slice(0,11)}</span>
+          <span>{props.createdAt.slice(0,10)}</span>
         </span>
         <span className="flex items-center gap-1.5">
           <span className="font-medium">Updated:</span>
-          <span>{props.updatedAt.slice(0,11)}</span>
+          <span>{props.updatedAt.slice(0,10)}</span>
         </span>
       </div>
     </div>

@@ -5,6 +5,7 @@ export interface Card {
   link: string;
   tags: string[];
   share: boolean;
+  type:string;
   createdAt: string;
   updatedAt: string;
 }

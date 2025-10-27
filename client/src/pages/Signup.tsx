@@ -3,11 +3,15 @@ import { Mail, Lock, User, ArrowRight,EyeOff,Eye } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { loadingAtom } from "../store/atoms/loading";
 
 const Signup = () => {
   const navigate = useNavigate();
   const [toggle,setToggle] = useState(false)
   const [isLogin, setIsLogin] = useState(false);
+  const loading = useRecoilValue(loadingAtom)
+  const setLoading = useSetRecoilState(loadingAtom)
     const [formData,setFormData] = useState({
         username: "",
         email: "",
@@ -42,6 +46,8 @@ const handleSignup = async(e: FormEvent<HTMLFormElement>) =>{
         }catch(err:any) {
             console.log(err);
             toast.error(err?.response?.data?.message)
+        } finally{
+          setLoading(false)
         }
         
     } else {
@@ -66,6 +72,8 @@ const handleSignup = async(e: FormEvent<HTMLFormElement>) =>{
         }catch(err:any) {
             console.log(err);
             toast.error(err?.response?.data?.message)
+        } finally{
+          setLoading(false)
         }
     }
   }

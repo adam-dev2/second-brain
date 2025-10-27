@@ -1,24 +1,35 @@
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useState, type FormEvent, type KeyboardEvent } from "react";
+import { useEffect, useState, type FormEvent, type KeyboardEvent } from "react";
 import { ArrowRight, X } from "lucide-react";
 import Cookies from "js-cookie";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { modalAtom } from "../store/atoms/modal";
 import { allcardsAtom } from "../store/atoms/allcards";
 import { formdataAtom } from "../store/atoms/formData";
-
+import { editCardAtom } from "../store/atoms/editcard";
+import { loadingAtom } from "../store/atoms/loading";
+import Loading from "./Loading";
 
 const AddCard = () => {
-  const formData = useRecoilValue(formdataAtom)
-  const setFormData = useSetRecoilState(formdataAtom)
-  const [domainName,setDomainName] = useState<string | null>(null)
+  const formData = useRecoilValue(formdataAtom);
+  const setFormData = useSetRecoilState(formdataAtom);
+  const [domainName, setDomainName] = useState<string | null>(null);
   const [tagInput, setTagInput] = useState("");
   const modal = useRecoilValue(modalAtom);
   const setModal = useSetRecoilState(modalAtom);
   const allCards = useRecoilValue(allcardsAtom);
   const setAllCards = useSetRecoilState(allcardsAtom);
-  
+  const editCardId = useRecoilValue(editCardAtom); 
+  const loading = useRecoilValue(loadingAtom)
+  const setLoading = useSetRecoilState(loadingAtom)
+
+  useEffect(()=>{
+    if(formData.link) {
+      setDomainName(getDomainName(formData.link))
+    }
+  },[formData.link])
+
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && tagInput.trim() !== "") {
       e.preventDefault();
@@ -43,27 +54,30 @@ const AddCard = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    if (name === 'link') {
+    if (name === "link") {
       setDomainName(getDomainName(value));
     }
   };
 
-  const getDomainName = (url:string): string|null => {
+  const getDomainName = (url: string): string | null => {
     try {
-      const urlWithProtocol = url.startsWith('http') ? url : `https://${url}`;
+      const urlWithProtocol = url.startsWith("http") ? url : `https://${url}`;
       const hostname = new URL(urlWithProtocol).hostname;
 
-      const match = hostname.match(/(?:www\.)?([^.]+)\.(com|org|net|io|co|edu|gov|tv|me|ai|dev|app)/);
-      
-      return match ? match[1] : hostname.split('.')[0];
+      const match = hostname.match(
+        /(?:www\.)?([^.]+)\.(com|org|net|io|co|edu|gov|tv|me|ai|dev|app)/
+      );
+
+      return match ? match[1] : hostname.split(".")[0];
     } catch {
       return null;
     }
-  }
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const token = Cookies.get('token');
+    const token = Cookies.get("token");
+    setLoading(true)
     try {
       const response = await axios.post(
         "http://localhost:5000/api/v1/card",
@@ -72,38 +86,114 @@ const AddCard = () => {
           link: formData.link,
           tags: formData.tags,
           share: formData.share,
-          type:domainName
+          type: domainName,
         },
         {
           withCredentials: true,
           headers: {
-            'Authorization':`Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         }
       );
-      console.log(response.data.card);
-      const newCard :any = response?.data?.card
-      setAllCards([...allCards,newCard]);
+      
+      const newCard: any = response?.data?.card;
+      setAllCards([...allCards, newCard]);
       toast.success("Card saved successfully!");
-      setFormData({ title: "", link: "", tags: [], share: false });
-      setModal(!modal)
+      setFormData({
+        title: "",
+        link: "",
+        tags: [],
+        share: false,
+        type: "",
+        heading: "Add Card",
+        button: "Save Card",
+      });
+      setModal(!modal);
     } catch (err: any) {
       console.log(err);
       toast.error(err?.response?.data?.message || "Failed to save card");
+    } finally{
+      setLoading(false)
+    }
+  };
+
+  const handleEditSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const token = Cookies.get("token");
+    setLoading(true)
+    try {
+      const response = await axios.put(
+        `http://localhost:5000/api/v1/editCard/${editCardId}`,
+        {
+          title: formData.title,
+          link: formData.link,
+          tags: formData.tags,
+          share: formData.share,
+          type: domainName,
+        },
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log("Edit response:", response.data);
+      const updatedCard = response.data.updateCard || response.data;
+      console.log(updatedCard);
+      const res = await axios.get('http://localhost:5000/api/v1/cards', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      setAllCards(res.data.cards);
+      toast.success("Card updated successfully!");
+      setFormData({
+        title: "",
+        link: "",
+        tags: [],
+        share: false,
+        type: "",
+        heading: "Add Card",
+        button: "Save Card",
+      });
+      setModal(false);
+    } catch (err: any) {
+      console.log("Edit error:", err.response);
+      toast.error(err?.response?.data?.message || "Failed to update card");
+    } finally {
+      setLoading(false)
     }
   };
 
   return (
     <div>
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                      bg-gray-50 backdrop-blur-2xl w-96 p-6 rounded-xl shadow-lg border border-gray-400">
-          <button className="cursor-pointer text-end z-10 w-full flex justify-end m-0" onClick={() => {setModal(!modal)}}><X className="hover:scale-105 transition" size={20}/></button>
+      {loading?<Loading />:
+      <div
+        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
+                      bg-gray-50 backdrop-blur-2xl w-96 p-6 rounded-xl shadow-lg border border-gray-400"
+      >
+        <button
+          className="cursor-pointer text-end z-10 w-full flex justify-end m-0"
+          onClick={() => {
+            setModal(!modal);
+          }}
+        >
+          <X className="hover:scale-105 transition" size={20} />
+        </button>
         <div className="text-center text-gray-900 mb-4 flex">
-          <h1 className="flex-1 text-2xl font-semibold">Add Card</h1>
+          <h1 className="flex-1 text-2xl font-semibold">{formData.heading}</h1>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form
+          onSubmit={formData.heading === "Add Card" ? handleSubmit : handleEditSubmit}
+          className="space-y-5"
+        >
           {/* Title */}
           <div className="relative">
             <input
@@ -128,11 +218,11 @@ const AddCard = () => {
               className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl 
                          focus:border-gray-500 focus:bg-white transition-all outline-none text-gray-900"
             />
-             {domainName && (
-                <p className="text-sm text-gray-600 mt-1">
-                  Domain: <span className="font-semibold text-gray-800">{domainName}</span>
-                </p>
-              )}
+            {domainName && (
+              <p className="text-sm text-gray-600 mt-1">
+                Domain: <span className="font-semibold text-gray-800">{domainName}</span>
+              </p>
+            )}
           </div>
 
           {/* Share Toggle */}
@@ -192,11 +282,12 @@ const AddCard = () => {
                        text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:scale-[1.02] 
                        transition-all flex items-center justify-center gap-2 group"
           >
-            Save Card
+            {formData.button}
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
         </form>
       </div>
+}
     </div>
   );
 };
