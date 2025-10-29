@@ -8,7 +8,7 @@ export interface IContent extends Document {
     tags:string[];
     share:boolean;
     embedding?:number[];
-    cardId?:string;
+    cardId:string;
     createdAt:Date;
     updatedAt:Date;
 } 

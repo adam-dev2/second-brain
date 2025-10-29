@@ -77,6 +77,7 @@ const Tags = () => {
           ))}
         </div>
       </div>
+      {allCards.length === 0 && <p className="text-gray-500 text-sm text-center py-8">No tags, Creat your first card with relevant tags!!</p>}
     </div>
   );
 };

@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
+import Cookies from "js-cookie";
+import toast from "react-hot-toast";
 
 interface UserProfile {
   avatar: string | null;
@@ -9,10 +12,12 @@ interface UserProfile {
 }
 
 const Profile: React.FC = () => {
+
+
   const [user, setUser] = useState<UserProfile>({
     avatar: null,
-    username: "adam_smith",
-    email: "adam@example.com",
+    username: "",
+    email: "",
     password: "",
   });
 
@@ -21,18 +26,89 @@ const Profile: React.FC = () => {
     setUser((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () =>
-      setUser((prev) => ({ ...prev, avatar: reader.result as string }));
-    reader.readAsDataURL(file);
+  const handleSave = async() => {
+    console.log("Saving user profile:", user);
+    const token = Cookies.get("token");
+    console.log(token);
+    
+    try {
+      if (!token) {
+        toast.error("No token found. Please log in again.");
+        return;
+      }
+      const res = await axios.put(
+        `http://localhost:5000/api/v1/profile`,
+        {
+          username: user.username,
+          email: user.email,
+          password: user.password,
+        },
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(res);
+      
+      const userProfile = res.data.userProfile; 
+      console.log("Fetched user profile:", userProfile);
+
+      setUser((prevUser: any) => ({
+        ...prevUser,
+        ...userProfile,
+      }));
+
+      toast.success("User details updated successfully");
+    } catch (err: any) {
+      console.error("Error while updating user profile:", err);
+      toast.error(
+        err?.response?.data?.message ||
+          "Error while updating user profile"
+      );
+    }
   };
 
-  const handleSave = () => {
-    console.log("Saving user profile:", user);
+ useEffect(() => {
+  const fetchUser = async () => {
+    const token = Cookies.get("token");
+    if (!token) {
+      toast.error("No token found. Please log in again.");
+      return;
+    }
+
+    try {
+      const res = await axios.get("http://localhost:5000/api/v1/user", {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      const userProfile = res.data.userProfile; 
+      console.log("Fetched user profile:", userProfile);
+
+      setUser((prevUser: any) => ({
+        ...prevUser,
+        ...userProfile,
+      }));
+
+      toast.success("User details fetched successfully");
+    } catch (err: any) {
+      console.error("Error fetching user profile:", err);
+      toast.error(
+        err?.response?.data?.message ||
+          "Error while fetching user profile"
+      );
+    }
   };
+
+  fetchUser();
+}, [setUser]); 
+
 
   return (
     <>
@@ -51,24 +127,10 @@ const Profile: React.FC = () => {
           <div className="relative">
             <img
               src={
-                user.avatar ||
-                "https://ui-avatars.com/api/?name=Adam&background=E0E7FF&color=312E81"
-              }
+                user?.avatar ||
+                `https://ui-avatars.com/api/?name=${user.username.toLowerCase()}&background=E0E7FF&color=312E81`              }
               alt="avatar"
               className="w-28 h-28 rounded-full object-cover border-2 border-gray-200 shadow-sm"
-            />
-            <label
-              htmlFor="avatar-upload"
-              className="absolute bottom-1 right-1 bg-gray-600 text-white text-xs px-2 py-1 rounded-md cursor-pointer hover:bg-gray-700 transition"
-            >
-              Edit
-            </label>
-            <input
-              id="avatar-upload"
-              type="file"
-              accept="image/*"
-              onChange={handleAvatarChange}
-              className="hidden"
             />
           </div>
         </div>
@@ -82,7 +144,7 @@ const Profile: React.FC = () => {
             <input
               type="text"
               name="username"
-              value={user.username}
+              value={user?.username}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-100 focus:border-gray-400 outline-none transition"
             />
@@ -95,7 +157,7 @@ const Profile: React.FC = () => {
             <input
               type="email"
               name="email"
-              value={user.email}
+              value={user?.email}
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-100 focus:border-gray-400 outline-none transition"
             />
@@ -108,7 +170,7 @@ const Profile: React.FC = () => {
             <input
               type="password"
               name="password"
-              value={user.password}
+              value={user?.password}
               placeholder="••••••••"
               onChange={handleChange}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-100 focus:border-gray-400 outline-none transition"

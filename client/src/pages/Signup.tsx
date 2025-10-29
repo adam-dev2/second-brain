@@ -41,8 +41,8 @@ const handleSignup = async(e: FormEvent<HTMLFormElement>) =>{
                 }
             },
             );
-            toast.success(response.data)
-            
+            toast.success('Signed in Successfull')
+            setIsLogin(true)
         }catch(err:any) {
             console.log(err);
             toast.error(err?.response?.data?.message)

@@ -5,11 +5,11 @@ import App from './App.tsx'
 import { Toaster } from "react-hot-toast";
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
+  // <StrictMode>
     <>
       <App />
       <Toaster 
-        position='bottom-center'
+        position='top-center'
         toastOptions={{
           style: {
             background: "#333",
@@ -25,5 +25,5 @@ createRoot(document.getElementById('root')!).render(
 
       />,
     </>
-   </StrictMode>
+  //  </StrictMode>
 )

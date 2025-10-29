@@ -12,8 +12,13 @@ import { loadingAtom } from "../store/atoms/loading"
 import Loading from "../components/Loading"
 import { useNavigate } from "react-router-dom"
 import { sidebarAtom } from "../store/atoms/sidebar"
+import { searchModalAtom } from "../store/atoms/searchModal"
+import ShareModal from "../components/ShareModal"
+import { sharelink } from "../store/atoms/sharelink"
+import { hideIconAtom } from "../store/atoms/hideIcons"
 
 const Cards = () => {
+  const setShareLink = useSetRecoilState(sharelink)
   const allCards = useRecoilValue(allcardsAtom)
   const setAllCards = useSetRecoilState(allcardsAtom)
   const modal = useRecoilValue(modalAtom);
@@ -24,6 +29,9 @@ const Cards = () => {
   const [originalCards, setOriginalCards] = useState<any[]>([]);
   const navigate = useNavigate();
   const isOpen = useRecoilValue(sidebarAtom)
+  const searchModal = useRecoilValue(searchModalAtom)
+  const setSearchModal = useSetRecoilState(searchModalAtom)
+  const setHideIcons = useSetRecoilState(hideIconAtom)
 
   
   const handleClick = () => {
@@ -31,6 +39,8 @@ const Cards = () => {
   }
   
   useEffect(()=>{
+    console.log(searchModal);
+    setHideIcons(true);
     const fetchCards = async() => {
       const token = Cookies.get('token');
       setLoading(true);
@@ -92,7 +102,9 @@ const Cards = () => {
       )
       console.log(res.data.ShareableLink);
       toast.success('Shareable Link generated')
-      navigate(`/${res.data.ShareableLink}`);
+      setSearchModal(true)
+      setShareLink(`http://localhost:5173/${res.data.ShareableLink}`);
+      // navigate(`/${res.data.ShareableLink}`);
     }catch(err: any) {
       console.log(err.response.message);
       
@@ -123,7 +135,7 @@ const Cards = () => {
           </div>
         </div>
         <div className={`grid gap-3 ${isOpen ? "lg:grid-cols-2 xl:grid-cols-3 sm:grid-cols-1" : "md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-1"}`}>
-          {Array.isArray(allCards) && allCards.map((item,idx)=>{
+          {Array.isArray(allCards)&& allCards.map((item,idx)=>{
               return (
               <Card 
                 key={idx} 
@@ -139,6 +151,8 @@ const Cards = () => {
           })}
         </div>
         {modal && <AddCard/>}
+        {searchModal && <ShareModal />}
+        {allCards.length === 0 && <p className="text-gray-500 text-sm text-center py-8">No cards yet. Create your first card!</p>}
       </div>
       }
     </>

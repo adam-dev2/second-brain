@@ -5,7 +5,8 @@ export interface IUser extends Document {
     email: string,
     password: string,
     sharelink:string,
-    avatar?: string
+    avatar?: string,
+    updatedAt:string,
 }
 
 const userSchema = new Schema<IUser>({
@@ -13,7 +14,8 @@ const userSchema = new Schema<IUser>({
     email:{type:String,required: true},
     password:{type:String,required: true},  
     sharelink:{type:String},
-    avatar:{type:String}
+    avatar:{type:String},
+    updatedAt:{type:String}
 })
 
 const User = mongoose.model<IUser>('User',userSchema);

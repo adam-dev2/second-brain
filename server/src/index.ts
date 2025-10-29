@@ -20,6 +20,19 @@ dotenv.config();
 ConnectDB();
 ConnectQdrant();
 
+interface IAns {
+    id: string | Number;
+    score: Number;
+    payload?:
+    | {
+        userId: string;
+        title: string;
+      }
+    | Record<string, unknown>
+    | null
+    | undefined;
+}
+
 interface CookieOptions {
     httpOnly: boolean;
     secure: boolean;
@@ -27,10 +40,12 @@ interface CookieOptions {
     sameSite: 'strict'|'lax'|'none';
 }
 app.use(express.json());
+
 app.use(cors({
     origin:"http://localhost:5173",
     credentials:true
 }))
+
 app.post('/api/v1/signup',async (req,res) => {
     const validation = signupSchema.safeParse(req.body);
     if(!validation) {
@@ -51,7 +66,27 @@ app.post('/api/v1/signup',async (req,res) => {
         let hashedPassword = await bcrypt.hash(password,10);
         findUser = new User({username,email,password: hashedPassword});
         await findUser.save();
-        return res.status(201).json({message: 'User created successfully',username,email})
+        if(!process.env.JWT_SECRET || !process.env.NODE_ENV) {
+            return res.status(500).json({message:"There's a missing env objects"})
+        }
+        let token = jwt.sign(
+            {
+                id:findUser._id,
+                username:findUser.username
+            },
+            process.env.JWT_SECRET,
+            {expiresIn:'1h'}
+        )
+        const cookieOptions:CookieOptions = { 
+            httpOnly: false,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 60*60*1000,
+            sameSite:process.env.NODE_ENV === 'production'?'none':'lax'
+        }
+        console.log(token);
+        
+        res.cookie('token',token,cookieOptions);
+        res.status(201).json({message: 'User created successfully',username,email})
     } catch (err) {
     if (err instanceof ZodError) {
       return res.status(422).json({
@@ -97,7 +132,7 @@ app.post('/api/v1/login',async (req,res) => {
             process.env.JWT_SECRET,
             {expiresIn:'1h'}
         )
-        const cookieOptions:CookieOptions = {
+        const cookieOptions:CookieOptions = { 
             httpOnly: false,
             secure: process.env.NODE_ENV === 'production',
             maxAge: 60*60*1000,
@@ -120,149 +155,401 @@ app.post('/api/v1/login',async (req,res) => {
     }
 })
 
-app.post('/api/v1/card',AuthMiddleware,async(req,res) => {
-    const {link,title,type,share} = req.body;
-    const tags = req.body.tags;
-    if(!link || !title || !type) {
-        return res.status(400).json({message:"All fields are required"});
+app.get('/api/v1/user',AuthMiddleware,async(req,res) => {
+    const userId = req.user?.id;
+    if(!userId) {
+        return res.status(401).json({message:'UnAuthroized'});
     }
-    if(tags.size === 0) {
-        return res.status(400).json({message: 'All fields are required'})
-    }
-    try{
-        const userID = req.user?.id;
-        if(!userID) {
-            return res.status(401).json({message:"Unauthorized"});
+    try {
+        const findUser = await User.findById(userId);
+        if(!findUser) {
+            return res.status(404).json({message: 'No User Found'});
         }
+        let userProfile = {
+            username: findUser.username,
+            email:findUser.email,
+            avatar:findUser.avatar
+        }
+        res.status(200).json({userProfile:userProfile})
+    }catch(err) {
+        return res.status(500).json({message:'Internal Server Error',err})
+    }
+})
+
+app.put('/api/v1/profile',AuthMiddleware,async(req,res) => {
+    const userId = req.user?.id;
+    const {username,email,password,avatar} = req.body;
+    if(!userId) {
+        return res.status(401).json({message:'UnAuthroized'});
+    }
+    try {
+        const findUser = await User.findByIdAndUpdate(
+            userId,
+            {
+                username,
+                email,
+                password,
+                avatar,
+                updatedAt: new Date().toISOString()
+            }
+        )
+        let userProfile = {
+            username: findUser?.username,
+            email: findUser?.email
+        }
+        return res.status(200).json({message:"User profile updated successfully",userProfile:userProfile})
+    }catch(err) {
+        return res.status(500).json({message:'Internal Server Error',err})
+    }
+})
+
+app.get('/api/v1/metrics', AuthMiddleware, async (req, res) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        const now = new Date();
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay()); 
+        startOfWeek.setHours(0, 0, 0, 0);
+
+        const totalCards = await Content.countDocuments({ userId });
+        const cardsLastWeek = await Content.countDocuments({
+            userId,
+            createdAt: { $gte: fourteenDaysAgo.toISOString(), $lt: sevenDaysAgo.toISOString() }
+        });
+        const cardsThisWeek = await Content.countDocuments({
+            userId,
+            createdAt: { $gte: sevenDaysAgo.toISOString() }
+        });
+        const cardsBeforeLastWeek = totalCards - cardsThisWeek;
+        const cardsChangePercent = cardsBeforeLastWeek > 0 
+            ? Number(((cardsThisWeek / cardsBeforeLastWeek) * 100).toFixed(1))
+            : 0;
+        const allCards = await Content.find({ userId }, { tags: 1 });
+        const uniqueTags = new Set<string>();
+        allCards.forEach(card => {
+            card.tags?.forEach((tag: string) => uniqueTags.add(tag));
+        });
+        const totalTags = uniqueTags.size;
+        const oldCards = await Content.find({
+            userId,
+            createdAt: { $lt: sevenDaysAgo.toISOString() }
+        }, { tags: 1 });
+        const oldUniqueTags = new Set<string>();
+        oldCards.forEach(card => {
+            card.tags?.forEach((tag: string) => oldUniqueTags.add(tag));
+        });
+        const tagsChange = totalTags - oldUniqueTags.size;
+        const sharedCards = allCards.map((item) => item.share === true).length
+        console.log(sharedCards);
+        const aiSearches = sharedCards
+        const searchesChange = -3.2;
+        const weeklyActivity = [];
+        const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        
+        for (let i = 6; i >= 0; i--) {
+            const dayStart = new Date(now);
+            dayStart.setDate(now.getDate() - i);
+            dayStart.setHours(0, 0, 0, 0);
+            
+            const dayEnd = new Date(dayStart);
+            dayEnd.setHours(23, 59, 59, 999);
+            
+            const cardsCount = await Content.countDocuments({
+                userId,
+                createdAt: { 
+                    $gte: dayStart.toISOString(), 
+                    $lte: dayEnd.toISOString() 
+                }
+            });
+            
+            weeklyActivity.push({
+                day: days[dayStart.getDay()],
+                cards: cardsCount
+            });
+        }
+        const tagCount: { [key: string]: number } = {};
+        allCards.forEach(card => {
+            card.tags?.forEach((tag: string) => {
+                tagCount[tag] = (tagCount[tag] || 0) + 1;
+            });
+        });
+
+        const topTags = Object.entries(tagCount)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 5)
+            .map(([name, count], index) => {
+                const colors = [
+                    'bg-blue-500',
+                    'bg-yellow-500',
+                    'bg-green-500',
+                    'bg-purple-500',
+                    'bg-pink-500'
+                ];
+                return {
+                    name,
+                    count,
+                    color: colors[index]
+                };
+            });
+        const recentCards = await Content.find({ userId })
+            .sort({ createdAt: -1 })
+            .limit(5)
+            .select('title type tags createdAt link');
+
+        const formattedRecentCards = recentCards.map(card => {
+            const createdDate = new Date(card.createdAt);
+            const diffMs = now.getTime() - createdDate.getTime();
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+
+            let createdAt;
+            if (diffMins < 60) {
+                createdAt = `${diffMins} ${diffMins === 1 ? 'minute' : 'minutes'} ago`;
+            } else if (diffHours < 24) {
+                createdAt = `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`;
+            } else {
+                createdAt = `${diffDays} ${diffDays === 1 ? 'day' : 'days'} ago`;
+            }
+
+            return {
+                id: card._id,
+                title: card.title,
+                type: card.type,
+                tags: card.tags,
+                createdAt
+            };
+        });
+
+        const metrics = {
+            stats: {
+                totalCards,
+                cardsChangePercent,
+                tags: totalTags,
+                tagsChange,
+                aiSearches,
+                searchesChange,
+                thisWeek: cardsThisWeek
+            },
+            weeklyActivity,
+            topTags,
+            recentCards: formattedRecentCards
+        };
+
+        return res.status(200).json({ metrics });
+    } catch (err) {
+        console.error('Error fetching metrics:', err);
+        return res.status(500).json({ message: 'Internal Server Error', error: err });
+    }
+});
+
+app.post('/api/v1/card', AuthMiddleware, async (req, res) => {
+    const { link, title, type, share } = req.body;
+    const tags = req.body.tags;
+    
+    if (!link || !title || !type) {
+        return res.status(400).json({ message: "All fields are required" });
+    }
+    if (!tags || tags.length < 1) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+    
+    try {
+        const userID = req.user?.id;
+        if (!userID) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        
         const qdrantID = uuidv4();
         const embeddings = await getEmbedding(title);
 
-        await qdrantClient.upsert(COLLECTION_NAME,{
+        await qdrantClient.upsert(COLLECTION_NAME, {
             wait: true,
-            points:[
+            points: [
                 {
-                    id:qdrantID,
-                    vector:embeddings,
-                    payload:{
+                    id: qdrantID,
+                    vector: embeddings,
+                    payload: {
+                        cardId: qdrantID,
                         userId: userID,
-                        title:title,
-                        link:title,
-                        type:type,
-                        createdAt: new Date().toISOString(),
-                        updatedAt: new Date().toISOString()
+                        title: title,
                     },
                 },
             ],
         });
         
         const newCard = new Content({
-            userId:userID,
-            cardId:qdrantID,
+            userId: userID,
+            cardId: qdrantID,
             link,
             title,
             type,
             tags,
             share,
-            createdAt:new Date().toISOString(),
-            updatedAt:new Date().toISOString()
-        })
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+        });
+        
         await newCard.save();
         console.log(`Storing Card title: ${newCard.title}`);
         console.log(`Card Stored successfully with ID: ${newCard.id}`);
         
-        return res.status(201).json({message:'Card created successfully',card:newCard});
-    }catch(err){
-        return res.status(500).json({error: 'Internal Server Error',err})
+        return res.status(201).json({ message: 'Card created successfully', card: newCard });
+    } catch (err) {
+        console.error('Error creating card:', err);
+        return res.status(500).json({ error: 'Internal Server Error', details: err });
     }
-})
+});
 
-app.put('/api/v1/editCard/:id',AuthMiddleware,async(req,res) => {
-    try{
-        const {id} = req.params;
-        const {link,title,share,tags} = req.body;
-        const findCard = await Content.findById(id)
-        console.log(findCard,"tesing ");
+app.put('/api/v1/editCard/:id', AuthMiddleware, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { link, title, share, tags } = req.body;
+        if (!link || !title || !tags) {
+            return res.status(400).json({ message: 'All fields are required' });
+        }
         
-        if(!findCard) {
-            return res.status(404).json({message: 'Card with that id not found'});
+        const findCard = await Content.findById(id);
+        console.log(findCard, "testing");
+        
+        if (!findCard) {
+            return res.status(404).json({ message: 'Card with that id not found' });
         }
-        if(findCard.title != title){
-            const cardId: any = findCard.cardId;
-            const newTitleEmbeddings = await getEmbedding(title);
-            const updateExisting = await qdrantClient.retrieve(COLLECTION_NAME,{
-                ids:[cardId],
-                with_payload:true
-            })
-
-            if(updateExisting.length === 0) {
-                return res.status(404).json({message: 'Card not found'});
+        const currentUserId = req.user?.id;
+        if (findCard.userId.toString() !== currentUserId) {
+            return res.status(403).json({ message: 'Unauthorized to edit this card' });
+        }
+        
+        if (findCard.title !== title) {
+            const cardId: string = findCard.cardId;
+            console.log('Updating Qdrant for cardId:', cardId);
+            
+            try {
+                const newTitleEmbeddings = await getEmbedding(title);
+                const result = await qdrantClient.retrieve(COLLECTION_NAME, { ids: [cardId] });
+                
+                if (result && result.length > 0) {
+                    const point = result[0];
+                    await qdrantClient.upsert(COLLECTION_NAME, {
+                        wait: true,
+                        points: [
+                            {
+                                id: cardId,
+                                vector: newTitleEmbeddings,
+                                payload: {
+                                    cardId: cardId,
+                                    userId: currentUserId,
+                                    title: title,
+                                },
+                            },
+                        ],
+                    });
+                    console.log("Qdrant updated successfully for cardId:", cardId);
+                } else {
+                    console.log("Card not found in Qdrant:", cardId);
+                }
+            } catch (qdrantErr) {
+                console.error("Error updating Qdrant:", qdrantErr);
             }
-
-            const updatePayload = updateExisting[0]?.payload;
-            await qdrantClient.upsert(COLLECTION_NAME,{
-                wait:true,
-                points:[
-                    {
-                        id:cardId,
-                        vector: newTitleEmbeddings,
-                        payload: {
-                            ...updatePayload,
-                            title,
-                            link,
-                            tags,
-                            updatedAt: new Date().toISOString()
-                        }
-                    }
-                ]
-            });
-
-            console.log(`Card updated Successfully ${cardId}`);
         }
-        const updateCard = await Content.findByIdAndUpdate(id,{
-            link,
-            title,
-            share,
-            tags,
-            updatedAt:Date.now()
-        })
-
-        return res.status(200).json({message:"Updated card successfully",updateCard});
-    }catch(err) {
-        return res.status(500).json({message:'Internal Server Error'});
+        
+        const updateCard = await Content.findByIdAndUpdate(
+            id,
+            {
+                link,
+                title,
+                share,
+                tags,
+                updatedAt: new Date().toISOString()
+            },
+            { new: true } 
+        );
+        
+        return res.status(200).json({ 
+            message: "Updated card successfully", 
+            card: updateCard 
+        });
+    } catch (err: any) {
+        console.error('Error updating card:', err);
+        return res.status(500).json({ message: 'Internal Server Error', error: err.message });
     }
-})
+});
 
-app.post('/api/v1/query',AuthMiddleware,async(req,res) => {
-    const {query} = req.body
-    if(!query) {
-        return res.status(400).json({message: "query shouldn't be empty"})
+app.post('/api/v1/query', AuthMiddleware, async (req, res) => {
+    const query = req.body.query;
+    let limit = req.body.limit;
+    console.log(query, " ------- ------ ----  ", limit);
+    
+    if (!query ) {
+        return res.status(400).json({ message: "query missing" });
+    }
+    if(!limit) {
+        limit = 1;
     }
     try {
+        const userID = req.user?.id;
+        if (!userID) {
+            return res.status(401).json({ message: "Unauthorized" });
+        }
+        
         const queryEmbeddings = await getEmbedding(query);
-        const searchResutls = await qdrantClient.search(COLLECTION_NAME,{
+        
+        const searchResults = await qdrantClient.search(COLLECTION_NAME, {
             vector: queryEmbeddings,
-            limit:3
+            limit: Number(limit),
+            filter: {
+                must: [
+                    {
+                        key: "userId",
+                        match: { value: userID }
+                    }
+                ]
+            }
         });
 
-        console.log(`Nearest Cards: ${searchResutls}`);
-        searchResutls.forEach((res) =>{
-            console.log({
-                id:res.id,
-                score:res.score,
-                payload:res.payload
-            });
-            
-        })
-        return res.status(200).json({searchResutls})
-    }catch(err){
-        return res.status(500).json({error: 'Internal Server Error',err})
+        const titles: any = [];
+        searchResults.forEach((res) => {
+            if (res.payload?.title) {
+                titles.push(res.payload.title);
+            }
+        });
+        
+        console.log('Found titles:', titles);
+        const queryCards = await Content.find({ 
+            title: { $in: titles },
+            userId: userID 
+        });
+        const titleScoreMap = new Map();
+        searchResults.forEach(res => {
+            if (res.payload?.title) {
+                titleScoreMap.set(res.payload.title, res.score);
+            }
+        });
+        const cardsWithScores = queryCards.map(card => ({
+            ...card.toObject(),
+            relevanceScore: titleScoreMap.get(card.title) || 0
+        })).sort((a, b) => b.relevanceScore - a.relevanceScore);
+        
+        return res.status(200).json({ 
+            queryCards: cardsWithScores
+        });
+    } catch (err: any) {
+        console.error('Error querying cards:', err);
+        return res.status(500).json({ 
+            error: 'Internal Server Error', 
+            details: err.message || err 
+        });
     }
-})
+});
 
 app.get('/api/v1/cards',AuthMiddleware,async(req,res) => {
     try{
         const userID = req.user?.id;
-        console.log(userID);
         
         if (!userID) {
             return res.status(401).json({ message: "Unauthorized" });
@@ -346,8 +633,6 @@ app.get('/api/v1/logout',(req,res) => {
         return res.status(500).json({error: 'Internal Server Error',err})
     }
 })
-
-
 
 app.listen(process.env.PORT,() => {
     console.log(`Listening on port: ${process.env.PORT}`);
