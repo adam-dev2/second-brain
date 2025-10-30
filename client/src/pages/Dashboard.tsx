@@ -105,115 +105,63 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <div className="p-2 bg-blue-50 rounded-lg">
+            {/* <div className="p-2 bg-blue-50 rounded-lg">
               <Bookmark className="w-5 h-5 text-blue-600" />
-            </div>
-            <div className={`flex items-center gap-1 text-sm font-medium ${stats.cardsChangePercent > 0 ? 'text-green-600' : 'text-red-600'}`}>
+            </div> */}
+            {/* <div className={`flex items-center gap-1 text-sm font-medium ${stats.cardsChangePercent > 0 ? 'text-green-600' : 'text-red-600'}`}>
               {stats.cardsChangePercent > 0 ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
               {Math.abs(stats.cardsChangePercent)}%
-            </div>
+            </div> */}
+          <p className="text-gray-600 font-semibold text-lg ">Total Cards</p>
           </div>
           <h3 className="text-3xl font-bold text-gray-900">{stats.totalCards}</h3>
-          <p className="text-gray-600 text-sm mt-1">Total Cards</p>
         </div>
 
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <div className="p-2 bg-purple-50 rounded-lg">
+            {/* <div className="p-2 bg-purple-50 rounded-lg">
               <Tag className="w-5 h-5 text-purple-600" />
-            </div>
-            <div className={`flex items-center gap-1 text-sm font-medium ${stats.tagsChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            </div> */}
+            {/* <div className={`flex items-center gap-1 text-sm font-medium ${stats.tagsChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {stats.tagsChange >= 0 ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
               {Math.abs(stats.tagsChange)}
-            </div>
+            </div> */}
+          <p className="text-gray-600 font-semibold text-lg ">Unique Tags</p>
           </div>
           <h3 className="text-3xl font-bold text-gray-900">{stats.tags}</h3>
-          <p className="text-gray-600 text-sm mt-1">Unique Tags</p>
         </div>
 
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <div className="p-2 bg-indigo-50 rounded-lg">
+            {/* <div className="p-2 bg-indigo-50 rounded-lg">
               <Share2 className="w-5 h-5 text-indigo-600" />
-            </div>
-            <div className={`flex items-center gap-1 text-sm font-medium ${stats.searchesChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+            </div> */}
+            {/* <div className={`flex items-center gap-1 text-sm font-medium ${stats.searchesChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {stats.searchesChange >= 0 ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
               {Math.abs(stats.searchesChange)}%
-            </div>
+            </div> */}
+          <p className="text-gray-600 font-semibold text-lg ">Shared cards</p>
           </div>
           <h3 className="text-3xl font-bold text-gray-900">{stats.aiSearches}</h3>
-          <p className="text-gray-600 text-sm mt-1">Shared cards</p>
         </div>
 
         <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <div className="p-2 bg-amber-50 rounded-lg">
+            {/* <div className="p-2 bg-amber-50 rounded-lg">
               <Clock className="w-5 h-5 text-amber-600" />
-            </div>
-            <span className="text-xs text-gray-500 font-medium">Last 7 days</span>
+            </div> */}
+            {/* <span className="text-xs text-gray-500 font-medium">Last 7 days</span> */}
+          <p className="text-gray-600 font-semibold text-lg ">Added This Week</p>
           </div>
           <h3 className="text-3xl font-bold text-gray-900">{stats.thisWeek}</h3>
-          <p className="text-gray-600 text-sm mt-1">Added This Week</p>
         </div>
       </div>
 
       {/* Analytics Section */}
       <div className="grid lg:grid-cols-3 gap-6 mb-8">
-        {/* Weekly Activity Chart */}
-        <div className="lg:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-800">Weekly Activity</h2>
-            <TrendingUp className="w-5 h-5 text-gray-400" />
-          </div>
-          <div className="flex items-end justify-between h-48 gap-4">
-            {weeklyActivity.map((data, idx) => (
-              <div key={idx} className="flex-1 flex flex-col items-center gap-2">
-                <div className="w-full bg-gray-100 rounded-lg relative flex items-end" style={{ height: '160px' }}>
-                  <div 
-                    className="w-full bg-linear-to-t from-indigo-500 to-indigo-400 rounded-lg transition-all hover:from-indigo-600 hover:to-indigo-500 cursor-pointer"
-                    style={{ height: `${(data.cards / maxCards) * 100}%`, minHeight: data.cards > 0 ? '20px' : '0' }}
-                  >
-                    {data.cards > 0 && (
-                      <div className="text-white text-xs font-semibold text-center mt-2">
-                        {data.cards}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <span className="text-xs font-medium text-gray-600">{data.day}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Top Tags */}
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-800 mb-6">Top Tags</h2>
-          {topTags.length > 0 ? (
-            <div className="space-y-4">
-              {topTags.map((tag, idx) => (
-                <div key={idx}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">{tag.name}</span>
-                    <span className="text-sm font-semibold text-gray-900">{tag.count}</span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
-                    <div 
-                      className={`${tag.color} h-2 rounded-full transition-all`}
-                      style={{ width: `${(tag.count / topTags[0].count) * 100}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-sm text-center py-8">No tags yet. Start adding cards!</p>
-          )}
-        </div>
-      </div>
-
-      {/* Recent Cards */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        
+        
+      <div className="bg-white rounded-xl p-6 shadow-sm border col-span-2 border-gray-200">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-gray-800">Recent Cards</h2>
           <button 
@@ -264,6 +212,32 @@ const Dashboard = () => {
           <p className="text-gray-500 text-sm text-center py-8">No cards yet. Create your first card!</p>
         )}
       </div>
+      <div className="bg-white rounded-xl p-6 shadow-sm border max-h-fit pb-10 border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-800 mb-6">Top Tags</h2>
+          {topTags.length > 0 ? (
+            <div className="space-y-4">
+              {topTags.map((tag, idx) => (
+                <div key={idx}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">{tag.name}</span>
+                    <span className="text-sm font-semibold text-gray-900">{tag.count}</span>
+                  </div>
+                  <div className="w-full bg-gray-100 rounded-full h-2">
+                    <div 
+                      className={`bg-gray-600 h-2 rounded-full transition-all`}
+                      style={{ width: `${(tag.count / topTags[0].count) * 100}%` }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-sm text-center py-8">No tags yet. Start adding cards!</p>
+          )}
+        </div>
+      </div>
+
+      {/* Recent Cards */}
     </div>
   );
 };

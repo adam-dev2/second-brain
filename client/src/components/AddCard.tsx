@@ -174,6 +174,7 @@ const AddCard = () => {
   return (
     <div>
       {loading?<Loading />:
+    <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm bg-opacity-40 z-50">
       <div
         className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
                       bg-gray-50 backdrop-blur-2xl w-96 p-6 rounded-xl shadow-lg border border-gray-400"
@@ -182,6 +183,15 @@ const AddCard = () => {
           className="cursor-pointer text-end z-10 w-full flex justify-end m-0"
           onClick={() => {
             setModal(!modal);
+            setFormData({
+              title: "",
+              link: "",
+              tags: [],
+              share: false,
+              type: "",
+              heading: "Add Card",
+              button: "Save Card",
+            });
           }}
         >
           <X className="hover:scale-105 transition" size={20} />
@@ -287,6 +297,7 @@ const AddCard = () => {
           </button>
         </form>
       </div>
+  </div>
 }
     </div>
   );

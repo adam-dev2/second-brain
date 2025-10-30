@@ -2,3 +2,34 @@
 ::selection{
     background-color: gray;
 }
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.8) translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2) translateY(-2px);
+  }
+}
+
+.sparkle-effect::before,
+.sparkle-effect::after {
+  content: "✦";
+  position: absolute;
+  font-size: 10px;
+  color: #d4d4d8; /* light gray to fit theme */
+  animation: sparkle 2s infinite ease-in-out;
+}
+
+.sparkle-effect::before {
+  top: 4px;
+  left: 6px;
+  animation-delay: 0.4s;
+}
+
+.sparkle-effect::after {
+  bottom: 4px;
+  right: 8px;
+  animation-delay: 1s;
+}

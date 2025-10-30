@@ -75,6 +75,7 @@ const Card = (props: Iprops) => {
   }
 
   return (
+    <>
     <div className="group bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-gray-400 shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col relative overflow-hidden">
       {/* Rank Badge - only show if index is provided */}
       {props.index !== undefined && (
@@ -163,6 +164,7 @@ const Card = (props: Iprops) => {
         </span>
       </div>
     </div>
+    </>
   );
 }
 

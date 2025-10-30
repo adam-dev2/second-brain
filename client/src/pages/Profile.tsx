@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
+import { Eye, EyeOff } from "lucide-react";
 
 interface UserProfile {
   avatar: string | null;
@@ -12,37 +13,47 @@ interface UserProfile {
 }
 
 const Profile: React.FC = () => {
-
-
+  const [toggle, setToggle] = useState(false);
   const [user, setUser] = useState<UserProfile>({
     avatar: null,
     username: "",
     email: "",
     password: "",
   });
+  const [showModal, setShowModal] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUser((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSave = async() => {
-    console.log("Saving user profile:", user);
+  // ✅ Main Save Button Click
+  const handleSave = async () => {
+    setShowModal(true);
+  };
+
+  // ✅ Verify password and update profile
+  const handleConfirmAndSave = async () => {
     const token = Cookies.get("token");
-    console.log(token);
-    
+    if (!token) {
+      toast.error("No token found. Please log in again.");
+      return;
+    }
+
+    if (!currentPassword.trim()) {
+      toast.error("Please enter your current password.");
+      return;
+    }
+
     try {
-      if (!token) {
-        toast.error("No token found. Please log in again.");
-        return;
-      }
-      const res = await axios.put(
-        `http://localhost:5000/api/v1/profile`,
-        {
-          username: user.username,
-          email: user.email,
-          password: user.password,
-        },
+      setLoading(true);
+
+      // Step 1: Verify current password
+      const verifyRes = await axios.post(
+        `http://localhost:5000/api/v1/userconfirmation`,
+        { password: currentPassword },
         {
           withCredentials: true,
           headers: {
@@ -51,143 +62,214 @@ const Profile: React.FC = () => {
           },
         }
       );
-      console.log(res);
-      
-      const userProfile = res.data.userProfile; 
-      console.log("Fetched user profile:", userProfile);
 
-      setUser((prevUser: any) => ({
-        ...prevUser,
-        ...userProfile,
-      }));
+      if (verifyRes.status === 200) {
+        // Step 2: Proceed to update profile
+        const res = await axios.put(
+          `http://localhost:5000/api/v1/profile`,
+          {
+            username: user.username,
+            email: user.email,
+            password: user.password,
+          },
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-      toast.success("User details updated successfully");
+        const userProfile = res.data.userProfile;
+        setUser((prevUser) => ({
+          ...prevUser,
+          ...userProfile,
+        }));
+
+        toast.success("Profile updated successfully!");
+        setShowModal(false);
+        setCurrentPassword("");
+      }
     } catch (err: any) {
-      console.error("Error while updating user profile:", err);
+      console.error("Error verifying or updating:", err);
       toast.error(
         err?.response?.data?.message ||
-          "Error while updating user profile"
+          "Incorrect current password or update failed"
       );
+    } finally {
+      setLoading(false);
     }
   };
 
- useEffect(() => {
-  const fetchUser = async () => {
-    const token = Cookies.get("token");
-    if (!token) {
-      toast.error("No token found. Please log in again.");
-      return;
-    }
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = Cookies.get("token");
+      if (!token) {
+        toast.error("No token found. Please log in again.");
+        return;
+      }
 
-    try {
-      const res = await axios.get("http://localhost:5000/api/v1/user", {
-        withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      try {
+        const res = await axios.get("http://localhost:5000/api/v1/user", {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
 
-      const userProfile = res.data.userProfile; 
-      console.log("Fetched user profile:", userProfile);
+        const userProfile = res.data.userProfile;
+        setUser((prevUser) => ({
+          ...prevUser,
+          ...userProfile,
+        }));
+      } catch (err: any) {
+        console.error("Error fetching user profile:", err);
+        toast.error(
+          err?.response?.data?.message ||
+            "Error while fetching user profile"
+        );
+      }
+    };
 
-      setUser((prevUser: any) => ({
-        ...prevUser,
-        ...userProfile,
-      }));
-
-      toast.success("User details fetched successfully");
-    } catch (err: any) {
-      console.error("Error fetching user profile:", err);
-      toast.error(
-        err?.response?.data?.message ||
-          "Error while fetching user profile"
-      );
-    }
-  };
-
-  fetchUser();
-}, [setUser]); 
-
+    fetchUser();
+  }, []);
 
   return (
     <>
-        <div className="min-h-screen w-full bg-gray-50 flex flex-col items-center py-12 px-4">
-      <div className="w-full max-w-md bg-white shadow-sm border border-gray-300 rounded-2xl p-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-semibold text-gray-800">Profile</h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Manage your personal information
-          </p>
+      <div className="min-h-screen w-full bg-gray-50 flex flex-col items-center py-12 px-4">
+        <div className="w-full max-w-md bg-white shadow-sm border border-gray-300 rounded-2xl p-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-semibold text-gray-800">Profile</h1>
+            <p className="text-gray-500 text-sm mt-1">
+              Manage your personal information
+            </p>
+          </div>
+
+          {/* Avatar */}
+          <div className="flex flex-col items-center mb-6">
+            <div className="relative">
+              <img
+                src={
+                  user?.avatar ||
+                  `https://ui-avatars.com/api/?name=${user.username.toLowerCase()}&background=E0E7FF&color=312E81`
+                }
+                alt="avatar"
+                className="w-28 h-28 rounded-full object-cover border-2 border-gray-200 shadow-sm"
+              />
+            </div>
+          </div>
+
+          {/* Form */}
+          <div className="flex flex-col gap-5">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Username
+              </label>
+              <input
+                type="text"
+                name="username"
+                value={user?.username}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-100 focus:border-gray-400 outline-none transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={user?.email}
+                onChange={handleChange}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-100 focus:border-gray-400 outline-none transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Password
+              </label>
+              <div className="relative">
+                <input
+                  type={toggle ? "text" : "password"}
+                  name="password"
+                  value={user?.password}
+                  placeholder="Enter new password"
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-100 focus:border-gray-400 outline-none transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setToggle((t) => !t)}
+                  className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
+                >
+                  {toggle ? (
+                    <EyeOff className="w-5 h-5" />
+                  ) : (
+                    <Eye className="w-5 h-5" />
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <button
+            onClick={handleSave}
+            className="w-full mt-8 bg-gray-600 text-white py-2.5 rounded-lg font-medium hover:bg-gray-700 transition active:scale-[0.98]"
+          >
+            Save Changes
+          </button>
         </div>
+        <p className="text-gray-500 items-end">Last updated: 10-10-2025</p>
+      </div>
 
-        {/* Avatar */}
-        <div className="flex flex-col items-center mb-6">
-          <div className="relative">
-            <img
-              src={
-                user?.avatar ||
-                `https://ui-avatars.com/api/?name=${user.username.toLowerCase()}&background=E0E7FF&color=312E81`              }
-              alt="avatar"
-              className="w-28 h-28 rounded-full object-cover border-2 border-gray-200 shadow-sm"
-            />
-          </div>
-        </div>
+      {/* ✅ Password Confirmation Modal */}
+      {showModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm bg-opacity-40 z-50">
+          <div className="bg-white rounded-xl shadow-md w-full max-w-sm p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-3">
+              Confirm Current Password
+            </h2>
+            <p className="text-sm text-gray-500 mb-4">
+              Enter your current password to confirm profile changes.
+            </p>
 
-        {/* Form */}
-        <div className="flex flex-col gap-5">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Username
-            </label>
-            <input
-              type="text"
-              name="username"
-              value={user?.username}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-100 focus:border-gray-400 outline-none transition"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={user?.email}
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-100 focus:border-gray-400 outline-none transition"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
             <input
               type="password"
-              name="password"
-              value={user?.password}
-              placeholder="••••••••"
-              onChange={handleChange}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-100 focus:border-gray-400 outline-none transition"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="Current password"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-2 focus:ring-gray-100 focus:border-gray-400 outline-none transition placeholder:opacity-55"
             />
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowModal(false)}
+                className="cursor-pointer px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmAndSave}
+                disabled={loading}
+                className={`cursor-pointer px-4 py-2 rounded-lg text-white font-medium ${
+                  loading
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-gray-700 hover:bg-gray-800"
+                }`}
+              >
+                {loading ? "Verifying..." : "Confirm"}
+              </button>
+            </div>
           </div>
         </div>
-
-        {/* Save Button */}
-        <button
-          onClick={handleSave}
-          className="w-full mt-8 bg-gray-600 text-white py-2.5 rounded-lg font-medium hover:bg-gray-700 transition active:scale-[0.98]"
-        >
-          Save Changes
-        </button>
-      </div>
-      <p className="text-gray-500 items-end">Last udpated: 10-10-2025</p>
-    </div>
+      )}
     </>
   );
 };

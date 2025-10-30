@@ -57,7 +57,6 @@ const Cards = () => {
             'Content-Type':'application/json'
           }
         });
-        
         setAllCards(res.data.cards);
         setOriginalCards(res.data.cards);
         toast.success('Fetched all cards successfully');
@@ -104,7 +103,6 @@ const Cards = () => {
       toast.success('Shareable Link generated')
       setSearchModal(true)
       setShareLink(`http://localhost:5173/${res.data.ShareableLink}`);
-      // navigate(`/${res.data.ShareableLink}`);
     }catch(err: any) {
       console.log(err.response.message);
       

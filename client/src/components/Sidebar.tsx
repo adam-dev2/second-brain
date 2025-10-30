@@ -38,7 +38,7 @@ const Sidebar = () => {
     { path: "/home/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { path: "/home/cards", label: "Cards", icon: FileStack },
     { path: "/home/tags", label: "Tags", icon: Tags },
-    { path: "/home/search", label: "Search", icon: Search },
+    { path: "/home/search", label: "Search", icon: Search, featured: false },
     { path: "/home/profile", label: "Profile", icon: UserRoundPen },
   ];
 
@@ -65,24 +65,41 @@ const Sidebar = () => {
 
       {/* Nav links */}
       <nav className="flex flex-col gap-2 sm:gap-3">
-        {links.map(({ path, label, icon: Icon }) => (
+        {links.map(({ path, label, icon: Icon, featured }) => (
           <NavLink
             key={path}
             to={path}
             className={({ isActive }) =>
-              `flex items-center ${
+              `relative flex items-center ${
                 isOpen ? "justify-start" : "justify-center"
               } gap-3 p-2 rounded-md transition-all text-sm sm:text-base ${
-                isActive ? "bg-gray-700" : "hover:bg-gray-800"
+                featured
+                  ? `bg-linear-to-br from-gray-200 to-gray-50 text-gray-900 hover:from-white hover:to-gray-50 shadow-xl ${
+                      isActive ? "ring-2 ring-gray-300" : ""
+                    }`
+                  : isActive
+                  ? "bg-gray-700 text-white"
+                  : "text-white hover:bg-gray-800"
               }`
             }
           >
             <Icon
-              className="shrink-0 text-gray-200"
+              className={`shrink-0 ${
+                featured ? "text-gray-900" : "text-gray-200"
+              }`}
               size={isOpen ? 20 : 24}
             />
             {isOpen && (
-              <span className="truncate text-sm sm:text-base">{label}</span>
+              <span
+                className={`truncate text-sm sm:text-base ${
+                  featured ? "font-bold tracking-wide" : ""
+                }`}
+              >
+                {label}
+              </span>
+            )}
+            {featured && (
+              <div className="absolute inset-0 rounded-md bg-linear-to-r from-transparent via-white to-transparent opacity-30 blur-sm -z-10"></div>
             )}
           </NavLink>
         ))}
@@ -95,7 +112,7 @@ const Sidebar = () => {
           className="flex items-center justify-center sm:justify-start gap-3 w-full p-2 sm:p-3 rounded-xl border border-gray-600 text-gray-100 hover:scale-[1.02] transition transform"
         >
           <LogOut size={20} />
-          {isOpen && <span className="text-sm sm:text-base">Logout</span>}
+          {isOpen && <span className="cursor-pointer text-sm sm:text-base">Logout</span>}
         </button>
       </div>
     </aside>

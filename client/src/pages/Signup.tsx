@@ -79,9 +79,9 @@ const handleSignup = async(e: FormEvent<HTMLFormElement>) =>{
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-600 via-zinc-600 to-gray-700 flex items-center justify-center p-4 w-full">
+    <div className="min-h-screen bg-linear-to-br from-gray-600 via-zinc-600 to-gray-700 flex items-center justify-center p-4 w-full overflow-hidden m-auto scroll-m-0">
       <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden">
-        <div className="grid md:grid-cols-2 min-h-[600px]">
+        <div className="grid md:grid-cols-2 min-h-[500px]">
           {/* Left Side - Form */}
           <div className="hidden md:flex bg-linear-to-br from-gray-600 via-zinc-600 to-gray-700 p-5 flex-col justify-center items-center text-white relative overflow-hidden">
             <div className="absolute inset-0 opacity-10">
