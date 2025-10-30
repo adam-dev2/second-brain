@@ -39,6 +39,20 @@ interface CookieOptions {
     maxAge: number;
     sameSite: 'strict'|'lax'|'none';
 }
+
+interface IAllCards {
+    userId:string;
+    link: string;
+    title: string;
+    type: string;
+    tags:string[];
+    share:boolean;
+    embedding?:number[];
+    cardId:string;
+    createdAt:Date;
+    updatedAt:Date;
+}
+
 app.use(express.json());
 
 app.use(cors({
@@ -176,19 +190,47 @@ app.get('/api/v1/user',AuthMiddleware,async(req,res) => {
     }
 })
 
+app.post('/api/v1/userconfirmation',AuthMiddleware,async(req,res) => {
+    const id = req.user?.id;
+    const {password} = req.body;
+    if(!id) {
+        return res.status(401).json({message:'UnAuthroized'});
+    }
+    if(!password) {
+        return res.status(400).json({message:'Please enter the current password'})
+    } 
+    try {
+        let findUser = await User.findById(id)
+        if(!findUser) {
+            return res.status(404).json({message:"User with this email doesn't exists"});
+        }
+        let comparePassword = await bcrypt.compare(password,findUser.password);
+        if(!comparePassword) {
+            return res.status(401).json({message: 'Invalid Password'});
+        }
+        return res.status(200).json({message:'User password confirmed'})
+    }catch(err) {
+        return res.status(500).json({message:'Internal Server Error',err})
+    }
+})
+
 app.put('/api/v1/profile',AuthMiddleware,async(req,res) => {
     const userId = req.user?.id;
     const {username,email,password,avatar} = req.body;
     if(!userId) {
         return res.status(401).json({message:'UnAuthroized'});
     }
+    if(!password) {
+        return res.status(400).json({message:'Please enter the current password in the password section'})
+    }
+    let hashedPassword = await bcrypt.hash(password,10);
     try {
         const findUser = await User.findByIdAndUpdate(
             userId,
             {
                 username,
                 email,
-                password,
+                password:hashedPassword,
                 avatar,
                 updatedAt: new Date().toISOString()
             }
@@ -244,8 +286,13 @@ app.get('/api/v1/metrics', AuthMiddleware, async (req, res) => {
             card.tags?.forEach((tag: string) => oldUniqueTags.add(tag));
         });
         const tagsChange = totalTags - oldUniqueTags.size;
-        const sharedCards = allCards.map((item) => item.share === true).length
+
+
+        const Allcards:IAllCards[] = await Content.find({userId})
+        const sharedCards = Allcards.filter(item => item.share === true).length 
         console.log(sharedCards);
+
+
         const aiSearches = sharedCards
         const searchesChange = -3.2;
         const weeklyActivity = [];
