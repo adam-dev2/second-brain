@@ -60,6 +60,10 @@ app.use(cors({
     credentials:true
 }))
 
+app.get('/api/v1/',(req,res) => {
+    return res.status(200).json({message:"Server is Healthy"})
+})
+
 app.post('/api/v1/signup',async (req,res) => {
     const validation = signupSchema.safeParse(req.body);
     if(!validation) {
