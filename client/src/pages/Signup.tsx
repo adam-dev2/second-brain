@@ -28,7 +28,7 @@ const Signup = () => {
 const handleSignup = async(e: FormEvent<HTMLFormElement>) =>{
       e.preventDefault();
     if(!isLogin) {
-        
+      setLoading(true)
         try{
             const response:any = await axios.post(`${backendUrl}/api/v1/signup`,
             {

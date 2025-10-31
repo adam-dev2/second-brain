@@ -4,6 +4,8 @@ import type { ChangeEvent } from "react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 
 interface UserProfile {
   avatar: string | null;
@@ -52,7 +54,7 @@ const Profile: React.FC = () => {
 
       // Step 1: Verify current password
       const verifyRes = await axios.post(
-        `http://localhost:5000/api/v1/userconfirmation`,
+        `${backendUrl}/api/v1/userconfirmation`,
         { password: currentPassword },
         {
           withCredentials: true,
@@ -66,7 +68,7 @@ const Profile: React.FC = () => {
       if (verifyRes.status === 200) {
         // Step 2: Proceed to update profile
         const res = await axios.put(
-          `http://localhost:5000/api/v1/profile`,
+          `${backendUrl}/api/v1/profile`,
           {
             username: user.username,
             email: user.email,
@@ -111,7 +113,7 @@ const Profile: React.FC = () => {
       }
 
       try {
-        const res = await axios.get("http://localhost:5000/api/v1/user", {
+        const res = await axios.get(`${backendUrl}/api/v1/user`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,

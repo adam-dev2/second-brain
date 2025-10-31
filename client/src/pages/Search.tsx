@@ -9,6 +9,8 @@ import toast from "react-hot-toast";
 import { sidebarAtom } from "../store/atoms/sidebar";
 import { hideIconAtom } from "../store/atoms/hideIcons";
 import { Brain, Search as SearchIcon, Sparkles, Zap, TrendingUp, ExternalLink, Lock, Globe } from "lucide-react";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 
 interface CardData {
   _id: string;
@@ -55,7 +57,7 @@ const Search = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/v1/query",
+        `${backendUrl}/api/v1/query`,
         { query: search, limit: parseInt(limit) },
         {
           withCredentials: true,

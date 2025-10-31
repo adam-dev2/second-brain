@@ -16,6 +16,8 @@ import { searchModalAtom } from "../store/atoms/searchModal"
 import ShareModal from "../components/ShareModal"
 import { sharelink } from "../store/atoms/sharelink"
 import { hideIconAtom } from "../store/atoms/hideIcons"
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 
 const Cards = () => {
   const setShareLink = useSetRecoilState(sharelink)
@@ -51,7 +53,7 @@ const Cards = () => {
           navigate('/')
           return;
         }
-        let res = await axios.get('http://localhost:5000/api/v1/cards',{
+        let res = await axios.get(`${backendUrl}/api/v1/cards`,{
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type':'application/json'
@@ -90,7 +92,7 @@ const Cards = () => {
     }
     setLoading(true);
     try {
-      const res = await axios.get('http://localhost:5000/api/v1/brain/share',
+      const res = await axios.get(`${backendUrl}/api/v1/brain/share`,
         {
           withCredentials:true,
           headers: {

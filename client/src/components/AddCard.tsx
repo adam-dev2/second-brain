@@ -10,6 +10,8 @@ import { formdataAtom } from "../store/atoms/formData";
 import { editCardAtom } from "../store/atoms/editcard";
 import { loadingAtom } from "../store/atoms/loading";
 import Loading from "./Loading";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 
 const AddCard = () => {
   const formData = useRecoilValue(formdataAtom);
@@ -80,7 +82,7 @@ const AddCard = () => {
     setLoading(true)
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/v1/card",
+        `${backendUrl}/api/v1/card`,
         {
           title: formData.title,
           link: formData.link,
@@ -124,7 +126,7 @@ const AddCard = () => {
     setLoading(true)
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/v1/editCard/${editCardId}`,
+        `${backendUrl}/api/v1/editCard/${editCardId}`,
         {
           title: formData.title,
           link: formData.link,
@@ -144,7 +146,7 @@ const AddCard = () => {
       console.log("Edit response:", response.data);
       const updatedCard = response.data.updateCard || response.data;
       console.log(updatedCard);
-      const res = await axios.get('http://localhost:5000/api/v1/cards', {
+      const res = await axios.get(`${backendUrl}/api/v1/cards`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
