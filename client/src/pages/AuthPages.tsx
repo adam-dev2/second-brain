@@ -3,7 +3,7 @@ import { Mail, Lock, User, ArrowRight,EyeOff,Eye } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useSetRecoilState } from "recoil";
 import { loadingAtom } from "../store/atoms/loading";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -11,7 +11,6 @@ const AuthPages = () => {
   const navigate = useNavigate();
   const [toggle,setToggle] = useState(false)
   const [isLogin, setIsLogin] = useState(false);
-  const loading = useRecoilValue(loadingAtom)
   const setLoading = useSetRecoilState(loadingAtom)
     const [formData,setFormData] = useState({
         username: "",
@@ -30,7 +29,7 @@ const handleSignup = async(e: FormEvent<HTMLFormElement>) =>{
     if(!isLogin) {
       setLoading(true)
         try{
-            const response:any = await axios.post(`${backendUrl}/api/v1/signup`,
+            await axios.post(`${backendUrl}/api/v1/signup`,
             {
                 username: formData.username,
                 email:formData.email,

@@ -1,5 +1,5 @@
 import { useRecoilValue, useSetRecoilState } from "recoil";
-import { Bookmark, Tag, Share2, TrendingUp, Clock, FileText, Video, Twitter, Link2, ArrowUp, ArrowDown } from 'lucide-react';
+import { FileText, Video, Twitter, Link2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { loadingAtom } from "../store/atoms/loading";
 import { useEffect, useState } from "react";
@@ -87,8 +87,7 @@ const Dashboard = () => {
     );
   }
 
-  const { stats, weeklyActivity, topTags, recentCards } = metrics;
-  const maxCards = Math.max(...weeklyActivity.map(d => d.cards), 1);
+  const { stats, topTags, recentCards } = metrics;
 
   return (
     <div className="h-full w-full p-9 bg-gray-50">

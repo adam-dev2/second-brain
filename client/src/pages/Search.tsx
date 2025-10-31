@@ -8,7 +8,7 @@ import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { sidebarAtom } from "../store/atoms/sidebar";
 import { hideIconAtom } from "../store/atoms/hideIcons";
-import { Brain, Search as SearchIcon, Sparkles, Zap, TrendingUp, ExternalLink, Lock, Globe } from "lucide-react";
+import { Search as SearchIcon,ExternalLink, Lock, Globe } from "lucide-react";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 
@@ -87,12 +87,6 @@ const Search = () => {
   };
 
   const handleSearch = () => fetchQuery();
-
-  const exampleQueries = [
-    "React performance optimization techniques",
-    "Database indexing strategies",
-    "Authentication best practices"
-  ];
 
   return (
     <>

@@ -51,7 +51,7 @@ const Share = () => {
   return (
     <>
       {loading ? <LoadingOverlay /> :
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+        <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-6">
           <div className="max-w-7xl mx-auto">
             <div className="mb-8">
               <h1 className="text-4xl font-bold text-gray-900 mb-2">Shared Brain</h1>
@@ -71,7 +71,7 @@ const Share = () => {
                     </div>
 
                     {/* Decorative Top Bar */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gray-400 via-gray-600 to-gray-800"></div>
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-gray-400 via-gray-600 to-gray-800"></div>
 
                     <div className="flex items-start justify-between gap-3 flex-1 mt-2">
                       <h1 className="flex-1 text-xl font-bold text-gray-900 line-clamp-2 group-hover:text-gray-700 transition-colors">
