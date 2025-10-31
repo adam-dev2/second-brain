@@ -7,7 +7,7 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { loadingAtom } from "../store/atoms/loading";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-const Signup = () => {
+const AuthPages = () => {
   const navigate = useNavigate();
   const [toggle,setToggle] = useState(false)
   const [isLogin, setIsLogin] = useState(false);
@@ -257,4 +257,4 @@ const handleSignup = async(e: FormEvent<HTMLFormElement>) =>{
   );
 };
 
-export default Signup
+export default AuthPages

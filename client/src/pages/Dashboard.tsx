@@ -10,6 +10,7 @@ import LoadingOverlay from "../components/Loading";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 
+
 interface MetricsData {
   stats: {
     totalCards: number;
@@ -48,6 +49,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchMetrics = async () => {
       const token = Cookies.get('token');
+      
       setLoading(true);
       try {
         const res = await axios.get(`${backendUrl}/api/v1/metrics`, {
