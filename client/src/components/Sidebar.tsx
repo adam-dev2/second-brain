@@ -13,6 +13,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { sidebarAtom } from "../store/atoms/sidebar";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 
 const Sidebar = () => {
   const isOpen = useRecoilValue(sidebarAtom);
@@ -21,7 +23,7 @@ const Sidebar = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/v1/logout", {
+      const res = await axios.get(`${backendUrl}/api/v1/logout`, {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
       });

@@ -6,6 +6,7 @@ import toast from "react-hot-toast"
 import axios from "axios"
 import LoadingOverlay from "../components/Loading"
 import { ExternalLink, Globe, Lock } from "lucide-react"
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface Card {
   _id: string;
@@ -28,7 +29,7 @@ const Share = () => {
     const fetchCards = async () => {
       setLoading(true);
       try {
-        let res = await axios.get(`http://localhost:5000/api/v1/brain/${params.id}`, {
+        let res = await axios.get(`${backendUrl}/api/v1/brain/${params.id}`, {
           headers: {
             'Content-Type': 'application/json'
           }

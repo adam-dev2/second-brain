@@ -9,6 +9,7 @@ import { modalAtom } from '../store/atoms/modal'
 import { editCardAtom } from '../store/atoms/editcard'
 import { loadingAtom } from "../store/atoms/loading";
 import { hideIconAtom } from '../store/atoms/hideIcons'
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface Iprops {
   title: string
@@ -57,7 +58,7 @@ const Card = (props: Iprops) => {
     }
     setLoading(true)
     try {
-      await axios.delete(`http://localhost:5000/api/v1/content/${props.id}`, {
+      await axios.delete(`${backendUrl}/api/v1/content/${props.id}`, {
         withCredentials: true,
         headers: {
           'Authorization': `Bearer ${token}`,

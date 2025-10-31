@@ -7,6 +7,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 import LoadingOverlay from "../components/Loading";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 
 interface MetricsData {
   stats: {
@@ -48,7 +50,7 @@ const Dashboard = () => {
       const token = Cookies.get('token');
       setLoading(true);
       try {
-        const res = await axios.get('http://localhost:5000/api/v1/metrics', {
+        const res = await axios.get(`${backendUrl}/api/v1/metrics`, {
           withCredentials: true,
           headers: {
             'Authorization': `Bearer ${token}`,

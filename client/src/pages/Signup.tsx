@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { loadingAtom } from "../store/atoms/loading";
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -27,9 +28,9 @@ const Signup = () => {
 const handleSignup = async(e: FormEvent<HTMLFormElement>) =>{
       e.preventDefault();
     if(!isLogin) {
-        
+      setLoading(true)
         try{
-            const response:any = await axios.post('http://localhost:5000/api/v1/signup',
+            const response:any = await axios.post(`${backendUrl}/api/v1/signup`,
             {
                 username: formData.username,
                 email:formData.email,
@@ -52,7 +53,7 @@ const handleSignup = async(e: FormEvent<HTMLFormElement>) =>{
         
     } else {
         try{
-            const response = await axios.post('http://localhost:5000/api/v1/login',
+            const response = await axios.post(`${backendUrl}/api/v1/login`,
             {
                 email:formData.email,
                 password:formData.password
