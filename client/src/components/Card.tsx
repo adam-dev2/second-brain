@@ -30,6 +30,7 @@ const Card = (props: Iprops) => {
   const setEditCardId = useSetRecoilState(editCardAtom);
   const setLoading = useSetRecoilState(loadingAtom)
   const hideIcons = useRecoilValue(hideIconAtom)
+  const setHideIcons = useSetRecoilState(hideIconAtom)
 
   const handleEdit = async () => {
     const findCard = allCards.find(item => item._id === props.id);
@@ -48,6 +49,7 @@ const Card = (props: Iprops) => {
 
     setModal(prev => !prev);
     setEditCardId(props.id)
+    setHideIcons(true);
   }
 
   const handleDelete = async () => {

@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Cards from "./pages/Cards";
 import Profile from "./pages/Profile";
 import Share from "./pages/Share";
+import ResetPassword from "./pages/ResetPassword";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
           
           <Route path="/" element={ <Signup /> } />
           <Route path="/:id" element={ <Share /> } />
+          <Route path="/reset-password/:token" element={ <ResetPassword /> } />
             
           <Route path="/home" element={<DashboardLayout />}>
             <Route path="dashboard" element={<Dashboard />} />

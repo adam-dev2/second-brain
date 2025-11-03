@@ -16,7 +16,7 @@ const ShareModal = () => {
   const setHideIcons = useSetRecoilState(hideIconAtom)
 
   useEffect(()=>{
-    setHideIcons(false);
+    setHideIcons(true);
   },[])
 
   const handleCopy = async () => {
@@ -30,14 +30,20 @@ const ShareModal = () => {
     }
   };
 
+  const handleOpenLink = () => {
+    window.open(shareLink, "_blank");
+    setSearchModal(false)
+  }
+
   return (
     <div>
       {loading ? (
         <Loading />
       ) : (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm bg-opacity-40 z-50">
         <div
           className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-          bg-white/70 backdrop-blur-xl w-96 p-6 rounded-2xl shadow-2xl border border-gray-200"
+          bg-gray-50 w-96 p-6 rounded-3xl shadow-2xl border border-gray-200"
         >
           <button
             className="cursor-pointer absolute top-3 right-3 text-gray-600 hover:text-gray-900 transition"
@@ -73,12 +79,13 @@ const ShareModal = () => {
 
           <div className="mt-5 text-center">
             <button
-              onClick={() => window.open(shareLink, "_blank")}
+              onClick={handleOpenLink}
               className="px-4 py-2 bg-gray-700 text-white text-sm font-medium rounded-lg cursor-pointer hover:scale-102 transition hover:bg-gray-900"
             >
               Open Link
             </button>
           </div>
+        </div>
         </div>
       )}
     </div>

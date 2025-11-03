@@ -1,5 +1,5 @@
 import { atom } from "recoil";
 export const hideIconAtom = atom({
-    default: false,
+    default: true,
     key:'HideIcon'
 }) 

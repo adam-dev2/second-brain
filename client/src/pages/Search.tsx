@@ -188,7 +188,7 @@ const Search = () => {
               className={`grid gap-4 ${
                 isOpen
                   ? "lg:grid-cols-2 xl:grid-cols-3 sm:grid-cols-1"
-                  : "md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:grid-cols-1"
+                  : "md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 sm:grid-cols-1"
               }`}
             >
               {queryCards.map((item, idx) => (
@@ -196,12 +196,11 @@ const Search = () => {
                   key={idx}
                   className="group bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-gray-400 shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col relative overflow-hidden"
                 >
-                  {/* Rank Badge */}
+                  
                   <div className="absolute top-4 right-4 w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
                     {idx + 1}
                   </div>
 
-                  {/* Relevance Score Bar */}
                   {item.relevanceScore && (
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100">
                       <div 
@@ -211,8 +210,8 @@ const Search = () => {
                     </div>
                   )}
 
-                  <div className="flex items-start justify-between gap-3 flex-1 mt-2">
-                    <h1 className="flex-1 text-xl font-bold text-gray-900 line-clamp-2 group-hover:text-gray-700 transition-colors">
+                  <div className="flex items-start justify-between gap-3 flex-1 mt-2 ">
+                    <h1 className="flex-1 text-xl font-bold text-gray-900 line-clamp-2 group-hover:text-gray-700 transition-colors text-wrap">
                       {item.title}
                     </h1>
                   </div>
