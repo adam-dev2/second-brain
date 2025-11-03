@@ -14,6 +14,10 @@ import { getEmbedding } from './config/embeddings.js';
 import { COLLECTION_NAME, qdrantClient } from './utils/qDrant.js';
 import {v4 as uuidv4} from 'uuid'
 import cors from 'cors'
+import passport from "./config/passport.js";
+import oauthRoutes from "./routes/oauthRoutes.js";
+import nodemailer from "nodemailer"
+
 
 const app = express();
 dotenv.config();
@@ -53,6 +57,14 @@ interface IAllCards {
     updatedAt:Date;
 }
 
+const transporter = nodemailer.createTransport({
+    service:"gmail",
+    auth:{
+        user:process.env.EMAIL_USER!,
+        pass:process.env.EMAIL_PASS!
+    },
+})
+
 app.use(express.json());
 
 app.use(cors({
@@ -60,8 +72,13 @@ app.use(cors({
     credentials:true
 }))
 
+app.use(passport.initialize());
+app.use("/api/v1/auth", oauthRoutes);
+
+
+
 app.get('/api/v1/',(req,res) => {
-    return res.status(200).json({message:"Server is Healthy"})
+    return res.status(200).json({message:"Server is asdasdasd"})
 })
 
 app.post('/api/v1/signup',async (req,res) => {
@@ -151,7 +168,7 @@ app.post('/api/v1/login',async (req,res) => {
             {expiresIn:'1h'}
         )
         const cookieOptions:CookieOptions = { 
-            httpOnly: true,
+            httpOnly: false,
             secure: process.env.NODE_ENV === 'production',
             maxAge: 60*60*1000,
             sameSite:'none'
@@ -170,6 +187,59 @@ app.post('/api/v1/login',async (req,res) => {
         message: 'Internal Server Error',
         details: err instanceof Error ? err.message : err,
         });
+    }
+})
+
+app.post('/api/v1/forgotPassword',async(req,res) => {
+    const {email} = req.body;
+    console.log(email);
+    
+    try {
+        const findUser = await User.findOne({email});
+        if(!findUser) {
+            return res.status(401).json({message:"User with this email doesn't exist"})
+        }
+        const token = jwt.sign({id:findUser._id},process.env.RESET_SECRET!,{expiresIn:'15m'});
+        const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+
+        await transporter.sendMail({
+            from:`"Second Brain" ${process.env.EMAIL_USER}`,
+            to:email,
+            subject:'Reset Your Password',
+            html:`<p>Click the link below to reset your password:</p>
+        <a href="${resetLink}">${resetLink}</a>
+        <p>This link expires in 15 minutes.</p>
+      `,
+        });
+        res.json({message:'Password reset email sent'});
+    }catch(err) {
+        console.log(err);
+        return res.status(500).json({message: 'Internal Server Error',err})
+    }
+ })
+
+app.post('/api/v1/reset-password',async(req,res) => {
+    const {token,newPassword} = req.body;
+    try {   
+        const decoded = jwt.verify(token,process.env.RESET_SECRET!) as {id: string};
+        const user = await User.findById(decoded.id);
+        console.log(user?.username);
+        
+        if(!user) {
+            return res.status(400).json({message:"Invalid or expired token"});
+        }
+        if(!newPassword) {
+            return res.status(400).json({message:'new Password is required'})
+        }
+        let hashedPassword = await bcrypt.hash(newPassword,10);
+        user.password = hashedPassword;
+        console.log(hashedPassword);
+        
+        await user.save();
+        return res.status(200).json({message:'Password reset succesfully'});
+    }catch(err) {
+        console.log(err);
+        return res.status(400).json({message: 'Invalid or expired token'})
     }
 })
 
