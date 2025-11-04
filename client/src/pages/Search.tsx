@@ -54,6 +54,8 @@ const Search = () => {
     const token = Cookies.get("token");
     setLoading(true);
     setHasSearched(true);
+    console.log(limit);
+    
 
     try {
       const res = await axios.post(
@@ -68,7 +70,7 @@ const Search = () => {
         }
       );
       setQueryCards(res.data.queryCards);
-      toast.success(`Found ${res.data.queryCards.length} relevant results`);
+      toast.success(`Found ${res.data.queryCards.length} , ${res.data.limit} relevant results`);
     } catch (err: any) {
       console.log(err);
       toast.error(err.response?.data?.message || "Error while fetching query");

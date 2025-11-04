@@ -13,12 +13,14 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { sidebarAtom } from "../store/atoms/sidebar";
+import { SignupFormAtom } from "../store/atoms/signupform";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Sidebar = () => {
   const isOpen = useRecoilValue(sidebarAtom);
   const setIsOpen = useSetRecoilState(sidebarAtom);
   const navigate = useNavigate();
+  const setFormData = useSetRecoilState(SignupFormAtom);
 
   const handleLogout = async () => {
     try {
@@ -27,7 +29,9 @@ const Sidebar = () => {
         headers: { "Content-Type": "application/json" },
       });
       console.log(res?.data);
+
       navigate("/");
+      setFormData(prev => ({ ...prev, username: '',email:'',password:'' }));
       toast.success("Logged out successfully");
     } catch (err) {
       console.log(err);

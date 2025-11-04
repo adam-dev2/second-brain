@@ -107,9 +107,7 @@ const AuthPages = () => {
         );
         console.log(response.data);
         toast.success('Login Successfull')
-        setTimeout(() => {
-          navigate('/home/dashboard')
-        }, 1000)
+        navigate('/home/dashboard')
       } catch (err: any) {
         console.log(err);
         toast.error(err?.response?.data?.message)

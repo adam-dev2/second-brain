@@ -1,9 +1,9 @@
 import type {Request,Response} from 'express';
 import {v4 as uuidv4} from 'uuid';
 import { getEmbedding } from '../utils/embeddings.js';
-import { ConnectQdrant } from '../config/QdrantConfig.js';
 import { COLLECTION_NAME, qdrantClient } from '../utils/qDrant.js';
 import Content from '../models/Content.js';
+import { processCard } from "../services/processor.js";
 
 interface IAllCards {
     userId:string;
@@ -167,137 +167,97 @@ export const FetchMetrics = async(req:Request,res:Response) => {
     }
 }
 
-export const createCard = async(req:Request,res:Response) => {
-    const { link, title, type, share } = req.body;
-    const tags = req.body.tags;
-    
-    if (!link || !title || !type) {
-        return res.status(400).json({ message: "All fields are required" });
-    }
-    if (!tags || tags.length < 1) {
-        return res.status(400).json({ message: 'All fields are required' });
-    }
-    
-    try {
-        const userID = req.user?.id;
-        if (!userID) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
-        
-        const qdrantID = uuidv4();
-        const embeddings = await getEmbedding(title);
+export const createCard = async (req: Request, res: Response) => {
+  const { link, title, type, share, tags } = req.body;
 
-        await qdrantClient.upsert(COLLECTION_NAME, {
-            wait: true,
-            points: [
-                {
-                    id: qdrantID,
-                    vector: embeddings,
-                    payload: {
-                        cardId: qdrantID,
-                        userId: userID,
-                        title: title,
-                    },
-                },
-            ],
-        });
-        
-        const newCard = new Content({
-            userId: userID,
-            cardId: qdrantID,
-            link,
-            title,
-            type,
-            tags,
-            share,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-        });
-        
-        await newCard.save();
-        console.log(`Storing Card title: ${newCard.title}`);
-        console.log(`Card Stored successfully with ID: ${newCard.id}`);
-        
-        return res.status(201).json({ message: 'Card created successfully', card: newCard });
-    } catch (err) {
-        console.error('Error creating card:', err);
-        return res.status(500).json({ error: 'Internal Server Error', details: err });
-    }
-}
+  if (!link || !title || !type || !tags?.length) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
 
-export const EditCard = async(req:Request,res:Response) => {
-    try {
-        const { id } = req.params;
-        const { link, title, share, tags } = req.body;
-        if (!link || !title || !tags) {
-            return res.status(400).json({ message: 'All fields are required' });
-        }
-        
-        const findCard = await Content.findById(id);
-        console.log(findCard, "testing");
-        
-        if (!findCard) {
-            return res.status(404).json({ message: 'Card with that id not found' });
-        }
-        const currentUserId = req.user?.id;
-        if (findCard.userId.toString() !== currentUserId) {
-            return res.status(403).json({ message: 'Unauthorized to edit this card' });
-        }
-        
-        if (findCard.title !== title) {
-            const cardId: string = findCard.cardId;
-            console.log('Updating Qdrant for cardId:', cardId);
-            
-            try {
-                const newTitleEmbeddings = await getEmbedding(title);
-                const result = await qdrantClient.retrieve(COLLECTION_NAME, { ids: [cardId] });
-                
-                if (result && result.length > 0) {
-                    const point = result[0];
-                    await qdrantClient.upsert(COLLECTION_NAME, {
-                        wait: true,
-                        points: [
-                            {
-                                id: cardId,
-                                vector: newTitleEmbeddings,
-                                payload: {
-                                    cardId: cardId,
-                                    userId: currentUserId,
-                                    title: title,
-                                },
-                            },
-                        ],
-                    });
-                    console.log("Qdrant updated successfully for cardId:", cardId);
-                } else {
-                    console.log("Card not found in Qdrant:", cardId);
-                }
-            } catch (qdrantErr) {
-                console.error("Error updating Qdrant:", qdrantErr);
-            }
-        }
-        
-        const updateCard = await Content.findByIdAndUpdate(
-            id,
-            {
-                link,
-                title,
-                share,
-                tags,
-                updatedAt: new Date().toISOString()
-            },
-            { new: true } 
-        );
-        
-        return res.status(200).json({ 
-            message: "Updated card successfully", 
-            card: updateCard 
-        });
-    } catch (err: any) {
-        console.error('Error updating card:', err);
-        return res.status(500).json({ message: 'Internal Server Error', error: err.message });
+  try {
+    const userID = req.user?.id;
+    if (!userID) return res.status(401).json({ message: "Unauthorized" });
+
+    const qdrantID = uuidv4();
+
+    // --- 1️⃣ Store card first (fast response)
+    const newCard = new Content({
+      userId: userID,
+      cardId: qdrantID,
+      link,
+      title,
+      type,
+      tags,
+      share,
+      status: "pending", // mark as pending until embeddings ready
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+
+    await newCard.save();
+
+    // --- 2️⃣ Fire and forget background task (non-blocking)
+    processCard(qdrantID,userID, title, link)
+      .then(() => console.log(`[bg] Process done for ${qdrantID}`))
+      .catch((err:any) => console.error(`[bg] Failed to process ${qdrantID}`, err));
+
+    // --- 3️⃣ Return fast response to user
+    return res.status(201).json({
+      message: "Card created successfully (processing in background)",
+      card: newCard,
+    });
+  } catch (err) {
+    console.error("Error creating card:", err);
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const EditCard = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { link, title, share, tags } = req.body;
+    const userID = req.user?.id!;
+
+    if (!link || !title || !tags?.length) {
+      return res.status(400).json({ message: "All fields are required" });
     }
-}
+
+    const findCard = await Content.findById(id);
+    if (!findCard) return res.status(404).json({ message: "Card not found" });
+
+    const currentUserId = req.user?.id;
+    if (findCard.userId.toString() !== currentUserId)
+      return res.status(403).json({ message: "Unauthorized to edit this card" });
+
+    // Update base data first
+    const updatedCard = await Content.findByIdAndUpdate(
+      id,
+      {
+        link,
+        title,
+        share,
+        tags,
+        status: "pending", // reprocess again
+        updatedAt: new Date().toISOString(),
+      },
+      { new: true }
+    );
+
+    // Fire async reprocessing in background
+    processCard(findCard.cardId,userID, title, link)
+      .then(() => console.log(`[bg] Reprocessed ${findCard.cardId}`))
+      .catch((err) => console.error(`[bg] Failed reprocess ${findCard.cardId}`, err));
+
+    return res.status(200).json({
+      message: "Card updated successfully (reprocessing in background)",
+      card: updatedCard,
+    });
+  } catch (err: any) {
+    console.error("Error updating card:", err);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 
 export const Query = async(req:Request,res:Response) => {
     const query = req.body.query;
@@ -309,6 +269,8 @@ export const Query = async(req:Request,res:Response) => {
     if(!limit) {
         limit = 1;
     }
+    console.log(limit);
+    
     try {
         const userID = req.user?.id;
         if (!userID) {
@@ -319,7 +281,7 @@ export const Query = async(req:Request,res:Response) => {
         
         const searchResults = await qdrantClient.search(COLLECTION_NAME, {
             vector: queryEmbeddings,
-            limit: Number(limit),
+            limit: parseInt(limit),
             filter: {
                 must: [
                     {
@@ -354,7 +316,8 @@ export const Query = async(req:Request,res:Response) => {
         })).sort((a, b) => b.relevanceScore - a.relevanceScore);
         
         return res.status(200).json({ 
-            queryCards: cardsWithScores
+            queryCards: cardsWithScores,
+            limit
         });
     } catch (err: any) {
         console.error('Error querying cards:', err);
@@ -390,6 +353,9 @@ export const DeleteCard = async(req:Request,res:Response) => {
         if(!findCard) {
             return res.status(404).json({message:"There's no card to delete"});
         }
+        await qdrantClient.delete("Card",{
+            points:[findCard.cardId]
+        })
         return res.status(200).json({message:"Card delete Successfilly"});
     }catch(err){
         return res.status(500).json({error: 'Internal Server Error',err})

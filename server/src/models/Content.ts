@@ -21,7 +21,7 @@ const contentSchema = new Schema<IContent>({
     type: {type:String,required: true},
     tags: {type:[String],required: true},
     share:{type:Boolean,required:true},
-    status:{type:String},
+    status:{type:String,enum:["pending","ready","failed"],default:"pending"},
     embedding:{type:[Number]},
     cardId:{type:String},
     createdAt:{type:Date,required:true},
