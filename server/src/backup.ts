@@ -4,17 +4,17 @@ import User from './models/User.js'
 import Content from './models/Content.js';
 import bcrypt from 'bcrypt'
 import dotenv from 'dotenv'
-import ConnectDB from './utils/db.js';
+import ConnectDB from './config/db.js';
 import { signupSchema,loginSchema } from './validations/AuthSchema.js';
 import { ZodError } from 'zod';
 import { AuthMiddleware } from './middlewares/auth.js';
 import { nanoid } from 'nanoid';
 import { ConnectQdrant } from './config/QdrantConfig.js';
-import { getEmbedding } from './config/embeddings.js';
+import { getEmbedding } from './utils/embeddings.js';
 import { COLLECTION_NAME, qdrantClient } from './utils/qDrant.js';
 import {v4 as uuidv4} from 'uuid'
 import cors from 'cors'
-import passport from "./config/passport.js";
+import passport from "./utils/passport.js";
 import oauthRoutes from "./routes/oauthRoutes.js";
 import nodemailer from "nodemailer"
 

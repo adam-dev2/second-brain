@@ -60,7 +60,7 @@ const Card = (props: Iprops) => {
     }
     setLoading(true)
     try {
-      await axios.delete(`${backendUrl}/api/v1/content/${props.id}`, {
+      await axios.delete(`${backendUrl}/api/v1/content/card/${props.id}`, {
         withCredentials: true,
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -108,7 +108,7 @@ const Card = (props: Iprops) => {
               className="p-1.5 hover:bg-red-50 rounded-lg cursor-pointer hover:scale-110 transition-all"
               aria-label="Delete card"
             >
-              <Trash2 size={16} className="text-gray-600 hover:text-red-600" />
+              <Trash2 size={16} className="text-gray-600 hover:text-red-700" />
             </button>
           </div>
         )}

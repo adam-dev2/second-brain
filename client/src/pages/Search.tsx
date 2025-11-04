@@ -57,7 +57,7 @@ const Search = () => {
 
     try {
       const res = await axios.post(
-        `${backendUrl}/api/v1/query`,
+        `${backendUrl}/api/v1/content/query`,
         { query: search, limit: parseInt(limit) },
         {
           withCredentials: true,

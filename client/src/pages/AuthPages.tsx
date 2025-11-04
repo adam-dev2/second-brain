@@ -44,7 +44,7 @@ const AuthPages = () => {
     
     try {
       setLoading(true)
-      const response = await axios.post(`${backendUrl}/api/v1/forgotPassword`,
+      const response = await axios.post(`${backendUrl}/api/v1/auth/forgot-password`,
         {
           email: formData.email
         },
@@ -69,7 +69,7 @@ const AuthPages = () => {
     if (!isLogin) {
       setLoading(true)
       try {
-        await axios.post(`${backendUrl}/api/v1/signup`,
+        await axios.post(`${backendUrl}/api/v1/auth/signup`,
           {
             username: formData.username,
             email: formData.email,
@@ -93,7 +93,7 @@ const AuthPages = () => {
     } else {
       setLoading(true)
       try {
-        const response = await axios.post(`${backendUrl}/api/v1/login`,
+        const response = await axios.post(`${backendUrl}/api/v1/auth/login`,
           {
             email: formData.email,
             password: formData.password

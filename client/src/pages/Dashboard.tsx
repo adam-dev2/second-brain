@@ -52,7 +52,7 @@ const Dashboard = () => {
       
       setLoading(true);
       try {
-        const res = await axios.get(`${backendUrl}/api/v1/metrics`, {
+        const res = await axios.get(`${backendUrl}/api/v1/content/metrics`, {
           withCredentials: true,
           headers: {
             'Authorization': `Bearer ${token}`,

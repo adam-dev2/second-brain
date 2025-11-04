@@ -53,7 +53,7 @@ const Cards = () => {
           navigate('/')
           return;
         }
-        let res = await axios.get(`${backendUrl}/api/v1/cards`,{
+        let res = await axios.get(`${backendUrl}/api/v1/content/cards`,{
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type':'application/json'
@@ -120,16 +120,16 @@ const Cards = () => {
         <div className="flex items-center justify-between py-4">
           <h1 className="text-4xl font-semibold text-gray-800 tracking-tight">
             Cards
-          </h1>
+          </h1> 
           <div className={`flex items-center gap-3`}>
             <input value={search} type="text" className="border border-gray-400 rounded-2xl bg-gray-50 p-2 outline-none placeholder:opacity-45  focus-within:scale-103 transition" placeholder="eg: Title" onChange={handleSearch}/>
             <button onClick={handleClick} className="cursor-pointer flex items-center gap-2 bg-zinc-900 text-gray-100 hover:text-gray-800 font-medium rounded-full py-2 px-4 hover:bg-zinc-200 hover:scale-[1.03] transition-all duration-200">
               <Plus size={20} />
               <span>Add Card</span>
             </button>
-            <button onClick={handleShare} className="cursor-pointer flex items-center gap-2 bg-purple-100 text-purple-700 font-medium rounded-full py-2 px-4 border border-purple-200 hover:bg-purple-200 hover:scale-[1.03] transition-all duration-200">
+            <button onClick={handleShare} className="cursor-pointer flex items-center gap-2 bg-red-100 text-red-900 font-medium rounded-full py-2 px-4 border border-red-200 hover:bg-red-200 hover:text-red-800 hover:scale-[1.03] transition-all duration-200">
               <Share2 size={20} />
-              {/* <span>Share</span> */}
+              <span>Share</span>
             </button>
           </div>
         </div>

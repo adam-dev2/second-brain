@@ -82,7 +82,7 @@ const AddCard = () => {
     setLoading(true)
     try {
       const response = await axios.post(
-        `${backendUrl}/api/v1/card`,
+        `${backendUrl}/api/v1/content/card`,
         {
           title: formData.title,
           link: formData.link,
@@ -126,7 +126,7 @@ const AddCard = () => {
     setLoading(true)
     try {
       const response = await axios.put(
-        `${backendUrl}/api/v1/editCard/${editCardId}`,
+        `${backendUrl}/api/v1/content/editCard/${editCardId}`,
         {
           title: formData.title,
           link: formData.link,
@@ -146,7 +146,7 @@ const AddCard = () => {
       console.log("Edit response:", response.data);
       const updatedCard = response.data.updateCard || response.data;
       console.log(updatedCard);
-      const res = await axios.get(`${backendUrl}/api/v1/cards`, {
+      const res = await axios.get(`${backendUrl}/api/v1/content/cards`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -297,7 +297,16 @@ const AddCard = () => {
             {formData.button}
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
+       <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-700 shadow-sm flex items-start gap-2">
+        <span className="text-gray-500 text-base">💡</span>
+        <p>
+          <span className="font-medium">Tip:</span> Use a descriptive and relevant name, it helps improve 
+          <span className="font-semibold text-gray-800"> search accuracy</span> and results when using 
+          <span className="font-semibold text-gray-800"> Elasticsearch</span>.
+        </p>
+      </div>
         </form>
+
       </div>
   </div>
 }

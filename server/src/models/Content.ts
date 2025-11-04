@@ -7,6 +7,7 @@ export interface IContent extends Document {
     type: string;
     tags:string[];
     share:boolean;
+    status?:string;
     embedding?:number[];
     cardId:string;
     createdAt:Date;
@@ -20,6 +21,7 @@ const contentSchema = new Schema<IContent>({
     type: {type:String,required: true},
     tags: {type:[String],required: true},
     share:{type:Boolean,required:true},
+    status:{type:String},
     embedding:{type:[Number]},
     cardId:{type:String},
     createdAt:{type:Date,required:true},

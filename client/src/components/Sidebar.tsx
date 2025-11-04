@@ -22,7 +22,7 @@ const Sidebar = () => {
 
   const handleLogout = async () => {
     try {
-      const res = await axios.get(`${backendUrl}/api/v1/logout`, {
+      const res = await axios.get(`${backendUrl}/api/v1/auth/logout`, {
         withCredentials: true,
         headers: { "Content-Type": "application/json" },
       });

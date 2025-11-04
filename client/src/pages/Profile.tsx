@@ -54,7 +54,7 @@ const Profile: React.FC = () => {
 
       // Step 1: Verify current password
       const verifyRes = await axios.post(
-        `${backendUrl}/api/v1/userconfirmation`,
+        `${backendUrl}/api/v1/user/userconfirmation`,
         { password: currentPassword },
         {
           withCredentials: true,
@@ -68,7 +68,7 @@ const Profile: React.FC = () => {
       if (verifyRes.status === 200) {
         // Step 2: Proceed to update profile
         const res = await axios.put(
-          `${backendUrl}/api/v1/profile`,
+          `${backendUrl}/api/v1/user/profile`,
           {
             username: user.username,
             email: user.email,

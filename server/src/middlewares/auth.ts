@@ -17,10 +17,7 @@ declare global {
 
 export const AuthMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // ✅ 1️⃣ Check token from cookie first
     const cookieToken = req.cookies?.token;
-
-    // ✅ 2️⃣ Fallback: Authorization header (for testing or API clients)
     const headerToken = req.headers.authorization?.split(" ")[1];
 
     const token = cookieToken || headerToken;
@@ -32,10 +29,8 @@ export const AuthMiddleware = async (req: Request, res: Response, next: NextFunc
       return res.status(500).json({ message: "JWT Secret is missing" });
     }
 
-    // ✅ 3️⃣ Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
 
-    // ✅ 4️⃣ Attach user to req
     const user = await User.findById(decoded.id).select("_id username email");
     if (!user) {
       return res.status(401).json({ message: "User not found" });
