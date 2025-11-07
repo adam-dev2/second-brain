@@ -1,15 +1,15 @@
-import mongoose, {Document,Schema, type ObjectId} from "mongoose";
+import mongoose, { Document, Schema, type ObjectId } from "mongoose";
 
 interface ITags extends Document {
-    title: string,
-    userID: ObjectId
+  title: string;
+  userID: ObjectId;
 }
 
 const tagsSchema = new Schema<ITags>({
-    title: {type:String,required:true},
-    userID:{type:mongoose.Schema.Types.ObjectId,ref:'User',required:true}
-})
+  title: { type: String, required: true },
+  userID: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+});
 
-const Tags = mongoose.model<ITags>('Tags',tagsSchema);
+const Tags = mongoose.model<ITags>("Tags", tagsSchema);
 
-export default Tags
+export default Tags;

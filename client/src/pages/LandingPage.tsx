@@ -1,54 +1,79 @@
-import { useState } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { Search, Tag, Share2, Lock, BarChart3, Clock, Zap, Github, ArrowRight, BookmarkPlus,LogOut, ChevronLeft, ChevronRight, LayoutDashboard, FileStack, Tags, UserRoundPen, FileText, Video, Twitter, Link2, User, Bookmark } from 'lucide-react';
+import { useState } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import {
+  Search,
+  Tag,
+  Share2,
+  Lock,
+  BarChart3,
+  Clock,
+  Zap,
+  Github,
+  ArrowRight,
+  BookmarkPlus,
+  LogOut,
+  ChevronLeft,
+  ChevronRight,
+  LayoutDashboard,
+  FileStack,
+  Tags,
+  UserRoundPen,
+  FileText,
+  Video,
+  Twitter,
+  Link2,
+  User,
+  Bookmark,
+} from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
+import { useNavigate } from "react-router-dom";
 
-
-const App = () => {
+const LandingPage = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const { scrollY } = useScroll();
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
   const scale = useTransform(scrollY, [0, 300], [1, 0.8]);
-
+  const navigate = useNavigate();
 
   const features = [
     {
       icon: <Search className="w-6 h-6" />,
       title: "Elastic Search",
-      description: "Lightning-fast search powered by Elasticsearch to find your bookmarks instantly"
+      description:
+        "Lightning-fast search powered by Elasticsearch to find your bookmarks instantly",
     },
     {
       icon: <Tag className="w-6 h-6" />,
       title: "Smart Tagging",
-      description: "Organize with custom tags and see your most-used tags at a glance"
+      description: "Organize with custom tags and see your most-used tags at a glance",
     },
     {
       icon: <Share2 className="w-6 h-6" />,
       title: "Share Your Brain",
-      description: "Make your second brain public and share knowledge with anyone"
+      description: "Make your second brain public and share knowledge with anyone",
     },
     {
       icon: <Lock className="w-6 h-6" />,
       title: "Privacy Control",
-      description: "Toggle between private and public for each bookmark with one click"
+      description: "Toggle between private and public for each bookmark with one click",
     },
     {
       icon: <BarChart3 className="w-6 h-6" />,
       title: "KPI Dashboard",
-      description: "Track your bookmarking habits with insightful metrics and analytics"
+      description: "Track your bookmarking habits with insightful metrics and analytics",
     },
     {
       icon: <Clock className="w-6 h-6" />,
       title: "Recent Activity",
-      description: "View your top 5 recent bookmarks for quick access to latest saves"
-    }
+      description: "View your top 5 recent bookmarks for quick access to latest saves",
+    },
   ];
 
   const stats = [
     { label: "Bookmarks Created", value: "10K+", icon: <Bookmark className="w-10 h-10" /> },
     { label: "Active Users", value: "2.5K+", icon: <User className="w-10 h-10" /> },
     { label: "Shared Brains", value: "1.2K+", icon: <Share2 className="w-10 h-10" /> },
-    { label: "Tags Used", value: "50K+", icon: <Tag className="w-10 h-10" /> }
+    { label: "Tags Used", value: "50K+", icon: <Tag className="w-10 h-10" /> },
   ];
 
   const sidebarLinks = [
@@ -60,11 +85,41 @@ const App = () => {
   ];
 
   const mockRecentCards = [
-    { id: 1, title: "React Performance Optimization", type: "document", tags: ["react", "performance"], date: "2 hours ago" },
-    { id: 2, title: "Advanced TypeScript Patterns", type: "video", tags: ["typescript", "tutorial"], date: "5 hours ago" },
-    { id: 3, title: "Design System Best Practices", type: "document", tags: ["design", "ui"], date: "1 day ago" },
-    { id: 4, title: "API Design Guidelines", type: "tweet", tags: ["api", "backend"], date: "2 days ago" },
-    { id: 5, title: "Database Optimization Tips", type: "link", tags: ["database", "sql"], date: "3 days ago" },
+    {
+      id: 1,
+      title: "React Performance Optimization",
+      type: "document",
+      tags: ["react", "performance"],
+      date: "2 hours ago",
+    },
+    {
+      id: 2,
+      title: "Advanced TypeScript Patterns",
+      type: "video",
+      tags: ["typescript", "tutorial"],
+      date: "5 hours ago",
+    },
+    {
+      id: 3,
+      title: "Design System Best Practices",
+      type: "document",
+      tags: ["design", "ui"],
+      date: "1 day ago",
+    },
+    {
+      id: 4,
+      title: "API Design Guidelines",
+      type: "tweet",
+      tags: ["api", "backend"],
+      date: "2 days ago",
+    },
+    {
+      id: 5,
+      title: "Database Optimization Tips",
+      type: "link",
+      tags: ["database", "sql"],
+      date: "3 days ago",
+    },
   ];
 
   const mockTopTags = [
@@ -75,38 +130,44 @@ const App = () => {
     { name: "tutorial", count: 24 },
   ];
 
-const sampleCards = [
-  {
-    title: "Design Inspiration Board",
-    link: "dribbble.com/shots/12345",
-    tags: ["design", "ui", "inspiration"],
-  },
-  {
-    title: "Next.js Performance Tips",
-    link: "vercel.com/blog/nextjs-performance",
-    tags: ["nextjs", "performance", "dev"],
-  },
-  {
-    title: "Building a Second Brain",
-    link: "aliabdaal.com/second-brain",
-    tags: ["productivity", "notes", "learning"],
-  },
-];
+  const sampleCards = [
+    {
+      title: "Design Inspiration Board",
+      link: "dribbble.com/shots/12345",
+      tags: ["design", "ui", "inspiration"],
+    },
+    {
+      title: "Next.js Performance Tips",
+      link: "vercel.com/blog/nextjs-performance",
+      tags: ["nextjs", "performance", "dev"],
+    },
+    {
+      title: "Building a Second Brain",
+      link: "aliabdaal.com/second-brain",
+      tags: ["productivity", "notes", "learning"],
+    },
+  ];
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case 'document': return <FileText className="w-4 h-4" />;
-      case 'video': return <Video className="w-4 h-4" />;
-      case 'tweet': return <Twitter className="w-4 h-4" />;
-      default: return <Link2 className="w-4 h-4" />;
+      case "document":
+        return <FileText className="w-4 h-4" />;
+      case "video":
+        return <Video className="w-4 h-4" />;
+      case "tweet":
+        return <Twitter className="w-4 h-4" />;
+      default:
+        return <Link2 className="w-4 h-4" />;
     }
   };
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
+      {/* Animated background gradient */}
       <div className="fixed inset-0 bg-linear-to-br from-gray-900 via-black to-gray-900 opacity-50" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05),transparent_50%)]" />
 
-      <motion.section 
+      {/* Hero Section */}
+      <motion.section
         className="relative min-h-screen flex items-center justify-center px-4"
         style={{ opacity, scale }}
       >
@@ -138,7 +199,8 @@ const sampleCards = [
             transition={{ duration: 0.8, delay: 0.4 }}
             className="text-2xl md:text-3xl text-gray-400 mb-12 max-w-3xl mx-auto"
           >
-            Think less about <span className='font-bold text-gray-200'>remembering</span>. Let your <span className='font-bold text-gray-200'>second brain</span> do it for you.
+            Think less about <span className="font-bold text-gray-200">remembering</span>. Let your{" "}
+            <span className="font-bold text-gray-200">second brain</span> do it for you.
           </motion.p>
 
           <motion.div
@@ -147,24 +209,35 @@ const sampleCards = [
             transition={{ duration: 0.8, delay: 0.6 }}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center"
           >
-            <button  className="group px-8 py-4 bg-white text-black rounded-lg font-semibold flex items-center gap-2 hover:bg-gray-200 transition-all">
+            <button
+              onClick={() => {
+                navigate("/auth");
+              }}
+              className="group px-8 py-4 bg-white text-black rounded-lg font-semibold flex items-center gap-2 hover:bg-gray-200 transition-all"
+            >
               <Github className="w-5 h-5" />
               Sign in with GitHub
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
-            <button className="px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-semibold flex items-center gap-2 hover:bg-white/20 transition-all">
+            <button
+              onClick={() => {
+                navigate("/auth");
+              }}
+              className="px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-semibold flex items-center gap-2 hover:bg-white/20 transition-all"
+            >
               <FcGoogle className="w-5 h-5" />
               Sign in with Google
             </button>
           </motion.div>
 
+          {/* Floating cards preview */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.8 }}
             className="mt-15 relative"
           >
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
               {sampleCards.map((card, i) => (
                 <motion.div
                   key={i}
@@ -175,7 +248,7 @@ const sampleCards = [
                   className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4 hover:border-white/20 transition-all"
                 >
                   <div className="flex flex-col items-start">
-                    <div className='flex justify-between w-full'>
+                    <div className="flex justify-between w-full">
                       <h3 className="text-sm font-semibold mb-2 text-white">{card.title}</h3>
                       <div className="flex items-start mb-3">
                         <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center">
@@ -201,6 +274,8 @@ const sampleCards = [
             </div>
           </motion.div>
         </div>
+
+        {/* Scroll indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -217,6 +292,7 @@ const sampleCards = [
         </motion.div>
       </motion.section>
 
+      {/* Stats Section */}
       <section className="relative py-20 px-4 border-t border-white/10">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -229,9 +305,7 @@ const sampleCards = [
                 transition={{ delay: index * 0.1 }}
                 className="text-center"
               >
-                <div className="flex justify-center mb-3 text-gray-400">
-                  {stat.icon}
-                </div>
+                <div className="flex justify-center mb-3 text-gray-400">{stat.icon}</div>
                 <div className="text-3xl md:text-4xl font-bold mb-2">{stat.value}</div>
                 <div className="text-sm text-gray-500">{stat.label}</div>
               </motion.div>
@@ -240,6 +314,7 @@ const sampleCards = [
         </div>
       </section>
 
+      {/* Features Section */}
       <section className="relative py-32 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -274,6 +349,7 @@ const sampleCards = [
         </div>
       </section>
 
+      {/* Interactive Dashboard Preview */}
       <section className="relative py-32 px-4 border-t border-white/10">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -283,7 +359,9 @@ const sampleCards = [
             className="text-center mb-16"
           >
             <h2 className="text-4xl md:text-5xl font-bold mb-4">Experience the Dashboard</h2>
-            <p className="text-gray-400 text-lg">A glimpse into your command center for knowledge management</p>
+            <p className="text-gray-400 text-lg">
+              A glimpse into your command center for knowledge management
+            </p>
           </motion.div>
 
           <motion.div
@@ -292,8 +370,12 @@ const sampleCards = [
             viewport={{ once: true }}
             className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden"
           >
+            {/* Mock App Interface */}
             <div className="flex h-[700px]">
-              <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-black border-r border-white/10  whitespace-nowrap transition-all duration-300 flex flex-col p-4`}>
+              {/* Sidebar */}
+              <div
+                className={`${sidebarOpen ? "w-64" : "w-20"} bg-black border-r border-white/10  whitespace-nowrap transition-all duration-300 flex flex-col p-4`}
+              >
                 <div className="flex items-center justify-between mb-10 mt-2">
                   {sidebarOpen && (
                     <h1 className="text-xl font-bold tracking-wide text-white">Second Brain</h1>
@@ -304,8 +386,10 @@ const sampleCards = [
                   {sidebarLinks.map(({ label, icon: Icon, active }) => (
                     <div
                       key={label}
-                      className={`flex items-center ${sidebarOpen ? 'justify-start' : 'justify-center'} gap-3 p-2 rounded-md transition-all ${
-                        active ? 'bg-white text-black font-semibold' : 'text-white hover:bg-neutral-900'
+                      className={`flex items-center ${sidebarOpen ? "justify-start" : "justify-center"} gap-3 p-2 rounded-md transition-all ${
+                        active
+                          ? "bg-white text-black font-semibold"
+                          : "text-white hover:bg-neutral-900"
                       }`}
                     >
                       <Icon className="shrink-0" size={sidebarOpen ? 20 : 24} />
@@ -323,21 +407,25 @@ const sampleCards = [
 
                 <button
                   onClick={() => setSidebarOpen(!sidebarOpen)}
-                  className={`absolute top-4 ${sidebarOpen ? 'left-60' : 'left-6'} p-2 rounded-lg bg-black transition-all z-10`}
+                  className={`absolute top-4 ${sidebarOpen ? "left-60" : "left-6"} p-2 rounded-lg bg-black transition-all z-10`}
                 >
                   {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
                 </button>
               </div>
 
+              {/* Main Dashboard Content */}
               <div className="flex-1 bg-gray-50 p-8 overflow-y-auto">
                 <div className="mb-3">
-                  <h1 className="text-4xl font-semibold text-gray-800 tracking-tight mb-1">Dashboard</h1>
+                  <h1 className="text-4xl font-semibold text-gray-800 tracking-tight mb-1">
+                    Dashboard
+                  </h1>
                   <p className="text-gray-600">Overview of your knowledge base</p>
                   <div className="text-sm text-gray-500 mt-2 opacity-85">
                     Last updated: {new Date().toLocaleDateString()}
                   </div>
                 </div>
 
+                {/* Stats Grid */}
                 <div className="grid grid-cols-4 gap-4 mb-6">
                   <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
                     <p className="text-gray-600 font-semibold text-sm mb-2">Total Cards</p>
@@ -357,7 +445,9 @@ const sampleCards = [
                   </div>
                 </div>
 
+                {/* Recent Cards & Top Tags */}
                 <div className="grid lg:grid-cols-3 gap-6">
+                  {/* Recent Cards */}
                   <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 col-span-2">
                     <div className="flex items-center justify-between mb-4">
                       <h2 className="text-lg font-semibold text-gray-800">Recent Cards</h2>
@@ -366,7 +456,7 @@ const sampleCards = [
                       </button>
                     </div>
                     <div className="space-y-2">
-                      {mockRecentCards.slice(0,4).map((card) => (
+                      {mockRecentCards.slice(0, 4).map((card) => (
                         <div
                           key={card.id}
                           className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer group"
@@ -398,6 +488,7 @@ const sampleCards = [
                     </div>
                   </div>
 
+                  {/* Top Tags */}
                   <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">Top Tags</h2>
                     <div className="space-y-3">
@@ -408,7 +499,7 @@ const sampleCards = [
                             <span className="text-sm font-semibold text-gray-900">{tag.count}</span>
                           </div>
                           <div className="w-full bg-gray-100 rounded-full h-2">
-                            <div 
+                            <div
                               className="bg-gray-600 h-2 rounded-full transition-all"
                               style={{ width: `${(tag.count / mockTopTags[0].count) * 100}%` }}
                             />
@@ -424,6 +515,7 @@ const sampleCards = [
         </div>
       </section>
 
+      {/* CTA Section */}
       <section className="relative py-32 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
@@ -440,7 +532,12 @@ const sampleCards = [
               Join thousands of users organizing their digital knowledge
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="group px-8 py-4 bg-white text-black rounded-lg font-semibold flex items-center gap-2 justify-center hover:bg-gray-200 transition-all">
+              <button
+                onClick={() => {
+                  navigate("/auth");
+                }}
+                className="group px-8 py-4 bg-white text-black rounded-lg font-semibold flex items-center gap-2 justify-center hover:bg-gray-200 transition-all"
+              >
                 Get Started Free
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
@@ -449,6 +546,7 @@ const sampleCards = [
         </div>
       </section>
 
+      {/* Footer */}
       <footer className="relative border-t border-white/10 py-8 px-4">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
           <div className="flex items-center gap-2 mb-4 md:mb-0">
@@ -456,9 +554,15 @@ const sampleCards = [
             <span>Second Brain © 2025</span>
           </div>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
-            <a href="#" className="hover:text-white transition-colors">Contact</a>
+            <a href="#" className="hover:text-white transition-colors">
+              Privacy
+            </a>
+            <a href="#" className="hover:text-white transition-colors">
+              Terms
+            </a>
+            <a href="#" className="hover:text-white transition-colors">
+              Contact
+            </a>
           </div>
         </div>
       </footer>
@@ -466,4 +570,4 @@ const sampleCards = [
   );
 };
 
-export default App;
+export default LandingPage;

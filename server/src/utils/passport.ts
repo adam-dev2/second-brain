@@ -1,8 +1,8 @@
-// config/passport.ts
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Strategy as GitHubStrategy } from "passport-github2";
-import User from "../models/User.js";
+import type { Profile, VerifyCallback } from "passport-google-oauth20";
+import UserModal from "../models/User.js";
 
 passport.use(
   new GoogleStrategy(
@@ -11,18 +11,18 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       callbackURL: "/api/v1/auth/google/callback",
     },
-    async (_accessToken, _refreshToken, profile, done) => {
+    async (_accessToken: string, _refreshToken: string, profile: Profile, done: VerifyCallback) => {
       try {
-        let user = await User.findOne({ googleId: profile.id });
-        if (!user) {
-          user = await User.create({
+        let User = await UserModal.findOne({ googleId: profile.id });
+        if (!User) {
+          User = await UserModal.create({
             googleId: profile.id,
             username: profile.displayName,
             email: profile.emails?.[0]?.value || "",
             avatar: profile.photos?.[0]?.value,
           });
         }
-        done(null, user);
+        done(null, User);
       } catch (err) {
         done(err, false);
       }
@@ -37,20 +37,20 @@ passport.use(
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
       callbackURL: "/api/v1/auth/github/callback",
     },
-    async (_accessToken:any, _refreshToken:any, profile:any, done:any) => {
+    async (_accessToken: string, _refreshToken: string, profile: Profile, done: VerifyCallback) => {
       try {
-        let user = await User.findOne({ githubId: profile.id });
-        if (!user) {
-          user = await User.create({
+        let User = await UserModal.findOne({ githubId: profile.id });
+        if (!User) {
+          User = await UserModal.create({
             githubId: profile.id,
             username: profile.username!,
             email: profile.emails?.[0]?.value || "",
             avatar: profile.photos?.[0]?.value,
           });
         }
-        done(null, user);
+        done(null, User);
       } catch (err) {
-        done(err, null);
+        done(err, false);
       }
     }
   )

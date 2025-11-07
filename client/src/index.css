@@ -1,9 +1,10 @@
-@import 'tailwindcss';
-::selection{
-    background-color: gray;
+@import "tailwindcss";
+::selection {
+  background-color: gray;
 }
 @keyframes sparkle {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0;
     transform: scale(0.8) translateY(0);
   }

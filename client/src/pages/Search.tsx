@@ -1,6 +1,6 @@
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { searchAtom } from "../store/atoms/search";
-import { useEffect, useState, type KeyboardEvent } from "react";
+import React, { useEffect, useState, type KeyboardEvent } from "react";
 import { loadingAtom } from "../store/atoms/loading";
 import LoadingOverlay from "../components/Loading";
 import axios from "axios";
@@ -8,9 +8,9 @@ import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { sidebarAtom } from "../store/atoms/sidebar";
 import { hideIconAtom } from "../store/atoms/hideIcons";
-import { Search as SearchIcon,ExternalLink, Lock, Globe } from "lucide-react";
+import { Search as SearchIcon, ExternalLink, Lock, Globe } from "lucide-react";
+import { handleError } from "../utils/handleError";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
 
 interface CardData {
   _id: string;
@@ -39,7 +39,7 @@ const Search = () => {
     setHideIcons(true);
   }, []);
 
-  const handleChange = (e: any) => setSearch(e.target.value);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value);
 
   const fetchQuery = async () => {
     if (search.trim() === "") {
@@ -55,7 +55,6 @@ const Search = () => {
     setLoading(true);
     setHasSearched(true);
     console.log(limit);
-    
 
     try {
       const res = await axios.post(
@@ -70,10 +69,10 @@ const Search = () => {
         }
       );
       setQueryCards(res.data.queryCards);
-      toast.success(`Found ${res.data.queryCards.length} , ${res.data.limit} relevant results`);
-    } catch (err: any) {
+      toast.success(`Found ${res.data.queryCards.length} relevant results`);
+    } catch (err: unknown) {
+      handleError(err, "Error while fetching query results");
       console.log(err);
-      toast.error(err.response?.data?.message || "Error while fetching query");
       setQueryCards([]);
     } finally {
       setLoading(false);
@@ -95,19 +94,17 @@ const Search = () => {
       {loading ? (
         <LoadingOverlay />
       ) : (
-        <div className="h-full w-full p-9 pt-20 m-auto">
+        <div className="w-full p-9 pt-20">
           {/* Hero Section */}
-          <div className="mb-8">
-            <div className="flex items-center gap-3 mb-4">
-              
-              <div>
+          <div className="mb-8 ">
+            <div className="flex gap-3 mb-4 ">
+              <div className="h-full">
                 <h1 className="text-4xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
                   AI-Powered Elastic Search
                 </h1>
                 <p className="text-gray-600 mt-1">Find cards by meaning, not just keywords</p>
               </div>
             </div>
-
 
             {/* Search Bar */}
             <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-200 p-2 hover:shadow-2xl transition-shadow">
@@ -123,7 +120,7 @@ const Search = () => {
                     onChange={handleChange}
                   />
                 </div>
-                
+
                 <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
                   <span className="text-gray-700 text-sm font-medium whitespace-nowrap">Top</span>
                   <input
@@ -145,14 +142,6 @@ const Search = () => {
                 </button>
               </div>
             </div>
-
-            {/* Example Queries */}
-            {!hasSearched && (
-              <div className="mt-4">
-                <p className="text-sm text-gray-600 mb-2">Try searching for:</p>
-                
-              </div>
-            )}
           </div>
 
           {/* Results Section */}
@@ -162,7 +151,7 @@ const Search = () => {
                 Search Results
                 {queryCards.length > 0 && (
                   <span className="text-lg font-normal text-gray-600">
-                    ({queryCards.length} {queryCards.length === 1 ? 'result' : 'results'})
+                    ({queryCards.length} {queryCards.length === 1 ? "result" : "results"})
                   </span>
                 )}
               </h2>
@@ -171,13 +160,25 @@ const Search = () => {
               )}
             </div>
           )}
-
+          {!hasSearched && (
+            <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-300">
+              <SearchIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                Start exploring your saved content
+              </h3>
+              <p className="text-gray-600 mb-4">
+                Powered by Elastic — search deeply across titles, tags, and text in real time.
+              </p>
+            </div>
+          )}
           {/* Query Result Cards */}
           {hasSearched && queryCards.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-300">
               <SearchIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-gray-900 mb-2">No Results Found</h3>
-              <p className="text-gray-600 mb-4">Try adjusting your search query or check your spelling</p>
+              <p className="text-gray-600 mb-4">
+                Try adjusting your search query or check your spelling
+              </p>
               <button
                 onClick={() => setHasSearched(false)}
                 className="text-gray-800 hover:text-gray-900 font-medium underline"
@@ -198,14 +199,13 @@ const Search = () => {
                   key={idx}
                   className="group bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-gray-400 shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col relative overflow-hidden"
                 >
-                  
                   <div className="absolute top-4 right-4 w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
                     {idx + 1}
                   </div>
 
                   {item.relevanceScore && (
                     <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100">
-                      <div 
+                      <div
                         className="h-full bg-gray-800 transition-all"
                         style={{ width: `${item.relevanceScore * 100}%` }}
                       ></div>
@@ -230,9 +230,7 @@ const Search = () => {
                     </a>
                     <span
                       className={`px-3 py-1.5 text-xs font-bold rounded-full whitespace-nowrap flex items-center gap-1.5 shadow-sm ${
-                        item.share
-                          ? "bg-gray-800 text-white"
-                          : "bg-gray-200 text-gray-800"
+                        item.share ? "bg-gray-800 text-white" : "bg-gray-200 text-gray-800"
                       }`}
                     >
                       {item.share ? (

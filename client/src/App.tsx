@@ -9,17 +9,18 @@ import Cards from "./pages/Cards";
 import Profile from "./pages/Profile";
 import Share from "./pages/Share";
 import ResetPassword from "./pages/ResetPassword";
+import LandingPage from "./pages/LandingPage";
 
 const App = () => {
   return (
     <RecoilRoot>
       <Router>
         <Routes>
-          
-          <Route path="/" element={ <Signup /> } />
-          <Route path="/:id" element={ <Share /> } />
-          <Route path="/reset-password/:token" element={ <ResetPassword /> } />
-            
+          <Route path="/auth" element={<Signup />} />
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/:id" element={<Share />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
+
           <Route path="/home" element={<DashboardLayout />}>
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="tags" element={<Tags />} />

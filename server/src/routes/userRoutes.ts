@@ -4,8 +4,8 @@ import { FetchProfile, FetchUser, FetchUserDetails } from "../controllers/userCo
 
 const router = express.Router();
 
-router.get('/',AuthMiddleware,FetchUser);
-router.post('/userconfirmation',AuthMiddleware,FetchUserDetails);
-router.put('/profile',AuthMiddleware,FetchProfile)
+router.get("/", AuthMiddleware, FetchUser);
+router.post("/userconfirmation", AuthMiddleware, FetchUserDetails);
+router.put("/profile", AuthMiddleware, FetchProfile);
 
 export default router;
