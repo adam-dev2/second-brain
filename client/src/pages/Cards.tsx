@@ -183,7 +183,7 @@ const Cards = () => {
               </button>
               <button
                 onClick={handleShare}
-                className="cursor-pointer flex items-center gap-2 bg-violet-200 text-violet-700 font-medium rounded-full py-2 px-4 border border-violet-500 hover:bg-violet-300 hover:text-violet-800 hover:scale-[1.03] transition-all duration-200"
+                className="cursor-pointer flex items-center gap-2 bg-red-50 text-red-400 font-medium rounded-full py-2 px-4 border border-red-400 hover:bg-red-100 hover:text-red-500 hover:scale-[1.03] transition-all duration-200"
               >
                 <Share2 size={20} />
                 <span className="hidden md:block">Share</span>

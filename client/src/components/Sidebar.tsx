@@ -54,7 +54,7 @@ const Sidebar = () => {
       } fixed top-0 left-0 h-full bg-black text-white flex flex-col p-4 border-r border-white/10 shadow-2xl transition-all duration-300 z-50`}
     >
       {/* Header with toggle */}
-      <div className="flex items-center justify-between mb-10 mt-2 overflow-hidden">
+      <div className="flex items-center justify-between m-0 md:mb-10 md:mt-2 overflow-hidden">
         <h1
           className={`text-sm sm:text-2xl font-bold tracking-wide text-white whitespace-nowrap transition-all duration-300 ${
             isOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
@@ -104,9 +104,9 @@ const Sidebar = () => {
       </div>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed top-3 ${isOpen ? "left-60" : "left-5"} p-2 rounded-lg bg-black transition-all`}
+        className={`md:block fixed hidden top-0 md:top-3 ${isOpen ? "left-60" : "left-5"} p-2 rounded-lg bg-black transition-all`}
       >
-        {isOpen ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
+        {isOpen ? <ChevronLeft  size={22} /> : <ChevronRight size={22} />}
       </button>
     </aside>
   );
