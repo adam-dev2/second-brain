@@ -1,15 +1,23 @@
 import { atom } from "recoil";
 
 interface IFormData {
-  heading:String;
+  heading: string;
   title: string;
   link: string;
   share: boolean;
-  type:string;
+  type: string;
   tags: string[];
-  button:string;
+  button: string;
 }
 export const formdataAtom = atom<IFormData>({
-    key:'FormData',
-    default:{title:'',link:'',share:false,tags:[],type:'',heading:'Add Card',button:'Save Card'}
-})
+  key: "FormData",
+  default: {
+    title: "",
+    link: "",
+    share: false,
+    tags: [],
+    type: "",
+    heading: "Add Card",
+    button: "Save Card",
+  },
+});

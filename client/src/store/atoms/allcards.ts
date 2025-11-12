@@ -5,11 +5,11 @@ export interface Card {
   link: string;
   tags: string[];
   share: boolean;
-  type:string;
+  type: string;
   createdAt: string;
   updatedAt: string;
 }
 export const allcardsAtom = atom<Card[]>({
-    key:"allcardsAtom",
-    default:[]
-})
+  key: "allcardsAtom",
+  default: [],
+});

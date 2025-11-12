@@ -4,8 +4,10 @@ import type { ChangeEvent } from "react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+import { useNavigate } from "react-router-dom";
+import { handleError } from "../utils/handleError";
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface UserProfile {
   avatar: string | null;
@@ -15,6 +17,7 @@ interface UserProfile {
 }
 
 const Profile: React.FC = () => {
+  const navigate = useNavigate();
   const [toggle, setToggle] = useState(false);
   const [user, setUser] = useState<UserProfile>({
     avatar: null,
@@ -25,22 +28,29 @@ const Profile: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const token = Cookies.get("token");
+
+  useEffect(() => {
+    if (!token) {
+      toast.error("No token found. Please log in again.");
+      navigate("/auth");
+      return;
+    }
+  }, []);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUser((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Main Save Button Click
   const handleSave = async () => {
     setShowModal(true);
   };
-
-  // ✅ Verify password and update profile
   const handleConfirmAndSave = async () => {
     const token = Cookies.get("token");
     if (!token) {
       toast.error("No token found. Please log in again.");
+      navigate("/auth");
       return;
     }
 
@@ -51,10 +61,8 @@ const Profile: React.FC = () => {
 
     try {
       setLoading(true);
-
-      // Step 1: Verify current password
       const verifyRes = await axios.post(
-        `${backendUrl}/api/v1/userconfirmation`,
+        `${backendUrl}/api/v1/user/userconfirmation`,
         { password: currentPassword },
         {
           withCredentials: true,
@@ -66,9 +74,8 @@ const Profile: React.FC = () => {
       );
 
       if (verifyRes.status === 200) {
-        // Step 2: Proceed to update profile
         const res = await axios.put(
-          `${backendUrl}/api/v1/profile`,
+          `${backendUrl}/api/v1/user/profile`,
           {
             username: user.username,
             email: user.email,
@@ -93,12 +100,9 @@ const Profile: React.FC = () => {
         setShowModal(false);
         setCurrentPassword("");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      handleError(err, "Incorrect current password or update failed");
       console.error("Error verifying or updating:", err);
-      toast.error(
-        err?.response?.data?.message ||
-          "Incorrect current password or update failed"
-      );
     } finally {
       setLoading(false);
     }
@@ -126,12 +130,8 @@ const Profile: React.FC = () => {
           ...prevUser,
           ...userProfile,
         }));
-      } catch (err: any) {
-        console.error("Error fetching user profile:", err);
-        toast.error(
-          err?.response?.data?.message ||
-            "Error while fetching user profile"
-        );
+      } catch (err: unknown) {
+        handleError(err, "Error while Fetching Profile");
       }
     };
 
@@ -145,9 +145,7 @@ const Profile: React.FC = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold text-gray-800">Profile</h1>
-            <p className="text-gray-500 text-sm mt-1">
-              Manage your personal information
-            </p>
+            <p className="text-gray-500 text-sm mt-1">Manage your personal information</p>
           </div>
 
           {/* Avatar */}
@@ -167,9 +165,7 @@ const Profile: React.FC = () => {
           {/* Form */}
           <div className="flex flex-col gap-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Username
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
               <input
                 type="text"
                 name="username"
@@ -180,9 +176,7 @@ const Profile: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
               <input
                 type="email"
                 name="email"
@@ -193,9 +187,7 @@ const Profile: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
               <div className="relative">
                 <input
                   type={toggle ? "text" : "password"}
@@ -210,11 +202,7 @@ const Profile: React.FC = () => {
                   onClick={() => setToggle((t) => !t)}
                   className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
                 >
-                  {toggle ? (
-                    <EyeOff className="w-5 h-5" />
-                  ) : (
-                    <Eye className="w-5 h-5" />
-                  )}
+                  {toggle ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
             </div>
@@ -235,9 +223,7 @@ const Profile: React.FC = () => {
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm bg-opacity-40 z-50">
           <div className="bg-white rounded-xl shadow-md w-full max-w-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">
-              Confirm Current Password
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-800 mb-3">Confirm Current Password</h2>
             <p className="text-sm text-gray-500 mb-4">
               Enter your current password to confirm profile changes.
             </p>
@@ -261,9 +247,7 @@ const Profile: React.FC = () => {
                 onClick={handleConfirmAndSave}
                 disabled={loading}
                 className={`cursor-pointer px-4 py-2 rounded-lg text-white font-medium ${
-                  loading
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-gray-700 hover:bg-gray-800"
+                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-gray-700 hover:bg-gray-800"
                 }`}
               >
                 {loading ? "Verifying..." : "Confirm"}
