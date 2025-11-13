@@ -51,7 +51,7 @@ const Cards = () => {
   };
   let processingToastId: string | undefined;
   useEffect(() => {
-    const es = new EventSource("http://localhost:5000/events", {
+    const es = new EventSource(`${backendUrl}/events`, {
       withCredentials: true,
     });
 
