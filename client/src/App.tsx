@@ -9,6 +9,7 @@ import Share from "./pages/Share";
 import ResetPassword from "./pages/ResetPassword";
 import LandingPage from "./pages/LandingPage";
 import AuthPages from "./pages/AuthPages";
+import Protected from "./components/Protected";
 
 const App = () => {
   return (
@@ -17,14 +18,15 @@ const App = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/:id" element={<Share />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
-
-          <Route path="/home" element={<DashboardLayout />}>
-            <Route path="dashboard" element={<Dashboard />} />
-            <Route path="tags" element={<Tags />} />
-            <Route path="cards" element={<Cards />} />
-            <Route path="search" element={<Search />} />
-            <Route path="profile" element={<Profile />} />
-          </Route>
+          <Route element={<Protected />}>
+              <Route path="/home" element={<DashboardLayout />}>
+                <Route path="dashboard" element={<Dashboard />} />
+                <Route path="tags" element={<Tags />} />
+                <Route path="cards" element={<Cards />} />
+                <Route path="search" element={<Search />} />
+                <Route path="profile" element={<Profile />} />
+              </Route>
+            </Route>
         </Routes>
   );
 };

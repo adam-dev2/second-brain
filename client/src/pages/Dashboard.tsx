@@ -48,9 +48,10 @@ const Dashboard = () => {
     const fetchMetrics = async () => {
       const token = Cookies.get("token");
       
-      if (!token) {
-        navigate("/auth");
-      }
+      // if (!token) {
+      //   navigate("/auth");
+      //   return;
+      // }
       setLoading(true);
       try {
         const res = await axios.get(`${backendUrl}/api/v1/content/metrics`, {
