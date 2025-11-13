@@ -1,6 +1,4 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { RecoilRoot } from "recoil";
-import Signup from "./pages/AuthPages";
+import { Route, Routes } from "react-router-dom";
 import DashboardLayout from "./layouts/DashboardLayout";
 import Tags from "./pages/Tags";
 import Search from "./pages/Search";
@@ -10,13 +8,12 @@ import Profile from "./pages/Profile";
 import Share from "./pages/Share";
 import ResetPassword from "./pages/ResetPassword";
 import LandingPage from "./pages/LandingPage";
+import AuthPages from "./pages/AuthPages";
 
 const App = () => {
   return (
-    <RecoilRoot>
-      <Router>
         <Routes>
-          <Route path="/auth" element={<Signup />} />
+          <Route path="/auth" element={<AuthPages />} />
           <Route path="/" element={<LandingPage />} />
           <Route path="/:id" element={<Share />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
@@ -29,8 +26,6 @@ const App = () => {
             <Route path="profile" element={<Profile />} />
           </Route>
         </Routes>
-      </Router>
-    </RecoilRoot>
   );
 };
 
