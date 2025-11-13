@@ -20,12 +20,24 @@ ConnectQdrant();
 
 app.use(express.json());
 app.use(cookieParser());
+const allowedOrigins = [
+  "https://second-brain-jade-gamma.vercel.app",
+  "http://localhost:5173",
+];  
+
 app.use(
   cors({
-    origin: ["https://second-brain-jade-gamma.vercel.app","http://localhost:5173"],
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
+
 app.use(passport.initialize());
 
 app.get("/api/v1/health", (req, res) => res.json({ status: "ok" }));

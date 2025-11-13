@@ -47,6 +47,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchMetrics = async () => {
       const token = Cookies.get("token");
+      
       if (!token) {
         navigate("/auth");
       }
@@ -59,7 +60,6 @@ const Dashboard = () => {
             "Content-Type": "application/json",
           },
         });
-        console.log(res.data.metrics);
         setMetrics(res.data.metrics);
         toast.success("Metrics fetched successfully");
       } catch (err: unknown) {

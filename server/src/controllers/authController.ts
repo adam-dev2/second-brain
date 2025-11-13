@@ -52,15 +52,15 @@ export const SignupController = async (req: Request, res: Response) => {
       process.env.JWT_SECRET,
       { expiresIn: "1h" }
     );
-    const cookieOptions: CookieOptions = {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 60 * 60 * 1000,
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    };
-    console.log(token);
+    // const cookieOptions: CookieOptions = {
+    //   httpOnly: false,
+    //   secure: process.env.NODE_ENV === "production",
+    //   maxAge: 60 * 60 * 1000,
+    //   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    // };
+    // console.log(token);
 
-    res.cookie("token", token, cookieOptions);
+    // res.cookie("token", token, cookieOptions);
     res.status(201).json({ message: "User created successfully", username, email });
   } catch (err) {
     if (err instanceof ZodError) {
@@ -111,7 +111,7 @@ export const LoginController = async (req: Request, res: Response) => {
       httpOnly: process.env.NODE_ENV === "production",
       secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 1000,
-      sameSite: "none",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     };
     res.cookie("token", token, cookieOptions);
     res.status(200).json({ message: "Logged in successfully" });

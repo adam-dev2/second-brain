@@ -19,10 +19,7 @@ export const AuthMiddleware = async (req: Request, res: Response, next: NextFunc
   try {
     const cookieToken = req.cookies?.token;
     const headerToken = req.header("Authorization")?.split(" ")[1];
-    // console.log(cookieToken, " ",headerToken);
-
-    // console.log(cookieToken, req.route);
-    //  console.log(headerToken);
+    
 
     const token = cookieToken || headerToken;
     if (!token) {
