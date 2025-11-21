@@ -23,17 +23,12 @@ app.use(cookieParser());
 const allowedOrigins = [
   "https://second-brain-jade-gamma.vercel.app",
   "http://localhost:5173",
+  "http://localhost:4173"
 ];  
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: allowedOrigins,
     credentials: true,
   })
 );

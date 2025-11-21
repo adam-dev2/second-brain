@@ -14,6 +14,10 @@ import toast from "react-hot-toast";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { sidebarAtom } from "../store/atoms/sidebar";
 import { SignupFormAtom } from "../store/atoms/signupform";
+import { loadingAtom } from "../store/atoms/loading";
+
+import LoadingOverlay from "../components/Loading";
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Sidebar = () => {
@@ -21,8 +25,11 @@ const Sidebar = () => {
   const setIsOpen = useSetRecoilState(sidebarAtom);
   const navigate = useNavigate();
   const setFormData = useSetRecoilState(SignupFormAtom);
+  const loading = useRecoilValue(loadingAtom);
+    const setLoading = useSetRecoilState(loadingAtom);
 
   const handleLogout = async () => {
+    setLoading(true);
     try {
       const res = await axios.get(`${backendUrl}/api/v1/auth/logout`, {
         withCredentials: true,
@@ -48,6 +55,7 @@ const Sidebar = () => {
   ];
 
   return (
+    <>
     <aside
       className={`${
         isOpen ? "w-64" : "w-20"
@@ -109,6 +117,8 @@ const Sidebar = () => {
         {isOpen ? <ChevronLeft  size={22} /> : <ChevronRight size={22} />}
       </button>
     </aside>
+    {loading && <LoadingOverlay/>}
+    </>
   );
 };
 
