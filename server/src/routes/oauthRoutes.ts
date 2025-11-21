@@ -23,9 +23,11 @@ interface JwtUser {
 function setJwtCookie(res: Response, user: JwtUser) {
   const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
   res.cookie("token", token, {
-    httpOnly: process.env.NODE_ENV === "production",
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
+    // httpOnly: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    secure: true,
+    // secure: process.env.NODE_ENV === "production",
+    sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 }

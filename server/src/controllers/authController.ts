@@ -108,8 +108,10 @@ export const LoginController = async (req: Request, res: Response) => {
       { expiresIn: "1h" }
     );
     const cookieOptions: CookieOptions = {
-      httpOnly: process.env.NODE_ENV === "production",
-      secure: process.env.NODE_ENV === "production",
+      // httpOnly: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      secure: true,
+      // secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 1000,
       sameSite: "none",
     };
