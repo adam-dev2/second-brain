@@ -10,7 +10,8 @@ interface CookieOptions {
   httpOnly: boolean;
   secure: boolean;
   maxAge: number;
-  sameSite: "strict" | "lax" | "none";
+  sameSite: "none";
+  path:string;
 }
 
 const transporter = nodemailer.createTransport({
@@ -114,6 +115,7 @@ export const LoginController = async (req: Request, res: Response) => {
       // secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 1000,
       sameSite: "none",
+      path:"/"
     };
     res.cookie("token", token, cookieOptions);
     res.status(200).json({ message: "Logged in successfully" });

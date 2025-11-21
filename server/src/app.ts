@@ -23,7 +23,8 @@ app.use(cookieParser());
 const allowedOrigins = [
   "https://second-brain-jade-gamma.vercel.app",
   "http://localhost:5173",
-  "http://localhost:4173"
+  "http://localhost:4173",
+  "https://secondbrain.madebyadam.xyz"
 ];  
 
 app.use(
