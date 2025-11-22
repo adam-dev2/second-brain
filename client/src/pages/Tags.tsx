@@ -7,7 +7,6 @@ import { ChevronDown, X } from "lucide-react";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 import { loadingAtom } from "../store/atoms/loading";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import LoadingOverlay from "../components/Loading";
 import { hideIconAtom } from "../store/atoms/hideIcons";
@@ -34,7 +33,6 @@ const Tags = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
-  const navigate = useNavigate();
   const setAllCards = useSetRecoilState(allcardsAtom);
   const setHideIcons = useSetRecoilState(hideIconAtom);
 
@@ -57,11 +55,6 @@ const Tags = () => {
       const token = Cookies.get("token");
       setLoading(true);
       try {
-        if (!token) {
-          toast.error("Token not found");
-          navigate("/auth");
-          return;
-        }
         const res = await axios.get(`${backendUrl}/api/v1/content/cards`, {
           withCredentials: true,
           headers: {

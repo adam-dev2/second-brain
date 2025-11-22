@@ -9,18 +9,20 @@ import {
   Search,
   UserRoundPen,
 } from "lucide-react";
-import axios from "axios";
+// import axios from "axios";
 import toast from "react-hot-toast";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { sidebarAtom } from "../store/atoms/sidebar";
 import { SignupFormAtom } from "../store/atoms/signupform";
 import { loadingAtom } from "../store/atoms/loading";
 
+import { useAuth } from "../context/AuthContext";
 import LoadingOverlay from "../components/Loading";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL;
+// const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const Sidebar = () => {
+  const { logout } = useAuth();
   const isOpen = useRecoilValue(sidebarAtom);
   const setIsOpen = useSetRecoilState(sidebarAtom);
   const navigate = useNavigate();
@@ -28,23 +30,31 @@ const Sidebar = () => {
   const loading = useRecoilValue(loadingAtom);
     const setLoading = useSetRecoilState(loadingAtom);
 
-  const handleLogout = async () => {
-    setLoading(true);
-    try {
-      const res = await axios.get(`${backendUrl}/api/v1/auth/logout`, {
-        withCredentials: true,
-        headers: { "Content-Type": "application/json" },
-      });
-      console.log(res?.data);
 
-      navigate("/");
-      setFormData((prev) => ({ ...prev, username: "", email: "", password: "" }));
-      toast.success("Logged out successfully");
-    } catch (err) {
-      console.log(err);
-      toast.error("Failed to logout");
-    }
-  };
+
+    const handleLogout = async () => {
+      setLoading(true);
+
+      try {
+        await logout(); // <-- calls /api/v1/auth/logout automatically
+
+        toast.success("Logged out successfully");
+        navigate("/auth");
+
+        // clear form state
+        setFormData({
+          username: "",
+          email: "",
+          password: "",
+        });
+      } catch (err) {
+        console.log(err);
+        toast.error("Failed to logout");
+      } finally {
+        setLoading(false);
+      }
+    };
+
 
   const links = [
     { path: "/home/dashboard", label: "Dashboard", icon: LayoutDashboard },

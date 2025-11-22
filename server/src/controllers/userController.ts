@@ -3,7 +3,7 @@ import UserModal from "../models/User.js";
 import bcrypt from "bcrypt";
 
 export const FetchUser = async (req: Request, res: Response) => {
-  const userId = req.User?.id;
+  const userId = req.user?.id;
   if (!userId) {
     return res.status(401).json({ message: "UnAuthroized" });
   }
@@ -24,7 +24,7 @@ export const FetchUser = async (req: Request, res: Response) => {
 };
 
 export const FetchUserDetails = async (req: Request, res: Response) => {
-  const id = req.User?.id;
+  const id = req.user?.id;
   const { password } = req.body;
   if (!id) {
     return res.status(401).json({ message: "UnAuthroized" });
@@ -48,7 +48,7 @@ export const FetchUserDetails = async (req: Request, res: Response) => {
 };
 
 export const FetchProfile = async (req: Request, res: Response) => {
-  const userId = req.User?.id;
+  const userId = req.user?.id;
   const { username, email, password, avatar } = req.body;
   if (!userId) {
     return res.status(401).json({ message: "UnAuthroized" });

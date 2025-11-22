@@ -5,7 +5,7 @@ import Content from "../models/Content.js";
 
 export const ShareBrain = async (req: Request, res: Response) => {
   try {
-    const userID = req.User?.id;
+    const userID = req.user?.id;
     if (!userID) {
       return res.status(401).json({ message: "Unauthorized" });
     }

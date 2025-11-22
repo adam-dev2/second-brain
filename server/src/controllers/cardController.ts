@@ -21,8 +21,8 @@ interface IAllCards {
 
 export const FetchMetrics = async (req: Request, res: Response) => {
   try {
-    const userId = req.User?.id;
-    console.log(req.User);
+    const userId = req.user?.id;
+    console.log(req.user);
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -175,7 +175,7 @@ export const createCard = async (req: Request, res: Response) => {
   }
 
   try {
-    const userID = req.User?.id;
+    const userID = req.user?.id;
     if (!userID) return res.status(401).json({ message: "Unauthorized" });
 
     const qdrantID = uuidv4();
@@ -236,10 +236,10 @@ export const EditCard = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const { link, title, share, tags } = req.body;
-    if (!req.User || !req.User.id) {
+    if (!req.user || !req.user.id) {
       return res.status(401).json({ message: "Unauthorized: missing user info" });
     }
-    const userID = req.User.id;
+    const userID = req.user.id;
 
     if (!link || !title || !(Array.isArray(tags) && tags.length > 0)) {
       return res.status(400).json({ message: "All fields are required" });
@@ -248,7 +248,7 @@ export const EditCard = async (req: Request, res: Response) => {
     const findCard = await Content.findById(id);
     if (!findCard) return res.status(404).json({ message: "Card not found" });
 
-    const currentUserId = req.User?.id;
+    const currentUserId = req.user?.id;
     if (findCard.userId.toString() !== currentUserId)
       return res.status(403).json({ message: "Unauthorized to edit this card" });
 
@@ -313,7 +313,7 @@ export const Query = async (req: Request, res: Response) => {
   console.log(limit);
 
   try {
-    const userID = req.User?.id;
+    const userID = req.user?.id;
     if (!userID) {
       return res.status(401).json({ message: "Unauthorized" });
     }
@@ -384,7 +384,7 @@ export const Query = async (req: Request, res: Response) => {
 
 export const FetchAllCards = async (req: Request, res: Response) => {
   try {
-    const userID = req.User?.id;
+    const userID = req.user?.id;
 
     if (!userID) {
       return res.status(401).json({ message: "Unauthorized" });

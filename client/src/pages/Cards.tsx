@@ -86,11 +86,6 @@ const Cards = () => {
     console.log(searchModal);
     setHideIcons(true);
     const token = Cookies.get("token");
-    if (!token) {
-      toast.error("Token not found");
-      navigate("/auth");
-      return;
-    }
     const fetchCards = async () => {
       setLoading(true);
       try {
@@ -130,10 +125,6 @@ const Cards = () => {
 
   const handleShare = async () => {
     const token = Cookies.get("token");
-    if (!token) {
-      toast.error("Token not found");
-      navigate("/");
-    }
     setLoading(true);
     try {
       const res = await axios.get(`${backendUrl}/api/v1/brain/share`, {

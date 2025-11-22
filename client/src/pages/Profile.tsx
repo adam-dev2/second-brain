@@ -4,7 +4,6 @@ import type { ChangeEvent } from "react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { handleError } from "../utils/handleError";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -17,7 +16,6 @@ interface UserProfile {
 }
 
 const Profile: React.FC = () => {
-  const navigate = useNavigate();
   const [toggle, setToggle] = useState(false);
   const [user, setUser] = useState<UserProfile>({
     avatar: null,
@@ -28,15 +26,8 @@ const Profile: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const token = Cookies.get("token");
 
-  useEffect(() => {
-    if (!token) {
-      toast.error("No token found. Please log in again.");
-      navigate("/auth");
-      return;
-    }
-  }, []);
+
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -48,11 +39,6 @@ const Profile: React.FC = () => {
   };
   const handleConfirmAndSave = async () => {
     const token = Cookies.get("token");
-    if (!token) {
-      toast.error("No token found. Please log in again.");
-      navigate("/auth");
-      return;
-    }
 
     if (!currentPassword.trim()) {
       toast.error("Please enter your current password.");
@@ -111,10 +97,6 @@ const Profile: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       const token = Cookies.get("token");
-      if (!token) {
-        toast.error("No token found. Please log in again.");
-        return;
-      }
 
       try {
         const res = await axios.get(`${backendUrl}/api/v1/user`, {

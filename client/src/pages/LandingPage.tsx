@@ -162,11 +162,10 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden">
-      {/* Animated background gradient */}
       <div className="fixed inset-0 bg-linear-to-br from-gray-900 via-black to-gray-900 opacity-50" />
       <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.05),transparent_50%)]" />
 
-      {/* Hero Section */}
+
       <motion.section
         className="relative min-h-screen flex items-center justify-center px-4"
         style={{ opacity, scale }}
@@ -230,7 +229,7 @@ const LandingPage = () => {
             </button>
           </motion.div>
 
-          {/* Floating cards preview */}
+
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
@@ -275,7 +274,6 @@ const LandingPage = () => {
           </motion.div>
         </div>
 
-        {/* Scroll indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -292,7 +290,6 @@ const LandingPage = () => {
         </motion.div>
       </motion.section>
 
-      {/* Stats Section */}
       <section className="relative py-20 px-4 border-t border-white/10">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -314,7 +311,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="relative py-32 px-4">
         <div className="max-w-6xl mx-auto">
           <motion.div
@@ -349,7 +345,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Interactive Dashboard Preview */}
       <section className="relative py-32 px-4 border-t border-white/10">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -370,9 +365,7 @@ const LandingPage = () => {
             viewport={{ once: true }}
             className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden"
           >
-            {/* Mock App Interface */}
             <div className="flex h-[700px]">
-              {/* Sidebar */}
               <div
                 className={`${sidebarOpen ? "w-64" : "w-20"} bg-black border-r border-white/10  whitespace-nowrap transition-all duration-300 flex flex-col p-4`}
               >
@@ -413,7 +406,6 @@ const LandingPage = () => {
                 </button>
               </div>
 
-              {/* Main Dashboard Content */}
               <div className="flex-1 bg-gray-50 p-8 overflow-y-auto">
                 <div className="mb-3">
                   <h1 className="text-4xl font-semibold text-gray-800 tracking-tight mb-1">
@@ -425,7 +417,6 @@ const LandingPage = () => {
                   </div>
                 </div>
 
-                {/* Stats Grid */}
                 <div className="grid grid-cols-4 gap-4 mb-6">
                   <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200">
                     <p className="text-gray-600 font-semibold text-sm mb-2">Total Cards</p>
@@ -445,9 +436,7 @@ const LandingPage = () => {
                   </div>
                 </div>
 
-                {/* Recent Cards & Top Tags */}
                 <div className="grid lg:grid-cols-3 gap-6">
-                  {/* Recent Cards */}
                   <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 col-span-2">
                     <div className="flex items-center justify-between mb-4">
                       <h2 className="text-lg font-semibold text-gray-800">Recent Cards</h2>
@@ -488,7 +477,6 @@ const LandingPage = () => {
                     </div>
                   </div>
 
-                  {/* Top Tags */}
                   <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
                     <h2 className="text-lg font-semibold text-gray-800 mb-4">Top Tags</h2>
                     <div className="space-y-3">
@@ -515,7 +503,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="relative py-32 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div
@@ -546,7 +533,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="relative border-t border-white/10 py-8 px-4">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center text-sm text-gray-500">
           <div className="flex items-center gap-2 mb-4 md:mb-0">

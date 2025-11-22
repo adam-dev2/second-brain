@@ -10,7 +10,7 @@ interface CookieOptions {
   httpOnly: boolean;
   secure: boolean;
   maxAge: number;
-  sameSite: "none";
+  sameSite: "none"|"lax";
   path:string;
   domain:string;
 }
@@ -46,23 +46,6 @@ export const SignupController = async (req: Request, res: Response) => {
     if (!process.env.JWT_SECRET || !process.env.NODE_ENV) {
       return res.status(500).json({ message: "There's a missing env objects" });
     }
-    const token = jwt.sign(
-      {
-        id: findUser._id,
-        username: findUser.username,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "1h" }
-    );
-    // const cookieOptions: CookieOptions = {
-    //   httpOnly: false,
-    //   secure: process.env.NODE_ENV === "production",
-    //   maxAge: 60 * 60 * 1000,
-    //   sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    // };
-    // console.log(token);
-
-    // res.cookie("token", token, cookieOptions);
     res.status(201).json({ message: "User created successfully", username, email });
   } catch (err) {
     if (err instanceof ZodError) {
@@ -115,7 +98,7 @@ export const LoginController = async (req: Request, res: Response) => {
       secure: true,
       // secure: process.env.NODE_ENV === "production",
       maxAge: 60 * 60 * 1000,
-      sameSite: "none",
+      sameSite: "lax",
       path:"/",
       domain: ".madebyadam.xyz",
     };
@@ -190,6 +173,8 @@ export const ResetPasswordController = async (req: Request, res: Response) => {
 };
 
 export const LogoutController = async (req: Request, res: Response) => {
+  console.log("ASdasdajsh");
+  
   try {
     res.clearCookie("token", {
       httpOnly: process.env.NODE_ENV === "production",

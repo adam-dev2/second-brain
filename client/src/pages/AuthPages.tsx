@@ -8,9 +8,12 @@ import { loadingAtom } from "../store/atoms/loading";
 import { SignupFormAtom } from "../store/atoms/signupform";
 import LoadingOverlay from "../components/Loading";
 import { handleError } from "../utils/handleError";
+import { useAuth } from "../context/AuthContext";
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 const AuthPages = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [toggle, setToggle] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
@@ -64,64 +67,52 @@ const AuthPages = () => {
     }
   };
 
-  const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!isLogin) {
+
+    const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+
       setLoading(true);
+
       try {
-        await axios.post(
-          `${backendUrl}/api/v1/auth/signup`,
-          {
-            username: formData.username,
+        if (!isLogin) {
+          await axios.post(
+            `${backendUrl}/api/v1/auth/signup`,
+            {
+              username: formData.username,
+              email: formData.email,
+              password: formData.password,
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+
+          toast.success("Signup successful! Please log in.");
+          setIsLogin(true);
+        } else {
+          await login({
             email: formData.email,
             password: formData.password,
-          },
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        toast.success("Signed in Successfull");
-        setIsLogin(true);
-      } catch (err: unknown) {
-        handleError(err, "Error while signing up");
+          });
+
+          toast.success("Login successful!");
+          navigate("/home/dashboard");
+        }
+      } catch (err) {
+        handleError(err, !isLogin ? "Error while signing up" : "Error while logging in");
       } finally {
         setLoading(false);
       }
-    } else {
-      setLoading(true);
-      try {
-        const response = await axios.post(
-          `${backendUrl}/api/v1/auth/login`,
-          {
-            email: formData.email,
-            password: formData.password,
-          },
-          {
-            withCredentials: true,
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        console.log(response.data);
-        toast.success("Login Successfull");
-        navigate("/home/dashboard");
-      } catch (err: unknown) {
-        handleError(err, "Error while logging in");
-      } finally {
-        setLoading(false);
-      }
-    }
-  };
+    };
+
 
   return (
     <>
       <div className="min-h-screen bg-linear-to-tr from-black via-neutral-800 to-black  flex items-center justify-center p-4 w-full overflow-hidden">
         <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden">
           <div className="grid md:grid-cols-2 min-h-[600px]">
-            {/* Left Side - Info Panel */}
             <div className="hidden md:flex bg-linear-to-br from-black via-neutral-800 to-black p-5 flex-col justify-center items-center text-white relative overflow-hidden">
               <div className="absolute inset-0 opacity-10">
                 <div className="absolute top-20 left-20 w-64 h-64 bg-white rounded-full blur-3xl"></div>
@@ -157,7 +148,7 @@ const AuthPages = () => {
               </div>
             </div>
 
-            {/* Right Side - Form */}
+
             <div className="p-6 md:p-6 flex flex-col justify-center">
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-3">

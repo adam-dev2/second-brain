@@ -5,7 +5,7 @@ import { addClient, removeClient } from "../utils/sseManager.js";
 const router = express.Router();
 
 router.get("/events", AuthMiddleware, (req, res) => {
-  const userId = req.User?.id;
+  const userId = req.user?.id;
   if (!userId) return res.status(401).end();
 
   res.setHeader("Content-Type", "text/event-stream");

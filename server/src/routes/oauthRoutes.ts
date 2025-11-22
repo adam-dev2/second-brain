@@ -23,10 +23,8 @@ interface JwtUser {
 function setJwtCookie(res: Response, user: JwtUser) {
   const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
   res.cookie("token", token, {
-    // httpOnly: process.env.NODE_ENV === "production",
     httpOnly: true,
     secure: true,
-    // secure: process.env.NODE_ENV === "production",
     sameSite: "none",
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path:"/",
@@ -43,7 +41,7 @@ router.get(
     session: false,
   }),
   (req: Request, res: Response) => {
-    const user = req.User;
+    const user = req.user as any;
     if (!user) return res.redirect(`${FRONTEND_URL}/?error=no_user`);
     setJwtCookie(res, { _id: user.id, username: user.username });
     res.redirect(`${FRONTEND_URL}/home/dashboard`);
@@ -59,7 +57,7 @@ router.get(
     session: false,
   }),
   (req: Request, res: Response) => {
-    const user = req.User;
+    const user = req.user as any;
     if (!user) return res.redirect(`${FRONTEND_URL}/?error=no_user`);
     setJwtCookie(res, { _id: user.id, username: user.username });
     res.redirect(`${FRONTEND_URL}/home/dashboard`);
@@ -70,6 +68,6 @@ router.post("/signup", SignupController);
 router.post("/login", LoginController);
 router.post("/forgot-password", ForgetPasswordController);
 router.post("/reset-password", ResetPasswordController);
-router.get("/logout", LogoutController);
+router.post("/logout", LogoutController);
 
 export default router;
