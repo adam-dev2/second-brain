@@ -10,7 +10,6 @@ import { modalAtom } from "../store/atoms/modal";
 import { allcardsAtom } from "../store/atoms/allcards";
 import { loadingAtom } from "../store/atoms/loading";
 import Loading from "../components/Loading";
-import { useNavigate } from "react-router-dom";
 import { sidebarAtom } from "../store/atoms/sidebar";
 import { searchModalAtom } from "../store/atoms/searchModal";
 import ShareModal from "../components/ShareModal";
@@ -40,7 +39,6 @@ const Cards = () => {
   const setLoading = useSetRecoilState(loadingAtom);
   const [search, setSearch] = useState("");
   const [originalCards, setOriginalCards] = useState<IOrgCard[]>([]);
-  const navigate = useNavigate();
   const isOpen = useRecoilValue(sidebarAtom);
   const searchModal = useRecoilValue(searchModalAtom);
   const setSearchModal = useSetRecoilState(searchModalAtom);

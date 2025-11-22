@@ -1,6 +1,7 @@
 import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface AuthUser {
@@ -20,6 +21,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const navigate  = useNavigate();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
@@ -40,11 +42,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (data: { email: string; password: string }) => {
-    await axios.post(`${backendUrl}/api/v1/auth/login`, data, {
+    const res = await axios.post(`${backendUrl}/api/v1/auth/login`, data, {
       withCredentials: true,
     });
 
     await verifyUser();
+    if(res.status == 200) {
+      navigate('/home/dashboard')
+    }
   };
 
   const logout = async () => {
