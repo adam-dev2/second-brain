@@ -12,7 +12,7 @@ import passport from "../utils/passport.js";
 
 const router = express.Router();
 
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://secondbrain.madebyadam.xyz";
 const JWT_SECRET = process.env.JWT_SECRET ?? "";
 
 interface JwtUser {
@@ -24,11 +24,11 @@ function setJwtCookie(res: Response, user: JwtUser) {
   const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
   res.cookie("token", token, {
     httpOnly: true,
-    secure: false,
+    secure: true,
     sameSite: "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path:"/",
-    // domain: ".madebyadam.xyz",
+    domain: ".madebyadam.xyz",
   });
 }
 
