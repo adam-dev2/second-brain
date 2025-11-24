@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
+import Cookies from "js-cookie";
 
 interface AuthUser {
   id: string;
@@ -27,9 +28,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authenticated, setAuthenticated] = useState(false);
 
   const verifyUser = async () => {
+    const token = Cookies.get('token');
+    console.log(token);
+    
     try {
       const res = await axios.get(`${backendUrl}/api/v1/me`, {
         withCredentials: true,
+        headers:{
+          'Authorization': `Bearer ${token}`
+        }
       });
       setAuthenticated(true);
       setUser(res.data.user);

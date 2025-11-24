@@ -100,7 +100,7 @@ const Search = () => {
             <div className="flex gap-3 mb-4 ">
               <div className="h-full">
                 <h1 className="text-4xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-                  AI-Powered Elastic Search
+                  Elastic Search
                 </h1>
                 <p className="text-gray-600 mt-1">Find cards by meaning, not just keywords</p>
               </div>
@@ -121,7 +121,7 @@ const Search = () => {
                   />
                 </div>
 
-                <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
                   <span className="text-gray-700 text-sm font-medium whitespace-nowrap">Top</span>
                   <input
                     type="number"
@@ -135,13 +135,33 @@ const Search = () => {
 
                 <button
                   onClick={handleSearch}
-                  className="px-8 py-4 bg-gray-800 text-white text-lg font-semibold hover:bg-gray-900 hover:scale-105 active:scale-95 transition-all rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
+                  className="hidden md:flex px-8 py-4 bg-gray-800 text-white text-lg font-semibold hover:bg-gray-900 hover:scale-105 active:scale-95 transition-all rounded-xl shadow-lg hover:shadow-xl items-center gap-2"
                 >
                   <SearchIcon className="w-5 h-5" />
                   Search
                 </button>
               </div>
             </div>
+               <div className="w-full flex gap-3 justify-end mt-3">
+                <div className="md:hidden flex h-14 items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl border border-gray-400 w-28 shadow-2xl">
+                  <span className="text-gray-700 text-sm font-medium whitespace-nowrap">Top</span>
+                  <input
+                    type="number"
+                    min="1"
+                    max="50"
+                    value={limit}
+                    onChange={(e) => setLimit(e.target.value)}
+                    className="w-12 bg-white border border-gray-200 rounded-lg px-2 py-1 outline-none text-center text-gray-800 font-medium"
+                  />
+                </div>
+                <button
+                  onClick={handleSearch}
+                  className="md:hidden h-14 px-6 bg-gray-800 text-white text-lg font-semibold hover:bg-gray-900 hover:scale-105 active:scale-95 transition-all rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
+                >
+                  <SearchIcon className="w-5 h-5" />
+                  Search
+                </button>
+               </div>
           </div>
 
           {/* Results Section */}

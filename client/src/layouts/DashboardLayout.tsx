@@ -10,7 +10,7 @@ const DashboardLayout = () => {
       <div className="flex h-screen">
         <Sidebar />
         <main
-          className={`flex-1 z-10 bg-white h-full my-0 py-0 ${isOpen ? "ml-64" : "ml-20"} transform`}
+          className={`flex-1 z-10 bg-white h-full my-0 py-0 ${isOpen ? "md:ml-64 ml-0" : "md:ml-20 ml-0"} transform`}
         >
           <Outlet />
         </main>

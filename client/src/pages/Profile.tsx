@@ -5,6 +5,11 @@ import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { Eye, EyeOff } from "lucide-react";
 import { handleError } from "../utils/handleError";
+import { loadingAtom } from "../store/atoms/loading";
+import LoadingOverlay from "../components/Loading";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+
+
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -26,7 +31,8 @@ const Profile: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const Loading = useRecoilValue(loadingAtom);
+  const setloading = useSetRecoilState(loadingAtom);
 
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -44,7 +50,7 @@ const Profile: React.FC = () => {
       toast.error("Please enter your current password.");
       return;
     }
-
+    setloading(true);
     try {
       setLoading(true);
       const verifyRes = await axios.post(
@@ -90,6 +96,7 @@ const Profile: React.FC = () => {
       handleError(err, "Incorrect current password or update failed");
       console.error("Error verifying or updating:", err);
     } finally {
+      setloading(false)
       setLoading(false);
     }
   };
@@ -238,6 +245,7 @@ const Profile: React.FC = () => {
           </div>
         </div>
       )}
+      {Loading && <LoadingOverlay/>}
     </>
   );
 };

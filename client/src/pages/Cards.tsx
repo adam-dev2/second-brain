@@ -135,7 +135,7 @@ const Cards = () => {
       console.log(res.data.ShareableLink);
       toast.success("Shareable Link generated");
       setSearchModal(true);
-      setShareLink(`http://localhost:5173/${res.data.ShareableLink}`);
+      setShareLink(`https://seconbrain.madebyadam.xyz/${res.data.ShareableLink}`);
     } catch (err: unknown) {
       handleError(err, "Error while sharing brain");
       throw err;
@@ -149,34 +149,36 @@ const Cards = () => {
         <Loading />
       ) : (
         <div className="min-h-screen w-full p-9">
-          <div className="flex items-center justify-between py-4">
-            <h1 className="text-4xl font-semibold text-gray-800 tracking-tight hidden md:block">
+          <div className="">
+            <h1 className="text-4xl font-semibold text-gray-800 tracking-tight py-4">
               Cards
             </h1>
-            <div className="flex justify-start  md:justify-end-safe w-full mr-4">
-              <input
-                value={search}
-                type="text"
-                className="border border-gray-400 rounded-2xl bg-gray-50 p-2 outline-none placeholder:opacity-45  focus-within:scale-103 transition "
-                placeholder="eg: Title"
-                onChange={handleSearch}
-              />
-            </div>
-            <div className={`flex flex-row items-center gap-3`}>
-              <button
-                onClick={handleClick}
-                className="cursor-pointer flex items-center gap-2 bg-zinc-900 text-gray-100 hover:text-gray-800 hover:border hover:border-gray-700 font-medium rounded-full py-2 px-4 hover:bg-zinc-200 hover:scale-[1.03] transition-all duration-150"
-              >
-                <Plus size={20} />
-                <span className="hidden md:block">Add</span>
-              </button>
-              <button
-                onClick={handleShare}
-                className="cursor-pointer flex items-center gap-2 bg-red-50 text-red-400 font-medium rounded-full py-2 px-4 border border-red-400 hover:bg-red-100 hover:text-red-500 hover:scale-[1.03] transition-all duration-200"
-              >
-                <Share2 size={20} />
-                <span className="hidden md:block">Share</span>
-              </button>
+            <div className="flex items-center justify-between pb-4">
+              <div className="flex justify-start  md:justify-end-safe w-full mr-4">
+                <input
+                  value={search}
+                  type="text"
+                  className="border border-gray-400 rounded-2xl bg-gray-50 p-2 outline-none placeholder:opacity-45  focus-within:scale-103 transition "
+                  placeholder="eg: Title"
+                  onChange={handleSearch}
+                />
+              </div>
+              <div className={`flex flex-row items-center gap-3`}>
+                <button
+                  onClick={handleClick}
+                  className="cursor-pointer flex items-center gap-2 bg-zinc-900 text-gray-100 hover:text-gray-800 hover:border hover:border-gray-700 font-medium rounded-full py-2 px-4 hover:bg-zinc-200 hover:scale-[1.03] transition-all duration-150"
+                >
+                  <Plus size={20} />
+                  <span >Add</span>
+                </button>
+                <button
+                  onClick={handleShare}
+                  className="cursor-pointer flex items-center gap-2 bg-red-50 text-red-400 font-medium rounded-full py-2 px-4 border border-red-400 hover:bg-red-100 hover:text-red-500 hover:scale-[1.03] transition-all duration-200"
+                >
+                  <Share2 size={20} />
+                  <span >Share</span>
+                </button>
+              </div>
             </div>
           </div>
           <div

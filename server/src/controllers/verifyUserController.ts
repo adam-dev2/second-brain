@@ -4,7 +4,10 @@ import jwt from "jsonwebtoken";
 export const verifyUserController = async (req: Request, res: Response) => {
   try {
     const cookieToken = req.cookies?.token;
-    if (!cookieToken) {
+    const headerToken = req.headers.authorization?.split(' ')[1];
+    console.log(req.headers.authorization);
+
+    if (!cookieToken || !headerToken) {
       return res.status(403).json({ message: "Token Not Found" });
     }
 
