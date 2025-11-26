@@ -7,7 +7,7 @@ import {
   FileStack,
   Tags,
   Search,
-  UserRoundPen,
+  UserRoundPen
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -70,7 +70,6 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* Mobile overlay backdrop */}
       {isMobile && (
         <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden"

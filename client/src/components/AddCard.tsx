@@ -147,6 +147,7 @@ const AddCard = () => {
       const updatedCard = response.data.updateCard || response.data;
       console.log(updatedCard);
       const res = await axios.get(`${backendUrl}/api/v1/content/cards`, {
+        withCredentials:true,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

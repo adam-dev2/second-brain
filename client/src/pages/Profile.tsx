@@ -104,7 +104,7 @@ const Profile: React.FC = () => {
   useEffect(() => {
     const fetchUser = async () => {
       const token = Cookies.get("token");
-
+      setloading(true);
       try {
         const res = await axios.get(`${backendUrl}/api/v1/user`, {
           withCredentials: true,
@@ -121,6 +121,8 @@ const Profile: React.FC = () => {
         }));
       } catch (err: unknown) {
         handleError(err, "Error while Fetching Profile");
+      }finally {
+        setloading(false);
       }
     };
 
@@ -131,13 +133,11 @@ const Profile: React.FC = () => {
     <>
       <div className="min-h-screen w-full bg-gray-50 flex flex-col items-center py-12 px-4">
         <div className="w-full max-w-md bg-white shadow-sm border border-gray-300 rounded-2xl p-8">
-          {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-3xl font-semibold text-gray-800">Profile</h1>
             <p className="text-gray-500 text-sm mt-1">Manage your personal information</p>
           </div>
 
-          {/* Avatar */}
           <div className="flex flex-col items-center mb-6">
             <div className="relative">
               <img
@@ -151,7 +151,6 @@ const Profile: React.FC = () => {
             </div>
           </div>
 
-          {/* Form */}
           <div className="flex flex-col gap-5">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
@@ -197,7 +196,6 @@ const Profile: React.FC = () => {
             </div>
           </div>
 
-          {/* Save Button */}
           <button
             onClick={handleSave}
             className="w-full mt-8 bg-gray-600 text-white py-2.5 rounded-lg font-medium hover:bg-gray-700 transition active:scale-[0.98]"
@@ -208,7 +206,6 @@ const Profile: React.FC = () => {
         <p className="text-gray-500 items-end">Last updated: 10-10-2025</p>
       </div>
 
-      {/* ✅ Password Confirmation Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm bg-opacity-40 z-50">
           <div className="bg-white rounded-xl shadow-md w-full max-w-sm p-6">

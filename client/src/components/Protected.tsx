@@ -13,7 +13,7 @@ const Protected = () => {
   const publicPaths = [
     "/auth/google/callback",
     "/auth/github/callback",
-    "/auth",
+    "/auth"
   ];
 
   if (publicPaths.includes(location.pathname)) {

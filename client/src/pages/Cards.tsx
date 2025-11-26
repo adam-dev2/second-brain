@@ -135,7 +135,7 @@ const Cards = () => {
       console.log(res.data.ShareableLink);
       toast.success("Shareable Link generated");
       setSearchModal(true);
-      setShareLink(`https://seconbrain.madebyadam.xyz/${res.data.ShareableLink}`);
+      setShareLink(`https://secondbrain.madebyadam.xyz/${res.data.ShareableLink}`);
     } catch (err: unknown) {
       handleError(err, "Error while sharing brain");
       throw err;
