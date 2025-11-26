@@ -93,12 +93,12 @@ export const LoginController = async (req: Request, res: Response) => {
       { expiresIn: "1h" }
     );
     const cookieOptions: CookieOptions = {
-      httpOnly: true,
+      httpOnly: false,
       secure: true,
       maxAge: 60 * 60 * 1000,
-      sameSite: "lax",
+      sameSite: "none",
       path:"/",
-      domain: ".madebyadam.xyz",
+      // domain: ".madebyadam.xyz",
     };
     res.cookie("token", token, cookieOptions);
     res.status(200).json({ message: "Logged in successfully" });
