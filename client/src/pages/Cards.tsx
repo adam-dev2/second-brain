@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Card from "../components/Card";
-import { Share2, Plus } from "lucide-react";
+import { Share2, Plus, ReplaceAll } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
@@ -16,6 +16,8 @@ import ShareModal from "../components/ShareModal";
 import { sharelink } from "../store/atoms/sharelink";
 import { hideIconAtom } from "../store/atoms/hideIcons";
 import { handleError } from "../utils/handleError";
+import MoveCards from "../components/MoveCards";
+import { moveAtom } from "../store/atoms/moveAtom";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface IOrgCard {
@@ -43,6 +45,8 @@ const Cards = () => {
   const searchModal = useRecoilValue(searchModalAtom);
   const setSearchModal = useSetRecoilState(searchModalAtom);
   const setHideIcons = useSetRecoilState(hideIconAtom);
+  const move = useRecoilValue(moveAtom)
+  const setMove = useSetRecoilState(moveAtom)
 
   const handleClick = () => {
     setModal((prev) => !prev);
@@ -166,7 +170,7 @@ const Cards = () => {
               <div className={`flex flex-row items-center gap-3`}>
                 <button
                   onClick={handleClick}
-                  className="cursor-pointer flex items-center gap-2 bg-zinc-900 text-gray-100 hover:text-gray-800 hover:border hover:border-gray-700 font-medium rounded-full py-2 px-4 hover:bg-zinc-200 hover:scale-[1.03] transition-all duration-150"
+                  className="cursor-pointer flex items-center gap-2 bg-neutral-50 text-neutral-600 font-medium rounded-full py-2 px-4 border border-neutral-500 hover:bg-neutral-200 hover:text-neutral-700 hover:scale-[1.03] transition-all duration-200"
                 >
                   <Plus size={20} />
                   <span >Add</span>
@@ -177,6 +181,13 @@ const Cards = () => {
                 >
                   <Share2 size={20} />
                   <span >Share</span>
+                </button>
+                <button
+                  onClick={()=>setMove(!move)}
+                  className="cursor-pointer flex items-center gap-2 bg-purple-50 text-purple-400 font-medium rounded-full py-2 px-4 border border-purple-400 hover:bg-purple-100 hover:text-purple-500 hover:scale-[1.03] transition-all duration-200"
+                >
+                  <ReplaceAll size={20} />
+                  <span >Move</span>
                 </button>
               </div>
             </div>
@@ -201,6 +212,7 @@ const Cards = () => {
               })}
           </div>
           {modal && <AddCard />}
+          {move && <MoveCards />}
           {searchModal && <ShareModal />}
           {allCards.length === 0 && (
             <p className="text-gray-500 text-sm text-center py-8">

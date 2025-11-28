@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const res = await axios.post(`${backendUrl}/api/v1/auth/login`, data, {
       withCredentials: true,
     });
-
+    
     await verifyUser();
     if(res.status == 200) {
       navigate('/home/dashboard')
