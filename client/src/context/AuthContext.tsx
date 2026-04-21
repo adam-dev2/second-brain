@@ -29,7 +29,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const verifyUser = async () => {
     const token = Cookies.get('token');
-    console.log(token);
     
     try {
       const res = await axios.get(`${backendUrl}/api/v1/me`, {

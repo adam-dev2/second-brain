@@ -6,8 +6,9 @@ export const verifyUserController = async (req: Request, res: Response) => {
     const cookieToken = req.cookies?.token;
     const headerToken = req.headers.authorization?.split(' ')[1];
     console.log(req.headers.authorization);
-
-    if (!cookieToken || !headerToken) {
+    console.log(req.cookies);
+    
+    if (!cookieToken && !headerToken) {
       return res.status(403).json({ message: "Token Not Found" });
     }
 

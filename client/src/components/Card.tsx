@@ -1,5 +1,5 @@
 import axios from "axios";
-import { SquarePen, Trash2, ExternalLink, Globe, Lock } from "lucide-react";
+import { SquarePen, Trash2, ExternalLink, Globe, Lock, EllipsisVertical, ChevronDown, ChevronRight } from "lucide-react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -10,6 +10,7 @@ import { editCardAtom } from "../store/atoms/editcard";
 import { loadingAtom } from "../store/atoms/loading";
 import { hideIconAtom } from "../store/atoms/hideIcons";
 import { handleError } from "../utils/handleError";
+import { useState } from "react";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export interface Iprops {
@@ -32,6 +33,8 @@ const Card = (props: Iprops) => {
   const setLoading = useSetRecoilState(loadingAtom);
   const hideIcons = useRecoilValue(hideIconAtom);
   const setHideIcons = useSetRecoilState(hideIconAtom);
+  const [sheet,setSheet] = useState(false);
+  const [showSections, setShowSections] = useState(false);
 
   const handleEdit = async () => {
     const findCard = allCards.find((item) => item._id === props.id);
@@ -51,6 +54,15 @@ const Card = (props: Iprops) => {
     setModal((prev) => !prev);
     setEditCardId(props.id);
     setHideIcons(true);
+  };
+
+  const handleSheet = () => {
+    setSheet(prev => !prev);
+    setShowSections(false); 
+  };
+
+  const handleSections = () => {
+    setShowSections(true);
   };
 
   const handleDelete = async () => {
@@ -95,19 +107,64 @@ const Card = (props: Iprops) => {
           {hideIcons && (
             <div className="flex items-center gap-2">
               <button
-                onClick={handleEdit}
+                onClick={handleSheet}
                 className="p-1.5 hover:bg-gray-100 rounded-lg cursor-pointer hover:scale-110 transition-all"
                 aria-label="Edit card"
               >
-                <SquarePen size={16} className="text-gray-600 hover:text-gray-900" />
+                <EllipsisVertical size={16} className="text-gray-600 hover:text-gray-900" />
               </button>
-              <button
-                onClick={handleDelete}
-                className="p-1.5 hover:bg-red-50 rounded-lg cursor-pointer hover:scale-110 transition-all"
-                aria-label="Delete card"
-              >
-                <Trash2 size={16} className="text-gray-600 hover:text-red-700" />
-              </button>
+              {sheet && (
+                <div className="ml-5 mt-10 w-40 bg-gray-50 shadow-2xl border border-gray-300 rounded-lg fixed z-20 flex flex-col py-2 text-sm" onMouseLeave={() => {setSheet(false);setShowSections(false);}}>
+
+                  {!showSections ? (
+                    <>
+                      <button
+                        onClick={handleEdit}
+                        className="px-3 py-1.5 text-left hover:bg-gray-100"
+                      >
+                        Edit
+                      </button>
+
+                      <button
+                        onClick={handleDelete}
+                        className="px-3 py-1.5 text-left hover:bg-red-50 text-red-600"
+                      >
+                        Delete
+                      </button>
+
+                      <button
+                        onClick={handleSections}
+                        className="px-3 py-1.5 flex justify-between items-center hover:bg-gray-100"
+                      >
+                        Section
+                        <ChevronRight size={14} />
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      {/* Back button */}
+                      <button
+                        onClick={() => setShowSections(false)}
+                        className="px-3 py-1.5 text-left hover:bg-gray-100"
+                      >
+                        ← Back
+                      </button>
+
+                      {/* Example sections */}
+                      <button className="px-3 py-1.5 text-left hover:bg-gray-100">
+                        Section 1
+                      </button>
+                      <button className="px-3 py-1.5 text-left hover:bg-gray-100">
+                        Section 2
+                      </button>
+                      <button className="px-3 py-1.5 text-left hover:bg-gray-100">
+                        Section 3
+                      </button>
+                    </>
+                  )}
+
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -2,7 +2,6 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { searchAtom } from "../store/atoms/search";
 import React, { useEffect, useState, type KeyboardEvent } from "react";
 import { loadingAtom } from "../store/atoms/loading";
-import LoadingOverlay from "../components/Loading";
 import axios from "axios";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
@@ -10,6 +9,7 @@ import { sidebarAtom } from "../store/atoms/sidebar";
 import { hideIconAtom } from "../store/atoms/hideIcons";
 import { Search as SearchIcon, ExternalLink, Lock, Globe } from "lucide-react";
 import { handleError } from "../utils/handleError";
+import SearchResultsSkeleton from "../components/SearchResultsSkeleton";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface CardData {
@@ -92,10 +92,9 @@ const Search = () => {
   return (
     <>
       {loading ? (
-        <LoadingOverlay />
+        <SearchResultsSkeleton />
       ) : (
         <div className="w-full p-9 pt-20">
-          {/* Hero Section */}
           <div className="mb-8 ">
             <div className="flex gap-3 mb-4 ">
               <div className="h-full">
@@ -106,7 +105,6 @@ const Search = () => {
               </div>
             </div>
 
-            {/* Search Bar */}
             <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-200 p-2 hover:shadow-2xl transition-shadow">
               <div className="flex gap-3">
                 <div className="flex-1 relative">
@@ -164,7 +162,6 @@ const Search = () => {
                </div>
           </div>
 
-          {/* Results Section */}
           {hasSearched && (
             <div className="mb-4">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
@@ -191,7 +188,6 @@ const Search = () => {
               </p>
             </div>
           )}
-          {/* Query Result Cards */}
           {hasSearched && queryCards.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-300">
               <SearchIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />

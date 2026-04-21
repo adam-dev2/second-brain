@@ -15,6 +15,8 @@ interface CookieOptions {
   domain?:string;
 }
 
+const isProduction = process.env.NODE_ENV === 'production'
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -93,12 +95,12 @@ export const LoginController = async (req: Request, res: Response) => {
       { expiresIn: "1h" }
     );
     const cookieOptions: CookieOptions = {
-      httpOnly: true,
-      secure: true,
+      httpOnly: isProduction,
+      secure: isProduction,
       maxAge: 60 * 60 * 1000,
       sameSite: "lax",
       path:"/",
-      domain: ".madebyadam.xyz",
+      ...(isProduction && { domain: ".madebyadam.xyz" }),
     };
     res.cookie("token", token, cookieOptions);
     res.status(200).json({ message: "Logged in successfully" });
@@ -175,8 +177,8 @@ export const LogoutController = async (req: Request, res: Response) => {
   
   try {
     res.clearCookie("token", {
-      httpOnly: process.env.NODE_ENV === "production",
-      secure: process.env.NODE_ENV === "production",
+      httpOnly: isProduction,
+      secure: isProduction,
       sameSite: "none",
     });
     return res.status(200).json({ message: "Logged out successfully" });

@@ -8,6 +8,7 @@ export interface IContent extends Document {
   tags: string[];
   share: boolean;
   status?: string;
+  sectionId:ObjectId | null;
   embedding?: number[];
   cardId: string;
   createdAt: Date;
@@ -22,6 +23,7 @@ const contentSchema = new Schema<IContent>({
   tags: { type: [String], required: true },
   share: { type: Boolean, required: true },
   status: { type: String, enum: ["pending", "ready", "failed"], default: "pending" },
+  sectionId:{type: mongoose.Schema.Types.ObjectId, ref:"Section", default:null},
   embedding: { type: [Number] },
   cardId: { type: String },
   createdAt: { type: Date, required: true },

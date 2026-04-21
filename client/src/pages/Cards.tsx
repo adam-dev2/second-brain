@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Card from "../components/Card";
-import { Share2, Plus } from "lucide-react";
+import { Share2, Plus, Move } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
@@ -9,13 +9,13 @@ import { useRecoilValue, useSetRecoilState } from "recoil";
 import { modalAtom } from "../store/atoms/modal";
 import { allcardsAtom } from "../store/atoms/allcards";
 import { loadingAtom } from "../store/atoms/loading";
-import Loading from "../components/Loading";
 import { sidebarAtom } from "../store/atoms/sidebar";
 import { searchModalAtom } from "../store/atoms/searchModal";
 import ShareModal from "../components/ShareModal";
 import { sharelink } from "../store/atoms/sharelink";
 import { hideIconAtom } from "../store/atoms/hideIcons";
 import { handleError } from "../utils/handleError";
+import CardSkeleton from "../components/CardSkeleton";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface IOrgCard {
@@ -143,11 +143,12 @@ const Cards = () => {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return <CardSkeleton/>;
+  }
   return (
     <>
-      {loading ? (
-        <Loading />
-      ) : (
         <div className="min-h-screen w-full p-9">
           <div className="">
             <h1 className="text-4xl font-semibold text-gray-800 tracking-tight py-4">
@@ -166,7 +167,7 @@ const Cards = () => {
               <div className={`flex flex-row items-center gap-3`}>
                 <button
                   onClick={handleClick}
-                  className="cursor-pointer flex items-center gap-2 bg-zinc-900 text-gray-100 hover:text-gray-800 hover:border hover:border-gray-700 font-medium rounded-full py-2 px-4 hover:bg-zinc-200 hover:scale-[1.03] transition-all duration-150"
+                  className="cursor-pointer flex items-center gap-2 bg-zinc-900 text-gray-100 hover:text-gray-800 hover:border hover:border-gray-700 font-medium rounded-full py-2 px-4 hover:bg-zinc-200 hover:scale-[1.01] transition-all duration-200"
                 >
                   <Plus size={20} />
                   <span >Add</span>
@@ -208,7 +209,6 @@ const Cards = () => {
             </p>
           )}
         </div>
-      )}
     </>
   );
 };

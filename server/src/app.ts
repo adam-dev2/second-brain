@@ -10,6 +10,7 @@ import oauthRoutes from "./routes/oauthRoutes.js";
 import cardRoutes from "./routes/cardRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import brainRoutes from "./routes/brainRoutes.js";
+import sectionRoutes from "./routes/sectionRoutes.js"
 import eventRoutes from "./routes/eventRoutes.js";
 import cookieParser from "cookie-parser";
 import { verifyUserController } from "./controllers/verifyUserController.js";
@@ -45,5 +46,6 @@ app.use("/api/v1/auth", oauthRoutes);
 app.use("/api/v1/content", cardRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/api/v1/brain", brainRoutes);
+app.use("/api/v1/section", sectionRoutes);
 
 export default app;

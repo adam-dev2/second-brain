@@ -168,9 +168,9 @@ export const FetchMetrics = async (req: Request, res: Response) => {
 };
 
 export const createCard = async (req: Request, res: Response) => {
-  const { link, title, type, share, tags } = req.body;
+  const { link, title, type, share, tags = [] } = req.body;
 
-  if (!link || !title || !type || !(Array.isArray(tags) && tags.length > 0)) {
+  if (!link || !title || !type) {
     return res.status(400).json({ message: "All fields are required" });
   }
 

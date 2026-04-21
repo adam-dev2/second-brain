@@ -7,7 +7,9 @@ import {
   FileStack,
   Tags,
   Search,
-  UserRoundPen
+  UserRoundPen,
+  List,
+  ChevronDown
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -17,6 +19,7 @@ import { loadingAtom } from "../store/atoms/loading";
 import { useAuth } from "../context/AuthContext";
 import LoadingOverlay from "../components/Loading";
 import { useState } from "react";
+import SectionsNav from "./SectionsNav";
 
 
 const Sidebar = () => {
@@ -28,6 +31,7 @@ const Sidebar = () => {
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
   const [isMobile, setIsMobile] = useState(false);
+  const [dropdown, setDropdown] = useState(false);
 
 
   const handleLogout = async () => {
@@ -67,6 +71,14 @@ const Sidebar = () => {
     { path: "/home/search", label: "Search", icon: Search },
     { path: "/home/profile", label: "Profile", icon: UserRoundPen },
   ];
+
+  const sections = [
+    {id:'1',path: "/home/adhoc",label:"Adhoc"},
+    {id:'2',path: "/home/study",label:"Study Material"},
+    {id:'3',path: "/home/dsa",label:"DSA"},
+    {id:'4',path: "/home/tweets",label:"Tweets"},
+    {id:'5',path: "/home/yt",label:"Youtube"},
+  ]
 
   return (
     <>
@@ -137,7 +149,7 @@ const Sidebar = () => {
       {/* Mobile Toggle Button */}
       <button
         onClick={() => setIsMobile(!isMobile)}
-        className="fixed top-4 p-2 rounded-lg bg-black text-white hover:bg-neutral-800 transition-all z-30 md:hidden"
+        className="fixed top-4 p-2 rounded-lg border border-neutral-400 bg-black/20 text-black hover:bg-neutral-800 transition-all z-30 md:hidden"
       >
         {isMobile ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
       </button>
@@ -146,7 +158,7 @@ const Sidebar = () => {
       <aside
         className={`${
           isOpen ? "w-64" : "w-20"
-        } fixed top-0 left-0 h-full bg-black text-white flex-col p-4 border-r border-white/10 shadow-2xl transition-all duration-300 z-50 hidden md:flex`}
+        } fixed top-0 left-0 h-full bg-black text-white flex-col p-4 border-r border-white/10 shadow-2xl transition-all duration-300 z-10 hidden md:flex`}
       >
         {/* Header with toggle */}
         <div className="flex items-center justify-between m-0 md:mb-10 md:mt-2 overflow-hidden">
@@ -158,9 +170,7 @@ const Sidebar = () => {
             Second Brain
           </h1>
         </div>
-
-        {/* Nav links */}
-        <nav className="flex flex-col gap-2 sm:gap-3 ">
+        <nav className="flex flex-col gap-2 sm:gap-3">
           {links.map(({ path, label, icon: Icon }) => (
             <NavLink
               key={path}
@@ -188,6 +198,12 @@ const Sidebar = () => {
               )}
             </NavLink>
           ))}
+
+  {/* SECTIONS BLOCK */}
+          <SectionsNav
+            isOpen={isOpen}
+            sections={sections}
+          />
         </nav>
 
         <div className="mt-auto pt-4 border-t border-white/10">
