@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
-// import LoadingOverlay from "../components/Loading";
 import { handleError } from "../utils/handleError";
 import DashboardSkeleton from "../components/DashboardSkeleton";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;

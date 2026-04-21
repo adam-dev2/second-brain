@@ -14,14 +14,7 @@ interface CookieOptions {
   path?:string;
   domain?:string;
 }
-
-<<<<<<< HEAD
 const isProduction = process.env.NODE_ENV === 'production'
-=======
-const isProduction = process.env.NODE_ENV === 'production';
-console.log(isProduction);
-
->>>>>>> 8ab5abf (parrot work)
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -101,19 +94,11 @@ export const LoginController = async (req: Request, res: Response) => {
       { expiresIn: "1h" }
     );
     const cookieOptions: CookieOptions = {
-<<<<<<< HEAD
-      httpOnly: isProduction,
-      secure: isProduction,
-      maxAge: 60 * 60 * 1000,
-      sameSite: "lax",
-      path:"/",
-=======
       httpOnly: true,
       secure: isProduction,
       maxAge: 60 * 60 * 1000,
       sameSite: isProduction ? 'lax' : 'lax',  
       path: "/",
->>>>>>> 8ab5abf (parrot work)
       ...(isProduction && { domain: ".madebyadam.xyz" }),
     };
     res.cookie("token", token, cookieOptions);
