@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 import { handleError } from "../utils/handleError";
 import DashboardSkeleton from "../components/DashboardSkeleton";
+import { sectionsAtom } from "../store/atoms/sections";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface MetricsData {
@@ -38,10 +39,17 @@ interface MetricsData {
   }>;
 }
 
+interface ISection {
+    sectionId:string;
+    cardId:string;
+    userId?:string;
+}
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
+  const sections = useRecoilValue<ISection[] | null>(sectionsAtom)
 
   const [metrics, setMetrics] = useState<MetricsData | null>(null);
   useEffect(() => {
@@ -65,9 +73,24 @@ const Dashboard = () => {
         setLoading(false);
       }
     };
-
+    
     fetchMetrics();
   }, []);
+  
+  
+  useEffect(() => {
+    const fetchSections = async () =>{
+      try{
+        const res = await axios.get(`${backendUrl}/api/v1/section`)
+        console.log(res.data.sections);
+        
+      }catch(err) {
+        console.log(err);
+        handleError(err, "Error while fetching sections");
+      }
+    }
+    fetchSections();
+  },[])
 
   const getTypeIcon = (type: string) => {
     switch (type) {

@@ -1,0 +1,111 @@
+"filename", "language", "JSON", "Markdown", "TypeScript", "JSON with Comments", "HTML", "JavaScript", "TypeScript JSX", "PostCSS", "XML", "YAML", "comment", "blank", "total"
+"/home/adam/Documents/second-brain/.github/workflows/semgrep.yml", "YAML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 1, 1, 27
+"/home/adam/Documents/second-brain/LandingPage/README.md", "Markdown", 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 74
+"/home/adam/Documents/second-brain/LandingPage/eslint.config.js", "JavaScript", 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 2, 24
+"/home/adam/Documents/second-brain/LandingPage/index.html", "HTML", 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 1, 14
+"/home/adam/Documents/second-brain/LandingPage/package-lock.json", "JSON", 4080, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 4081
+"/home/adam/Documents/second-brain/LandingPage/package.json", "JSON", 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 37
+"/home/adam/Documents/second-brain/LandingPage/public/vite.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1
+"/home/adam/Documents/second-brain/LandingPage/src/App.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 37, 0, 0, 0, 6, 43
+"/home/adam/Documents/second-brain/LandingPage/src/App.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 438, 0, 0, 0, 0, 31, 469
+"/home/adam/Documents/second-brain/LandingPage/src/assets/react.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1
+"/home/adam/Documents/second-brain/LandingPage/src/index.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+"/home/adam/Documents/second-brain/LandingPage/src/main.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 2, 11
+"/home/adam/Documents/second-brain/LandingPage/tsconfig.app.json", "JSON", 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 29
+"/home/adam/Documents/second-brain/LandingPage/tsconfig.json", "JSON with Comments", 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 1, 8
+"/home/adam/Documents/second-brain/LandingPage/tsconfig.node.json", "JSON", 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 27
+"/home/adam/Documents/second-brain/LandingPage/vite.config.ts", "TypeScript", 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 1, 2, 9
+"/home/adam/Documents/second-brain/README.md", "Markdown", 0, 76, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 96
+"/home/adam/Documents/second-brain/client/CLIENT_README.md", "Markdown", 0, 500, 0, 0, 0, 0, 0, 0, 0, 0, 0, 105, 605
+"/home/adam/Documents/second-brain/client/README.md", "Markdown", 0, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 74
+"/home/adam/Documents/second-brain/client/eslint.config.js", "JavaScript", 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 2, 24
+"/home/adam/Documents/second-brain/client/index.html", "HTML", 0, 0, 0, 0, 13, 0, 0, 0, 0, 0, 0, 1, 14
+"/home/adam/Documents/second-brain/client/package-lock.json", "JSON", 10388, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 10389
+"/home/adam/Documents/second-brain/client/package.json", "JSON", 53, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 54
+"/home/adam/Documents/second-brain/client/public/vite.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1
+"/home/adam/Documents/second-brain/client/src/App.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 37, 0, 0, 0, 6, 43
+"/home/adam/Documents/second-brain/client/src/App.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 32, 0, 0, 0, 0, 3, 35
+"/home/adam/Documents/second-brain/client/src/AuthSuccess.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 0, 2, 15
+"/home/adam/Documents/second-brain/client/src/assets/react.svg", "XML", 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1
+"/home/adam/Documents/second-brain/client/src/components/AddCard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 291, 0, 0, 0, 5, 22, 318
+"/home/adam/Documents/second-brain/client/src/components/Card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 206, 0, 0, 0, 2, 20, 228
+"/home/adam/Documents/second-brain/client/src/components/CardSkeleton.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 65, 0, 0, 0, 0, 4, 69
+"/home/adam/Documents/second-brain/client/src/components/DashboardSkeleton.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 61, 0, 0, 0, 5, 4, 70
+"/home/adam/Documents/second-brain/client/src/components/Loading.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 3, 26
+"/home/adam/Documents/second-brain/client/src/components/Protected.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 21, 0, 0, 0, 0, 8, 29
+"/home/adam/Documents/second-brain/client/src/components/SearchResultsSkeleton.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 4, 64
+"/home/adam/Documents/second-brain/client/src/components/SectionsNav.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 175, 0, 0, 0, 6, 16, 197
+"/home/adam/Documents/second-brain/client/src/components/ShareModal.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 85, 0, 0, 0, 0, 10, 95
+"/home/adam/Documents/second-brain/client/src/components/Sidebar.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 204, 0, 0, 0, 9, 22, 235
+"/home/adam/Documents/second-brain/client/src/context/AuthContext.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 73, 0, 0, 0, 0, 13, 86
+"/home/adam/Documents/second-brain/client/src/index.css", "PostCSS", 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 1, 14
+"/home/adam/Documents/second-brain/client/src/layouts/DashboardLayout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 0, 3, 23
+"/home/adam/Documents/second-brain/client/src/main.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 2, 4, 58
+"/home/adam/Documents/second-brain/client/src/pages/AuthPages.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 275, 0, 0, 0, 0, 30, 305
+"/home/adam/Documents/second-brain/client/src/pages/Cards.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 205, 0, 0, 0, 0, 12, 217
+"/home/adam/Documents/second-brain/client/src/pages/Dashboard.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 221, 0, 0, 0, 0, 20, 241
+"/home/adam/Documents/second-brain/client/src/pages/LandingPage.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 503, 0, 0, 0, 0, 31, 534
+"/home/adam/Documents/second-brain/client/src/pages/MoveCards.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 170, 29, 199
+"/home/adam/Documents/second-brain/client/src/pages/Profile.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 225, 0, 0, 0, 0, 26, 251
+"/home/adam/Documents/second-brain/client/src/pages/ResetPassword.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 146, 0, 0, 0, 0, 18, 164
+"/home/adam/Documents/second-brain/client/src/pages/Search.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 339, 0, 0, 0, 1, 28, 368
+"/home/adam/Documents/second-brain/client/src/pages/Share.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 200, 0, 0, 0, 3, 21, 224
+"/home/adam/Documents/second-brain/client/src/pages/Tags.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 191, 0, 0, 0, 0, 15, 206
+"/home/adam/Documents/second-brain/client/src/store/atoms/allcards.ts", "TypeScript", 0, 0, 15, 0, 0, 0, 0, 0, 0, 0, 0, 1, 16
+"/home/adam/Documents/second-brain/client/src/store/atoms/counter.ts", "TypeScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7
+"/home/adam/Documents/second-brain/client/src/store/atoms/editcard.ts", "TypeScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7
+"/home/adam/Documents/second-brain/client/src/store/atoms/formData.ts", "TypeScript", 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 2, 24
+"/home/adam/Documents/second-brain/client/src/store/atoms/hideIcons.ts", "TypeScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6
+"/home/adam/Documents/second-brain/client/src/store/atoms/loading.ts", "TypeScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7
+"/home/adam/Documents/second-brain/client/src/store/atoms/modal.ts", "TypeScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7
+"/home/adam/Documents/second-brain/client/src/store/atoms/resetpassword.ts", "TypeScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7
+"/home/adam/Documents/second-brain/client/src/store/atoms/search.ts", "TypeScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7
+"/home/adam/Documents/second-brain/client/src/store/atoms/searchModal.ts", "TypeScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6
+"/home/adam/Documents/second-brain/client/src/store/atoms/sections.ts", "TypeScript", 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 2, 11
+"/home/adam/Documents/second-brain/client/src/store/atoms/sharelink.ts", "TypeScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6
+"/home/adam/Documents/second-brain/client/src/store/atoms/sidebar.ts", "TypeScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7
+"/home/adam/Documents/second-brain/client/src/store/atoms/signupform.ts", "TypeScript", 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 3, 13
+"/home/adam/Documents/second-brain/client/src/utils/handleError.ts", "TypeScript", 0, 0, 13, 0, 0, 0, 0, 0, 0, 0, 0, 3, 16
+"/home/adam/Documents/second-brain/client/tsconfig.app.json", "JSON", 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 29
+"/home/adam/Documents/second-brain/client/tsconfig.json", "JSON with Comments", 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 1, 8
+"/home/adam/Documents/second-brain/client/tsconfig.node.json", "JSON", 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 27
+"/home/adam/Documents/second-brain/client/vercel.json", "JSON", 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 6
+"/home/adam/Documents/second-brain/client/vite.config.ts", "TypeScript", 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 1, 2, 9
+"/home/adam/Documents/second-brain/server/SERVER_README.md", "Markdown", 0, 777, 0, 0, 0, 0, 0, 0, 0, 0, 0, 204, 981
+"/home/adam/Documents/second-brain/server/eslint.config.ts", "TypeScript", 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 2, 12
+"/home/adam/Documents/second-brain/server/package-lock.json", "JSON", 11906, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 11907
+"/home/adam/Documents/second-brain/server/package.json", "JSON", 71, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 72
+"/home/adam/Documents/second-brain/server/src/app.ts", "TypeScript", 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 10, 52
+"/home/adam/Documents/second-brain/server/src/config/QdrantConfig.ts", "TypeScript", 0, 0, 40, 0, 0, 0, 0, 0, 0, 0, 0, 7, 47
+"/home/adam/Documents/second-brain/server/src/config/db.ts", "TypeScript", 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 3, 11
+"/home/adam/Documents/second-brain/server/src/controllers/authController.ts", "TypeScript", 0, 0, 172, 0, 0, 0, 0, 0, 0, 0, 0, 16, 188
+"/home/adam/Documents/second-brain/server/src/controllers/cardController.ts", "TypeScript", 0, 0, 407, 0, 0, 0, 0, 0, 0, 0, 1, 53, 461
+"/home/adam/Documents/second-brain/server/src/controllers/guide.md", "Markdown", 0, 46, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 60
+"/home/adam/Documents/second-brain/server/src/controllers/sectionController.ts", "TypeScript", 0, 0, 130, 0, 0, 0, 0, 0, 0, 0, 0, 19, 149
+"/home/adam/Documents/second-brain/server/src/controllers/shareController.ts", "TypeScript", 0, 0, 68, 0, 0, 0, 0, 0, 0, 0, 0, 12, 80
+"/home/adam/Documents/second-brain/server/src/controllers/userController.ts", "TypeScript", 0, 0, 77, 0, 0, 0, 0, 0, 0, 0, 0, 4, 81
+"/home/adam/Documents/second-brain/server/src/controllers/verifyUserController.ts", "TypeScript", 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 5, 27
+"/home/adam/Documents/second-brain/server/src/middlewares/auth.ts", "TypeScript", 0, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 13, 61
+"/home/adam/Documents/second-brain/server/src/models/Content.ts", "TypeScript", 0, 0, 31, 0, 0, 0, 0, 0, 0, 0, 0, 5, 36
+"/home/adam/Documents/second-brain/server/src/models/Link.ts", "TypeScript", 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 5, 16
+"/home/adam/Documents/second-brain/server/src/models/Section.ts", "TypeScript", 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 0, 3, 20
+"/home/adam/Documents/second-brain/server/src/models/Tags.ts", "TypeScript", 0, 0, 11, 0, 0, 0, 0, 0, 0, 0, 0, 5, 16
+"/home/adam/Documents/second-brain/server/src/models/User.ts", "TypeScript", 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 5, 28
+"/home/adam/Documents/second-brain/server/src/routes/brainRoutes.ts", "TypeScript", 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 4, 11
+"/home/adam/Documents/second-brain/server/src/routes/cardRoutes.ts", "TypeScript", 0, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 5, 23
+"/home/adam/Documents/second-brain/server/src/routes/eventRoutes.ts", "TypeScript", 0, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 8, 27
+"/home/adam/Documents/second-brain/server/src/routes/oauthRoutes.ts", "TypeScript", 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 12, 76
+"/home/adam/Documents/second-brain/server/src/routes/sectionRoutes.ts", "TypeScript", 0, 0, 14, 0, 0, 0, 0, 0, 0, 0, 0, 4, 18
+"/home/adam/Documents/second-brain/server/src/routes/userRoutes.ts", "TypeScript", 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 4, 12
+"/home/adam/Documents/second-brain/server/src/server.ts", "TypeScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 3, 8
+"/home/adam/Documents/second-brain/server/src/services/processor.ts", "TypeScript", 0, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 5, 30
+"/home/adam/Documents/second-brain/server/src/utils/embeddings.ts", "TypeScript", 0, 0, 42, 0, 0, 0, 0, 0, 0, 0, 0, 9, 51
+"/home/adam/Documents/second-brain/server/src/utils/passport.ts", "TypeScript", 0, 0, 56, 0, 0, 0, 0, 0, 0, 0, 0, 4, 60
+"/home/adam/Documents/second-brain/server/src/utils/qDrant.ts", "TypeScript", 0, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 3, 12
+"/home/adam/Documents/second-brain/server/src/utils/scrape.ts", "TypeScript", 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 12, 4, 38
+"/home/adam/Documents/second-brain/server/src/utils/sseManager.ts", "TypeScript", 0, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 7, 29
+"/home/adam/Documents/second-brain/server/src/validations/AuthSchema.ts", "TypeScript", 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 3, 13
+"/home/adam/Documents/second-brain/server/src/validations/ContentSchema.ts", "TypeScript", 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 2, 6
+"/home/adam/Documents/second-brain/server/tsconfig.json", "JSON with Comments", 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 0, 2, 19
+"/home/adam/Documents/second-brain/server/tsconfig.tsbuildinfo", "JSON", 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+"Total", "-", 26632, 1519, 1573, 31, 26, 44, 4133, 88, 4, 25, 227, 1091, 35393
