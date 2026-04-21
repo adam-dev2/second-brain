@@ -302,15 +302,16 @@ export const EditCard = async (req: Request, res: Response) => {
 
 export const Query = async (req: Request, res: Response) => {
   const query = req.body.query;
-  let limit = req.body.limit;
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
 
   if (!query) {
     return res.status(400).json({ message: "query missing" });
   }
-  if (!limit) {
-    limit = 1;
-  }
-  console.log(limit);
+
+  const maxLimit = 50; // Maximum limit for search results
+  const finalLimit = Math.min(limit, maxLimit);
+  const searchLimit = Math.min(finalLimit * page * 2, 200); // Get more results from Qdrant for better relevance
 
   try {
     const userID = req.user?.id;
@@ -322,7 +323,7 @@ export const Query = async (req: Request, res: Response) => {
 
     const searchResults = await qdrantClient.search(COLLECTION_NAME, {
       vector: queryEmbeddings,
-      limit: parseInt(limit),
+      limit: searchLimit,
       filter: {
         must: [
           {
@@ -332,6 +333,7 @@ export const Query = async (req: Request, res: Response) => {
         ],
       },
     });
+
     type TitlesType = string[];
     const titles: TitlesType = [];
     searchResults.forEach((res) => {
@@ -345,12 +347,14 @@ export const Query = async (req: Request, res: Response) => {
       title: { $in: titles },
       userId: userID,
     });
+
     const titleScoreMap = new Map();
     searchResults.forEach((res) => {
       if (res.payload?.title) {
         titleScoreMap.set(res.payload.title, res.score);
       }
     });
+
     const cardsWithScores = queryCards
       .map((card) => ({
         ...card.toObject(),
@@ -358,9 +362,23 @@ export const Query = async (req: Request, res: Response) => {
       }))
       .sort((a, b) => b.relevanceScore - a.relevanceScore);
 
+    // Apply pagination to the sorted results
+    const totalResults = cardsWithScores.length;
+    const totalPages = Math.ceil(totalResults / finalLimit);
+    const startIndex = (page - 1) * finalLimit;
+    const endIndex = startIndex + finalLimit;
+    const paginatedResults = cardsWithScores.slice(startIndex, endIndex);
+
     return res.status(200).json({
-      queryCards: cardsWithScores,
-      limit,
+      queryCards: paginatedResults,
+      pagination: {
+        totalResults,
+        totalPages,
+        currentPage: page,
+        limit: finalLimit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
     });
   } catch (err: unknown) {
     let errorMessage = "Unknown error";
@@ -385,18 +403,43 @@ export const Query = async (req: Request, res: Response) => {
 export const FetchAllCards = async (req: Request, res: Response) => {
   try {
     const userID = req.user?.id;
-
     if (!userID) {
       return res.status(401).json({ message: "Unauthorized" });
     }
+    const page = parseInt(req.query.page as string) || 1;     
+    const limit = parseInt(req.query.limit as string) || 10;  
+    
+    const maxLimit = 100;
+    const finalLimit = Math.min(limit, maxLimit);
+    const skip = (page - 1) * finalLimit;
 
-    const FetchContent = await Content.find({ userId: userID });
-    if (!FetchContent) {
-      return res.status(404).json({ message: "no cards to show" });
-    }
-    return res.status(200).json({ message: "Fetched cards successfully", cards: FetchContent });
+    const [cards, totalCards] = await Promise.all([
+      Content.find({ userId: userID })
+        .sort({ createdAt: -1 })           
+        .skip(skip)
+        .limit(finalLimit)
+        .lean(),
+      
+      Content.countDocuments({ userId: userID })
+    ]);
+
+    const totalPages = Math.ceil(totalCards / finalLimit);
+
+    return res.status(200).json({
+      message: "Fetched cards successfully",
+      cards,
+      pagination: {
+        totalCards,
+        totalPages,
+        currentPage: page,
+        limit: finalLimit,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1
+      }
+    });
+
   } catch (err) {
-    return res.status(500).json({ error: "Internal Server Error", err });
+    return res.status(500).json({ error: "Internal Server Error", details: err });
   }
 };
 

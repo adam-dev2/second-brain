@@ -24,15 +24,25 @@ interface CardData {
   relevanceScore?: number;
 }
 
+interface PaginationData {
+  totalResults: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
+}
+
 const Search = () => {
   const search = useRecoilValue(searchAtom);
   const setSearch = useSetRecoilState(searchAtom);
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
   const [queryCards, setQueryCards] = useState<CardData[]>([]);
+  const [pagination, setPagination] = useState<PaginationData | null>(null);
   const isOpen = useRecoilValue(sidebarAtom);
   const setHideIcons = useSetRecoilState(hideIconAtom);
-  const [limit, setLimit] = useState("5");
+  const [limit, setLimit] = useState("10");
   const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
@@ -41,7 +51,7 @@ const Search = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value);
 
-  const fetchQuery = async () => {
+  const fetchQuery = async (page: number = 1) => {
     if (search.trim() === "") {
       toast.error("Please enter a search query");
       return;
@@ -54,12 +64,11 @@ const Search = () => {
     const token = Cookies.get("token");
     setLoading(true);
     setHasSearched(true);
-    console.log(limit);
 
     try {
       const res = await axios.post(
-        `${backendUrl}/api/v1/content/query`,
-        { query: search, limit: parseInt(limit) },
+        `${backendUrl}/api/v1/content/query?page=${page}&limit=${limit}`,
+        { query: search },
         {
           withCredentials: true,
           headers: {
@@ -69,25 +78,30 @@ const Search = () => {
         }
       );
       setQueryCards(res.data.queryCards);
-      toast.success(`Found ${res.data.queryCards.length} relevant results`);
+      setPagination(res.data.pagination);
+      toast.success(`Found ${res.data.pagination.totalResults} relevant results`);
     } catch (err: unknown) {
       handleError(err, "Error while fetching query results");
       console.log(err);
       setQueryCards([]);
+      setPagination(null);
     } finally {
       setLoading(false);
-      setSearch("");
     }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      fetchQuery();
+      fetchQuery(1); // Reset to first page on new search
     }
   };
 
-  const handleSearch = () => fetchQuery();
+  const handleSearch = () => fetchQuery(1); // Reset to first page on new search
+
+  const handlePageChange = (page: number) => {
+    fetchQuery(page);
+  };
 
   return (
     <>
@@ -286,6 +300,62 @@ const Search = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Pagination Controls */}
+          {hasSearched && pagination && pagination.totalPages > 1 && (
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-2xl p-6 border-2 border-gray-200 shadow-lg">
+              <div className="text-sm text-gray-600">
+                Showing {((pagination.currentPage - 1) * pagination.limit) + 1} to {Math.min(pagination.currentPage * pagination.limit, pagination.totalResults)} of {pagination.totalResults} results
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage - 1)}
+                  disabled={!pagination.hasPrevPage}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Previous
+                </button>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (pagination.totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (pagination.currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (pagination.currentPage >= pagination.totalPages - 2) {
+                      pageNum = pagination.totalPages - 4 + i;
+                    } else {
+                      pageNum = pagination.currentPage - 2 + i;
+                    }
+
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
+                          pageNum === pagination.currentPage
+                            ? "bg-gray-800 text-white"
+                            : "text-gray-700 bg-gray-100 hover:bg-gray-200"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <button
+                  onClick={() => handlePageChange(pagination.currentPage + 1)}
+                  disabled={!pagination.hasNextPage}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </div>

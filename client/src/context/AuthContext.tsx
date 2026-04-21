@@ -32,10 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     try {
       const res = await axios.get(`${backendUrl}/api/v1/me`, {
-        withCredentials: true,
-        headers:{
-          'Authorization': `Bearer ${token}`
-        }
+        withCredentials: true
       });
       setAuthenticated(true);
       setUser(res.data.user);
