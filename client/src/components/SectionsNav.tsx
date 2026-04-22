@@ -59,7 +59,7 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
       }
     };
     fetchSections();
-  });
+  },[]);
 
   // delete section here ----------------------
   const handleDelete = async (sectionId: string) => {

@@ -69,7 +69,7 @@ const Dashboard = () => {
     };
     
     fetchMetrics();
-  });
+  },[]);
   
   
   

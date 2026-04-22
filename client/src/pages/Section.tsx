@@ -78,7 +78,7 @@ const Section = () => {
         }
     })
     return () => es.close();
-  });
+  },[]);
   useEffect(() => {
     console.log(searchModal);
     setHideIcons(true);

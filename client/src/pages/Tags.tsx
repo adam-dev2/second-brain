@@ -79,7 +79,7 @@ const Tags = () => {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  });
+  },[]);
 
   useEffect(() => {
     if (selected.length === 0) {

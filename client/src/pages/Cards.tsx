@@ -1,9 +1,3 @@
-// CHANGES FROM ORIGINAL:
-// 1. Added `pagination` state to hold server response metadata
-// 2. fetchCards now accepts a `page` param and passes it to the API
-// 3. Pagination component is rendered at the bottom
-// 4. Removed setAllCards from useEffect deps (was causing infinite loop risk)
-
 import React, { useEffect, useRef, useState } from "react";
 import Card from "../components/Card";
 import { Share2, Plus } from "lucide-react";
@@ -82,7 +76,7 @@ const Cards = () => {
       toast.error(`${data.message}`, { id: processingToastId.current, position: "top-right" });
     });
     return () => es.close();
-  });
+  },[]);
 
   const fetchCards = async (page: number) => {
     setHideIcons(true);

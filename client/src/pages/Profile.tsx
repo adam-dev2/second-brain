@@ -127,7 +127,7 @@ const Profile: React.FC = () => {
     };
 
     fetchUser();
-  });
+  },[]);
 
   return (
     <>

@@ -18,7 +18,7 @@ const ShareModal = () => {
 
   useEffect(() => {
     setHideIcons(true);
-  })
+  },[])
 
   const handleCopy = async () => {
     try {

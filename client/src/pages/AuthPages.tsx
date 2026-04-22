@@ -113,20 +113,6 @@ const AuthPages = () => {
               <div className="absolute top-0 right-0 w-32 h-32 border-t border-r border-white/10 rounded-bl-2xl" />
               <div className="absolute bottom-0 left-0 w-32 h-32 border-b border-l border-white/10 rounded-tr-2xl" />
 
-              {/* Logo */}
-              <motion.div
-                initial={{ opacity: 0, x: -16 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-                className="flex items-center gap-2.5"
-              >
-                <div className="w-7 h-7 rounded-lg bg-white flex items-center justify-center shrink-0">
-                  <Zap className="w-3.5 h-3.5 text-black" fill="black" />
-                </div>
-                <span className="text-white font-bold tracking-tight">secondbrain</span>
-              </motion.div>
-
-              {/* Headline copy */}
               <div className="relative z-10">
                 <AnimatePresence mode="wait">
                   <motion.div

@@ -32,6 +32,7 @@ const AddCard = (props:Iprops) => {
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
   const setSectionCards = useSetRecoilState(secitonCardsAtom)
+  const [toggleScrapping,setToggleScrapping] = useState(false);
 
   useEffect(() => {
     if (formData.link) {
@@ -142,6 +143,7 @@ const AddCard = (props:Iprops) => {
           tags: formData.tags,
           share: formData.share,
           type: domainName,
+          scrape:toggleScrapping
         },
         {
           withCredentials: true,
@@ -251,18 +253,7 @@ const AddCard = (props:Iprops) => {
               </div>
 
               {/* Share Toggle */}
-              <div className="flex items-center justify-between">
-                <span className="text-gray-700 font-medium">Share:</span>
-                <button
-                  type="button"
-                  onClick={() => setFormData((prev) => ({ ...prev, share: !prev.share }))}
-                  className={`cursor-pointer px-3 py-1.5 rounded-full text-sm font-semibold transition ${
-                    formData.share ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {formData.share ? "Public" : "Private"}
-                </button>
-              </div>
+              
 
               {/* Tags Input */}
               <div>
@@ -295,7 +286,18 @@ const AddCard = (props:Iprops) => {
                   />
                 </div>
               </div>
-
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700 font-medium"></span>
+                <button
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, share: !prev.share }))}
+                  className={`cursor-pointer px-3 py-1.5 rounded-full text-sm font-semibold transition ${
+                    formData.share ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                  }`}
+                >
+                  {formData.share ? "Public" : "Private"}
+                </button>
+              </div>
               {/* Submit */}
               <button
                 type="submit"
