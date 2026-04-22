@@ -8,8 +8,6 @@ import {
   Tags,
   Search,
   UserRoundPen,
-  List,
-  ChevronDown
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -31,7 +29,6 @@ const Sidebar = () => {
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
   const [isMobile, setIsMobile] = useState(false);
-  const [dropdown, setDropdown] = useState(false);
 
 
   const handleLogout = async () => {
