@@ -167,7 +167,7 @@ export const FetchMetrics = async (req: Request, res: Response) => {
 };
 
 export const createCard = async (req: Request, res: Response) => {
-  const { link, title, type, share, tags = [] } = req.body;
+  const { link, title, type, share, tags = [],sectionId=null } = req.body;
 
   if (!link || !title || !type) {
     return res.status(400).json({ message: "All fields are required" });
@@ -187,6 +187,7 @@ export const createCard = async (req: Request, res: Response) => {
       type,
       tags,
       share,
+      sectionId,
       status: "pending",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -219,9 +220,20 @@ export const createCard = async (req: Request, res: Response) => {
           error: message,
         });
       });
+
+      const parseInformation = {
+          id:newCard._id,
+          title:newCard.title,
+          link:newCard.link,
+          tags:newCard.tags,
+          share:newCard.share,
+          sectionId:newCard.sectionId,
+          createdAt:newCard.createdAt,
+          updatedAt:newCard.updatedAt
+      }
     return res.status(201).json({
       message: "Card created successfully (processing in background)",
-      card: newCard,
+      card: parseInformation,
     });
   } catch (err: unknown) {
     if (err instanceof Error) {
@@ -263,7 +275,7 @@ export const EditCard = async (req: Request, res: Response) => {
       },
       { new: true }
     );
-    if (findCard.title !== title || findCard.link !== link) {
+    if (findCard.link !== link) {
       sendEvent(userID, "startCardProcessing", {
         cardId: findCard.cardId,
         title,
@@ -308,7 +320,7 @@ export const Query = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "query missing" });
   }
 
-  const maxLimit = 50; // Maximum limit for search results
+  const maxLimit = 10; // Maximum limit for search results
   const finalLimit = Math.min(limit, maxLimit);
   const searchLimit = Math.min(finalLimit * page * 2, 200); // Get more results from Qdrant for better relevance
 
@@ -361,7 +373,6 @@ export const Query = async (req: Request, res: Response) => {
       }))
       .sort((a, b) => b.relevanceScore - a.relevanceScore);
 
-    // Apply pagination to the sorted results
     const totalResults = cardsWithScores.length;
     const totalPages = Math.ceil(totalResults / finalLimit);
     const startIndex = (page - 1) * finalLimit;
@@ -405,8 +416,8 @@ export const FetchAllCards = async (req: Request, res: Response) => {
     if (!userID) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const page = parseInt(req.query.page as string) || 1;     
-    const limit = parseInt(req.query.limit as string) || 10;  
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit as string) || 10);
     
     const maxLimit = 100;
     const finalLimit = Math.min(limit, maxLimit);
@@ -414,7 +425,7 @@ export const FetchAllCards = async (req: Request, res: Response) => {
 
     const [cards, totalCards] = await Promise.all([
       Content.find({ userId: userID })
-        .sort({ createdAt: -1 })           
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(finalLimit)
         .lean(),

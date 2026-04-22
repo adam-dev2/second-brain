@@ -1,6 +1,12 @@
-import React, { useEffect, useState } from "react";
+// CHANGES FROM ORIGINAL:
+// 1. Added `pagination` state to hold server response metadata
+// 2. fetchCards now accepts a `page` param and passes it to the API
+// 3. Pagination component is rendered at the bottom
+// 4. Removed setAllCards from useEffect deps (was causing infinite loop risk)
+
+import React, { useEffect, useRef, useState } from "react";
 import Card from "../components/Card";
-import { Share2, Plus, Move } from "lucide-react";
+import { Share2, Plus } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
@@ -16,6 +22,8 @@ import { sharelink } from "../store/atoms/sharelink";
 import { hideIconAtom } from "../store/atoms/hideIcons";
 import { handleError } from "../utils/handleError";
 import CardSkeleton from "../components/CardSkeleton";
+import Pagination from "../components/Pagination"; // ← import
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface IOrgCard {
@@ -27,6 +35,15 @@ interface IOrgCard {
   type: string;
   createdAt: string;
   updatedAt: string;
+}
+
+interface PaginationMeta {
+  totalCards: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
 }
 
 const Cards = () => {
@@ -44,73 +61,68 @@ const Cards = () => {
   const setSearchModal = useSetRecoilState(searchModalAtom);
   const setHideIcons = useSetRecoilState(hideIconAtom);
 
-  const handleClick = () => {
-    setModal((prev) => !prev);
-  };
-  let processingToastId: string | undefined;
-  useEffect(() => {
-    const es = new EventSource(`${backendUrl}/events`, {
-      withCredentials: true,
-    });
+  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
+  const handleClick = () => setModal((prev) => !prev);
+
+  const processingToastId = useRef<string | undefined>(undefined)
+  useEffect(() => {
+    const es = new EventSource(`${backendUrl}/events`, { withCredentials: true });
     es.addEventListener("startCardProcessing", (e) => {
       const data = JSON.parse(e.data);
-      processingToastId = toast.loading(`${data.message}`, {
-        position: "top-right",
-      });
+      processingToastId.current = toast.loading(`${data.message}`, { position: "top-right" });
     });
-
     es.addEventListener("cardProcessed", (e) => {
       const data = JSON.parse(e.data);
-      console.log("Card Processed succesfull", data);
-      toast.success(`${data.message}`, {
-        id: processingToastId,
-        position: "top-right",
-      });
+      toast.success(`${data.message}`, { id: processingToastId.current, position: "top-right" });
     });
-
     es.addEventListener("cardFailed", (e) => {
       const data = JSON.parse(e.data);
-      console.log("Card processing failed");
-      toast.error(`${data.message}`, {
-        id: processingToastId,
-        position: "top-right",
-      });
+      toast.error(`${data.message}`, { id: processingToastId.current, position: "top-right" });
     });
-
     return () => es.close();
-  }, []);
-  useEffect(() => {
-    console.log(searchModal);
+  });
+
+  const fetchCards = async (page: number) => {
     setHideIcons(true);
     const token = Cookies.get("token");
-    const fetchCards = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get(`${backendUrl}/api/v1/content/cards`, {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        setAllCards(res.data.cards);
-        setOriginalCards(res.data.cards);
-        toast.success("Fetched all cards successfully");
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to fetch cards");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCards();
-  }, [setAllCards]);
+    setLoading(true);
+    try {
+      const res = await axios.get(`${backendUrl}/api/v1/content/cards`, {
+        params: { page, limit: 10 }, // ← pass page & limit as query params
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      setAllCards(res.data.cards);
+      setOriginalCards(res.data.cards);
+      setPagination(res.data.pagination); // ← store pagination meta
+      toast.success("Fetched all cards successfully");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch cards");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ← re-fetch whenever currentPage changes
+  useEffect(() => {
+    fetchCards(currentPage);
+  }, [currentPage]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setSearch(""); // clear search on page change
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearch(value);
-    console.log(value.length, value.trim() !== "");
     if (value.trim() !== "") {
       const filtered = originalCards.filter((item) =>
         item.title.toLowerCase().includes(value.toLowerCase())
@@ -127,12 +139,8 @@ const Cards = () => {
     try {
       const res = await axios.get(`${backendUrl}/api/v1/brain/share`, {
         withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
-      console.log(res.data.ShareableLink);
       toast.success("Shareable Link generated");
       setSearchModal(true);
       setShareLink(`https://secondbrain.madebyadam.xyz/${res.data.ShareableLink}`);
@@ -144,71 +152,86 @@ const Cards = () => {
     }
   };
 
-  if (loading) {
-    return <CardSkeleton/>;
-  }
+  if (loading) return <CardSkeleton />;
+
   return (
     <>
-        <div className="min-h-screen w-full p-9">
-          <div className="">
-            <h1 className="text-4xl font-semibold text-gray-800 tracking-tight py-4">
-              Cards
-            </h1>
-            <div className="flex items-center justify-between pb-4">
-              <div className="flex justify-start  md:justify-end-safe w-full mr-4">
-                <input
-                  value={search}
-                  type="text"
-                  className="border border-gray-400 rounded-2xl bg-gray-50 p-2 outline-none placeholder:opacity-45  focus-within:scale-103 transition "
-                  placeholder="eg: Title"
-                  onChange={handleSearch}
-                />
-              </div>
-              <div className={`flex flex-row items-center gap-3`}>
-                <button
-                  onClick={handleClick}
-                  className="cursor-pointer flex items-center gap-2 bg-zinc-900 text-gray-100 hover:text-gray-800 hover:border hover:border-gray-700 font-medium rounded-full py-2 px-4 hover:bg-zinc-200 hover:scale-[1.01] transition-all duration-200"
-                >
-                  <Plus size={20} />
-                  <span >Add</span>
-                </button>
-                <button
-                  onClick={handleShare}
-                  className="cursor-pointer flex items-center gap-2 bg-red-50 text-red-400 font-medium rounded-full py-2 px-4 border border-red-400 hover:bg-red-100 hover:text-red-500 hover:scale-[1.03] transition-all duration-200"
-                >
-                  <Share2 size={20} />
-                  <span >Share</span>
-                </button>
-              </div>
+      <div className="min-h-screen w-full p-9">
+        <div className="">
+          <h1 className="text-4xl font-semibold text-gray-800 tracking-tight py-4">Cards</h1>
+          <div className="flex items-center justify-between pb-4">
+            <div className="flex justify-start w-full mr-4">
+              <input
+                value={search}
+                type="text"
+                className="border border-gray-400 rounded-2xl bg-gray-50 p-2 outline-none placeholder:opacity-45 focus-within:scale-103 transition"
+                placeholder="eg: Title"
+                onChange={handleSearch}
+              />
+            </div>
+            <div className="flex flex-row items-center gap-3">
+              <button
+                onClick={handleClick}
+                className="cursor-pointer flex items-center gap-2 bg-zinc-900 text-gray-100 hover:text-gray-800 hover:border hover:border-gray-700 font-medium rounded-full py-2 px-4 hover:bg-zinc-200 hover:scale-[1.01] transition-all duration-200"
+              >
+                <Plus size={20} />
+                <span>Add</span>
+              </button>
+              <button
+                onClick={handleShare}
+                className="cursor-pointer flex items-center gap-2 bg-red-50 text-red-400 font-medium rounded-full py-2 px-4 border border-red-400 hover:bg-red-100 hover:text-red-500 hover:scale-[1.03] transition-all duration-200"
+              >
+                <Share2 size={20} />
+                <span>Share</span>
+              </button>
             </div>
           </div>
-          <div
-            className={`grid gap-3 ${isOpen ? "lg:grid-cols-2 xl:grid-cols-3 sm:grid-cols-1" : "md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-1"}`}
-          >
-            {Array.isArray(allCards) &&
-              allCards.map((item, idx) => {
-                return (
-                  <Card
-                    key={idx}
-                    title={item.title}
-                    link={item.link}
-                    tags={item.tags}
-                    share={item.share}
-                    createdAt={item.createdAt}
-                    updatedAt={item.updatedAt}
-                    id={item._id}
-                  />
-                );
-              })}
-          </div>
-          {modal && <AddCard id={null} />}
-          {searchModal && <ShareModal />}
-          {allCards.length === 0 && (
-            <p className="text-gray-500 text-sm text-center py-8">
-              No cards yet. Create your first card!
-            </p>
-          )}
         </div>
+
+        <div
+          className={`grid gap-3 ${
+            isOpen
+              ? "lg:grid-cols-2 xl:grid-cols-3 sm:grid-cols-1"
+              : "md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-1"
+          }`}
+        >
+          {Array.isArray(allCards) &&
+            allCards.map((item, idx) => (
+              <Card
+                key={idx}
+                title={item.title}
+                link={item.link}
+                tags={item.tags}
+                share={item.share}
+                createdAt={item.createdAt}
+                updatedAt={item.updatedAt}
+                id={item._id}
+              />
+            ))}
+        </div>
+
+        {/* ← Pagination sits right below the grid */}
+        {pagination && !search && (
+          <Pagination
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalCards}
+            limit={pagination.limit}
+            hasNextPage={pagination.hasNextPage}
+            hasPrevPage={pagination.hasPrevPage}
+            onPageChange={handlePageChange}
+            itemLabel="cards"
+          />
+        )}
+
+        {modal && <AddCard id={null} />}
+        {searchModal && <ShareModal />}
+        {allCards.length === 0 && (
+          <p className="text-gray-500 text-sm text-center py-8">
+            No cards yet. Create your first card!
+          </p>
+        )}
+      </div>
     </>
   );
 };

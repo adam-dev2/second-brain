@@ -47,7 +47,7 @@ const Search = () => {
 
   useEffect(() => {
     setHideIcons(true);
-  }, []);
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value);
 

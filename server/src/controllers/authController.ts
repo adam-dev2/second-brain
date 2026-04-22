@@ -154,7 +154,7 @@ export const ResetPasswordController = async (req: Request, res: Response) => {
     console.log(user?.username);
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid or expired token" });
+      return res.status(401).json({ message: "Invalid or expired token" });
     }
     if (!newPassword) {
       return res.status(400).json({ message: "new Password is required" });
@@ -167,7 +167,7 @@ export const ResetPasswordController = async (req: Request, res: Response) => {
     return res.status(200).json({ message: "Password reset succesfully" });
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ message: "Invalid or expired token" });
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 

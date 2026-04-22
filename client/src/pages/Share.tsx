@@ -57,7 +57,7 @@ const Share = () => {
 
   useEffect(() => {
     fetchCards(1);
-  }, []);
+  });
 
   const handlePageChange = (page: number) => {
     fetchCards(page);

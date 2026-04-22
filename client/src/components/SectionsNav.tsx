@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Layers, ChevronDown, Plus, Hash, Check, Trash2 } from "lucide-react";
 import axios from "axios";
@@ -29,7 +29,6 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
   const setSections = useSetRecoilState(sectionsAtom)
   const sections = useRecoilValue(sectionsAtom)
   const inputRef = useRef<HTMLInputElement>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (adding) {
@@ -60,7 +59,7 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
       }
     };
     fetchSections();
-  }, []);
+  });
 
   // delete section here ----------------------
   const handleDelete = async (sectionId: string) => {
@@ -73,7 +72,8 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
           "Content-Type": "application/json",
         },
       });
-
+      console.log(response.data.message);
+      
       toast.success("deleted succesfully");
       setSections((prev) => prev.filter((section) => section.id !== sectionId));
     } catch (err) {
@@ -239,7 +239,7 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
                           </div>
                           <Trash2
                             size={14}
-                            className="text-red-500 hover:text-red-600 hover:scale-103 transform transition-all"
+                            className="text-red-400 hover:text-red-500 hover:scale-103 transform transition-all"
                             onClick={() => {
                               handleDelete(section.id);
                             }}

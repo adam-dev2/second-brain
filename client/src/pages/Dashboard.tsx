@@ -8,7 +8,6 @@ import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 import { handleError } from "../utils/handleError";
 import DashboardSkeleton from "../components/DashboardSkeleton";
-import { sectionsAtom } from "../store/atoms/sections";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface MetricsData {
@@ -57,9 +56,11 @@ const Dashboard = () => {
             "Content-Type": "application/json",
           },
         });
+        
         setMetrics(res.data.metrics);
         toast.success("Metrics fetched successfully");
       } catch (err: unknown) {
+        
         handleError(err, "Error while fetching metrics");
         console.error(err);
       } finally {
@@ -68,7 +69,7 @@ const Dashboard = () => {
     };
     
     fetchMetrics();
-  }, []);
+  });
   
   
   

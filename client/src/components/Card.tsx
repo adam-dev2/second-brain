@@ -1,5 +1,5 @@
 import axios from "axios";
-import { SquarePen, Trash2, ExternalLink, Globe, Lock, EllipsisVertical, ChevronDown, ChevronRight } from "lucide-react";
+import { ExternalLink, Globe, Lock, EllipsisVertical, ChevronRight } from "lucide-react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -12,6 +12,7 @@ import { hideIconAtom } from "../store/atoms/hideIcons";
 import { handleError } from "../utils/handleError";
 import { useState } from "react";
 import { sectionsAtom } from "../store/atoms/sections";
+import { secitonCardsAtom } from "../store/atoms/sectionCards";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export interface Iprops {
@@ -37,6 +38,8 @@ const Card = (props: Iprops) => {
   const [sheet,setSheet] = useState(false);
   const [showSections, setShowSections] = useState(false);
   const sections = useRecoilValue(sectionsAtom);
+  const setSectionCards = useSetRecoilState(secitonCardsAtom);
+  const sectionCards = useRecoilValue(secitonCardsAtom);
 
   const handleEdit = async () => {
     const findCard = allCards.find((item) => item._id === props.id);
@@ -84,6 +87,8 @@ const Card = (props: Iprops) => {
           }
         }
       )
+      console.log(response.data.message);
+      
       toast.success(`moved card to ${sectionName}`)
     }catch(err) {
       handleError(err,'Error while moving card')
@@ -102,6 +107,7 @@ const Card = (props: Iprops) => {
         },
       });
       setAllCards(allCards.filter((item) => item._id !== props.id));
+      setSectionCards(sectionCards.filter((item) => item.id !== props.id));
       toast.success("Card Deleted successfully");
     } catch (err: unknown) {
       handleError(err, "Failed to Delete Card");

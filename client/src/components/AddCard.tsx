@@ -11,6 +11,7 @@ import { editCardAtom } from "../store/atoms/editcard";
 import { loadingAtom } from "../store/atoms/loading";
 import Loading from "./Loading";
 import { handleError } from "../utils/handleError";
+import { secitonCardsAtom } from "../store/atoms/sectionCards";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface Iprops {
@@ -30,6 +31,7 @@ const AddCard = (props:Iprops) => {
   const editCardId = useRecoilValue(editCardAtom);
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
+  const setSectionCards = useSetRecoilState(secitonCardsAtom)
 
   useEffect(() => {
     if (formData.link) {
@@ -104,7 +106,7 @@ const AddCard = (props:Iprops) => {
           },
         }
       );
-
+      
       const newCard: Card = response?.data?.card;
       setAllCards([...allCards, newCard]);
       toast.success("Card saved successfully!");
@@ -117,6 +119,7 @@ const AddCard = (props:Iprops) => {
         heading: "Add Card",
         button: "Save Card",
       });
+      setSectionCards((prev) =>[...prev, response.data.card])
       setModal(!modal);
     } catch (err: unknown) {
       console.log(err);
@@ -161,6 +164,7 @@ const AddCard = (props:Iprops) => {
       });
 
       setAllCards(res.data.cards);
+      setSectionCards(res.data.cards);
       toast.success("Card updated successfully!");
       setFormData({
         title: "",

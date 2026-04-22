@@ -52,7 +52,7 @@ export const getSections = async(req:Request,res:Response) => {
     const userId = req.user?.id;
     try{
         const fetchAllSections = await Section.find({userId});
-        const parseInformation = fetchAllSections.map((section) => {
+        const parseInformation = fetchAllSections.map((section) => {    
             return {
                 id: section._id,
                 label:section.name,

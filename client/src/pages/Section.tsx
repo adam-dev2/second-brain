@@ -37,11 +37,12 @@ const Section = () => {
   const sections = useRecoilValue(sectionsAtom);
   const sectionCards = useRecoilValue(secitonCardsAtom)
   const setSectionCards = useSetRecoilState(secitonCardsAtom)
+  const processingToastId = useRef<string | undefined>(undefined)
+  
 
   const handleClick = () => {
     setModal((prev) => !prev);
   };
-  let processingToastId: string | undefined;
   useEffect(() => {
     const es = new EventSource(`${backendUrl}/events`, {
       withCredentials: true,
@@ -49,7 +50,7 @@ const Section = () => {
 
     es.addEventListener("startCardProcessing", (e) => {
       const data = JSON.parse(e.data);
-      processingToastId = toast.loading(`${data.message}`, {
+      processingToastId.current = toast.loading(`${data.message}`, {
         position: "top-right",
       });
     });
@@ -58,7 +59,7 @@ const Section = () => {
       const data = JSON.parse(e.data);
       console.log("Card Processed succesfull", data);
       toast.success(`${data.message}`, {
-        id: processingToastId,
+        id: processingToastId.current,
         position: "top-right",
       });
     });
@@ -67,7 +68,7 @@ const Section = () => {
       const data = JSON.parse(e.data);
       console.log("Card processing failed");
       toast.error(`${data.message}`, {
-        id: processingToastId,
+        id: processingToastId.current,
         position: "top-right",
       });
     });
@@ -77,7 +78,7 @@ const Section = () => {
         }
     })
     return () => es.close();
-  }, []);
+  });
   useEffect(() => {
     console.log(searchModal);
     setHideIcons(true);

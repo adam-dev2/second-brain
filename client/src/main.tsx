@@ -9,7 +9,7 @@ import { AuthProvider } from "./context/AuthContext.tsx";
 
 
 createRoot(document.getElementById("root")!).render(
-  // <StrictMode>
+  <StrictMode>
     <>
       <RecoilRoot>
         <BrowserRouter>
@@ -53,5 +53,5 @@ createRoot(document.getElementById("root")!).render(
       </RecoilRoot>
 
     </>
-  // </StrictMode> 
+   </StrictMode> 
 );

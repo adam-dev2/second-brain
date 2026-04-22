@@ -8,7 +8,7 @@ const Protected = () => {
   const { loading, authenticated,verifyUser } = useAuth();
   useEffect(() => {
     verifyUser();
-  }, []);
+  });
 
   const publicPaths = [
     "/auth/google/callback",
