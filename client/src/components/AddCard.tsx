@@ -13,7 +13,12 @@ import Loading from "./Loading";
 import { handleError } from "../utils/handleError";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-const AddCard = () => {
+interface Iprops {
+  id:string | null;
+}
+
+
+const AddCard = (props:Iprops) => {
   const formData = useRecoilValue(formdataAtom);
   const setFormData = useSetRecoilState(formdataAtom);
   const [domainName, setDomainName] = useState<string | null>(null);
@@ -89,6 +94,7 @@ const AddCard = () => {
           tags: formData.tags,
           share: formData.share,
           type: domainName,
+          sectionId:props.id
         },
         {
           withCredentials: true,

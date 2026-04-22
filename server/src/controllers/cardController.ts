@@ -22,7 +22,6 @@ interface IAllCards {
 export const FetchMetrics = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
-    console.log(req.user);
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });

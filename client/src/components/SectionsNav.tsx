@@ -1,7 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Layers, ChevronDown, Plus, Hash, Check, Trash, Trash2 } from "lucide-react";
+import { Layers, ChevronDown, Plus, Hash, Check, Trash2 } from "lucide-react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { handleError } from "../utils/handleError";
+import Cookies from "js-cookie";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { sectionsAtom } from "../store/atoms/sections";
 
 interface Section {
   id: string;
@@ -14,39 +20,102 @@ interface SectionsNavProps {
   sections: Section[];
 }
 
-const SectionsNav = ({ isOpen, sections: initialSections }: SectionsNavProps) => {
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+const SectionsNav = ({ isOpen }: SectionsNavProps) => {
   const [dropdown, setDropdown] = useState(false);
   const [adding, setAdding] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [sections, setSections] = useState<Section[]>(initialSections);
+  const setSections = useSetRecoilState(sectionsAtom)
+  const sections = useRecoilValue(sectionsAtom)
   const inputRef = useRef<HTMLInputElement>(null);
+  const navigate = useNavigate();
 
-  // Auto-focus input whenever it appears
   useEffect(() => {
     if (adding) {
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [adding]);
 
+  useEffect(() => {
+    const token = Cookies.get("token");
+    const fetchSections = async () => {
+      try {
+        const res = await axios.get(`${backendUrl}/api/v1/section`, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        console.log(res.data.sections);
+        if (res.data.sections.length === 0) {
+          toast.success("No Sections Available");
+        }
+        setSections(res.data.sections);
+        console.log(sections);
+      } catch (err) {
+        console.log(err);
+        handleError(err, "Error while fetching sections");
+      }
+    };
+    fetchSections();
+  }, []);
+
+  // delete section here ----------------------
+  const handleDelete = async (sectionId: string) => {
+    const token = Cookies.get("token");
+    try {
+      const response = await axios.delete(`${backendUrl}/api/v1/section/${sectionId}`, {
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      toast.success("deleted succesfully");
+      setSections((prev) => prev.filter((section) => section.id !== sectionId));
+    } catch (err) {
+      handleError(err, "Error while deleting Section");
+    }
+  };
+
   const handleAddClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // don't toggle the dropdown
-    setDropdown(true);   // ensure dropdown is open
+    e.stopPropagation();
+    setDropdown(true);
     setAdding(true);
   };
 
-  const handleConfirm = () => {
+  // Adding new section here--------------------------------
+  const handleConfirm = async () => {
     const trimmed = inputValue.trim();
     if (!trimmed) {
       setAdding(false);
       setInputValue("");
       return;
     }
-    const newSection: Section = {
-      id: `section-${Date.now()}`,
-      path: `/sections/section-${Date.now()}`,
-      label: trimmed,
-    };
-    setSections((prev) => [...prev, newSection]);
+    const token = Cookies.get("token");
+    try {
+      const response = await axios.post(
+        `${backendUrl}/api/v1/section`,
+        {
+          name: trimmed,
+        },
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response.data.section);
+      setSections((prev) => [...prev, response.data.section]);
+      toast.success("section added successfully");
+    } catch (err) {
+      handleError(err, "Error while adding section");
+    }
     setInputValue("");
     setAdding(false);
   };
@@ -61,7 +130,6 @@ const SectionsNav = ({ isOpen, sections: initialSections }: SectionsNavProps) =>
 
   return (
     <div className="flex flex-col">
-
       {/* ── Header row ── */}
       <button
         onClick={() => setDropdown((prev) => !prev)}
@@ -103,7 +171,6 @@ const SectionsNav = ({ isOpen, sections: initialSections }: SectionsNavProps) =>
             style={{ overflow: "hidden" }}
           >
             <div className="flex flex-col gap-0.5 mt-1 pb-1">
-
               {/* ── Inline input — appears at the top ── */}
               <AnimatePresence>
                 {adding && isOpen && (
@@ -137,9 +204,7 @@ const SectionsNav = ({ isOpen, sections: initialSections }: SectionsNavProps) =>
 
               {/* ── Empty state ── */}
               {sections.length === 0 && isOpen && !adding && (
-                <p className="text-xs text-neutral-500 px-9 py-2">
-                  No sections yet
-                </p>
+                <p className="text-xs text-neutral-500 px-9 py-2">No sections yet</p>
               )}
 
               {/* ── Section items ── */}
@@ -151,7 +216,7 @@ const SectionsNav = ({ isOpen, sections: initialSections }: SectionsNavProps) =>
                   transition={{ delay: i * 0.04, duration: 0.18, ease: "easeOut" }}
                 >
                   <NavLink
-                    to={`/sections/${section.id}`}
+                    to={`/home/sections/${section.id}`}
                     className={({ isActive }) =>
                       `flex items-center ${
                         isOpen ? "pl-9 pr-2" : "justify-center"
@@ -172,7 +237,13 @@ const SectionsNav = ({ isOpen, sections: initialSections }: SectionsNavProps) =>
                             />
                             <span className="truncate">{section.label}</span>
                           </div>
-                          <Trash2 size={14} className="text-red-500 hover:text-red-600 hover:scale-103 transform transition-all" />
+                          <Trash2
+                            size={14}
+                            className="text-red-500 hover:text-red-600 hover:scale-103 transform transition-all"
+                            onClick={() => {
+                              handleDelete(section.id);
+                            }}
+                          />
                         </div>
                       ) : (
                         <span
@@ -185,7 +256,6 @@ const SectionsNav = ({ isOpen, sections: initialSections }: SectionsNavProps) =>
                   </NavLink>
                 </motion.div>
               ))}
-
             </div>
           </motion.div>
         )}

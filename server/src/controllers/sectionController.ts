@@ -10,7 +10,7 @@ const handleError = (res:Response,err:any) => {
 }
 
 const handleUserId = (req:Request,res:Response) => {
-    const userID = req.user?.id;
+    const userID = req.user?.id;    
     if (!userID) return res.status(401).json({ message: "Unauthorized" });
 }
 
@@ -23,15 +23,25 @@ const handleMessage = (res:Response,status:number,message:Object|string) => {
 export const createSection = async(req:Request,res:Response) => {
     handleUserId(req,res)
     const {name} = req.body;
+    const userId = req.user?.id;
+    console.log(userId);
+    
     if(!name) {
         handleMessage(res,400,"Title is requried");
     }
 
     try{
-        const newSection = new Section({name});
+        const newSection = new Section({userId:userId,name:name});
         await newSection.save();
-        console.log(newSection.name);
-        handleMessage(res,201,"New Section Created")
+        const parseSectionInformation = {
+            id:newSection._id,
+            path:`/home/sections/${newSection._id}`,
+            label:newSection.name
+        }
+        handleMessage(res,201,{
+            message:"New Section Created",
+            section:parseSectionInformation
+        })
     }catch(err) {
         handleError(res,err)
     }
@@ -42,11 +52,19 @@ export const getSections = async(req:Request,res:Response) => {
     const userId = req.user?.id;
     try{
         const fetchAllSections = await Section.find({userId});
-        if(fetchAllSections.length === 0) handleMessage(res,404,"no existing sections for this user");
+        const parseInformation = fetchAllSections.map((section) => {
+            return {
+                id: section._id,
+                label:section.name,
+                path:`/home/sections/${section._id}`,
+                createdAt:section.createdAt,
+                updatedAt:section.updatedAt
+            }
+        })
         handleMessage(res,200,{
             message:'fetched sections successfully',
             totalSections:fetchAllSections.length,
-            sections:fetchAllSections
+            sections:parseInformation
         })
     }catch(err) {
         handleError(res,err)
@@ -87,7 +105,6 @@ export const deleteSectionById = async(req:Request,res:Response) => {
         handleMessage(res,400,"Section Id Missing")
     }
     try{
-
         const findSection = await Section.findOne({_id:sectionId});
         if(!findSection) {
             handleMessage(res,400,"Section not found");
@@ -114,17 +131,28 @@ export const deleteSectionById = async(req:Request,res:Response) => {
 
 export const singleCardMove = async(req:Request,res:Response) => {
     handleUserId(req,res)
-    try{
-
-    }catch(err) {
-        handleError(res,err)
+    const {sectionId,cardId} = req.body;
+    const userId = req.user?.id;
+    if(!sectionId || !cardId){
+        handleMessage(res,400,"sectionId and cardId both are required");
     }
-}
-
-export const bulkCardsMove = async(req:Request,res:Response) => {
-    handleUserId(req,res)
     try{
+        const verifySection = await Section.find({_id:sectionId,userId});
+        if(!verifySection) {
+            handleMessage(res,404,"section with this id not found");
+        }
 
+        console.log(verifySection.length);
+        const updateCard = await Content.findOneAndUpdate(
+            { _id: cardId, userId },
+            {$set:{sectionId}},
+            {new:true}
+        )
+        if(!updateCard) {
+            handleMessage(res,400,"Card with this ID not found");
+        }
+
+        handleMessage(res,200,"moved card succesfully")
     }catch(err) {
         handleError(res,err)
     }
@@ -132,17 +160,35 @@ export const bulkCardsMove = async(req:Request,res:Response) => {
 
 export const fetchSectionCardsbyId = async(req:Request,res:Response) => {
     handleUserId(req,res)
-    try{
-
-    }catch(err) {
-        handleError(res,err)
+    const sectionId = req.params.id;
+    const userId = req.user?.id
+    if(!sectionId) {
+        handleMessage(res,400,"Section Id is required")
     }
-}
-
-export const fetchDefaultSectionCards = async(req:Request,res:Response) => {
-    handleUserId(req,res)
     try{
-
+        const findSectionCards = await Content.find({
+            sectionId,
+            userId
+        })
+        console.log(findSectionCards.length);
+        const parseInformation = findSectionCards.map((card) => {
+            return {
+                id:card._id,
+                title:card.title,
+                link:card.link,
+                tags:card.tags,
+                share:card.share,
+                sectionId:card.sectionId,
+                createdAt:card.createdAt,
+                updatedAt:card.updatedAt
+            }
+        })
+        console.log(parseInformation);
+        
+        handleMessage(res,200,{
+            message:"fetched section cards succesfully",
+            cards:parseInformation
+        })
     }catch(err) {
         handleError(res,err)
     }

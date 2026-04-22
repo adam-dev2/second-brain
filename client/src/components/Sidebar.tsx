@@ -18,6 +18,8 @@ import { useAuth } from "../context/AuthContext";
 import LoadingOverlay from "../components/Loading";
 import { useState } from "react";
 import SectionsNav from "./SectionsNav";
+import { sectionsAtom } from "../store/atoms/sections";
+
 
 
 const Sidebar = () => {
@@ -29,6 +31,7 @@ const Sidebar = () => {
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
   const [isMobile, setIsMobile] = useState(false);
+  const sections = useRecoilValue(sectionsAtom);
 
 
   const handleLogout = async () => {
@@ -69,13 +72,13 @@ const Sidebar = () => {
     { path: "/home/profile", label: "Profile", icon: UserRoundPen },
   ];
 
-  const sections = [
-    {id:'1',path: "/home/adhoc",label:"Adhoc"},
-    {id:'2',path: "/home/study",label:"Study Material"},
-    {id:'3',path: "/home/dsa",label:"DSA"},
-    {id:'4',path: "/home/tweets",label:"Tweets"},
-    {id:'5',path: "/home/yt",label:"Youtube"},
-  ]
+  // const sections = [
+  //   {id:'1',path: "/home/adhoc",label:"Adhoc"},
+  //   {id:'2',path: "/home/study",label:"Study Material"},
+  //   {id:'3',path: "/home/dsa",label:"DSA"},
+  //   {id:'4',path: "/home/tweets",label:"Tweets"},
+  //   {id:'5',path: "/home/yt",label:"Youtube"},
+  // ]
 
   return (
     <>

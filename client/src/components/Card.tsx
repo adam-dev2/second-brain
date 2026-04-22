@@ -11,6 +11,7 @@ import { loadingAtom } from "../store/atoms/loading";
 import { hideIconAtom } from "../store/atoms/hideIcons";
 import { handleError } from "../utils/handleError";
 import { useState } from "react";
+import { sectionsAtom } from "../store/atoms/sections";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export interface Iprops {
@@ -35,6 +36,7 @@ const Card = (props: Iprops) => {
   const setHideIcons = useSetRecoilState(hideIconAtom);
   const [sheet,setSheet] = useState(false);
   const [showSections, setShowSections] = useState(false);
+  const sections = useRecoilValue(sectionsAtom);
 
   const handleEdit = async () => {
     const findCard = allCards.find((item) => item._id === props.id);
@@ -64,13 +66,32 @@ const Card = (props: Iprops) => {
   const handleSections = () => {
     setShowSections(true);
   };
+ 
+   const handleMove = async (sectionId:string,cardId:string,sectionName:string) => {
+    const token = Cookies.get("token");
+    
+    try {
+        const response = await axios.post(`${backendUrl}/api/v1/section/move-card`,
+        {
+          sectionId,
+          cardId
+        },
+        {
+          withCredentials:true,
+          headers:{
+            Authorization:`Bearer ${token}`,
+            "Content-Type":'application/json'
+          }
+        }
+      )
+      toast.success(`moved card to ${sectionName}`)
+    }catch(err) {
+      handleError(err,'Error while moving card')
+    }
+  };
 
   const handleDelete = async () => {
     const token = Cookies.get("token");
-    if (!token) {
-      toast.error("No Token Found");
-      return;
-    }
     setLoading(true);
     try {
       await axios.delete(`${backendUrl}/api/v1/content/card/${props.id}`, {
@@ -136,7 +157,7 @@ const Card = (props: Iprops) => {
                         onClick={handleSections}
                         className="px-3 py-1.5 flex justify-between items-center hover:bg-gray-100"
                       >
-                        Section
+                        Move
                         <ChevronRight size={14} />
                       </button>
                     </>
@@ -151,15 +172,18 @@ const Card = (props: Iprops) => {
                       </button>
 
                       {/* Example sections */}
-                      <button className="px-3 py-1.5 text-left hover:bg-gray-100">
-                        Section 1
-                      </button>
-                      <button className="px-3 py-1.5 text-left hover:bg-gray-100">
-                        Section 2
-                      </button>
-                      <button className="px-3 py-1.5 text-left hover:bg-gray-100">
-                        Section 3
-                      </button>
+                      {sections.map((section) => {
+                        return (
+                          <button
+                            key={section.id}
+                            className="px-3 py-1.5 text-left hover:bg-gray-100"
+                            onClick={() => {handleMove(section.id,props.id,section.label)}}
+                          >
+                            {section.label}
+                          </button>
+                        )
+                      }
+                    )}
                     </>
                   )}
 

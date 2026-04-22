@@ -39,17 +39,10 @@ interface MetricsData {
   }>;
 }
 
-interface ISection {
-    sectionId:string;
-    cardId:string;
-    userId?:string;
-}
-
 const Dashboard = () => {
   const navigate = useNavigate();
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
-  const sections = useRecoilValue<ISection[] | null>(sectionsAtom)
 
   const [metrics, setMetrics] = useState<MetricsData | null>(null);
   useEffect(() => {
@@ -78,19 +71,7 @@ const Dashboard = () => {
   }, []);
   
   
-  useEffect(() => {
-    const fetchSections = async () =>{
-      try{
-        const res = await axios.get(`${backendUrl}/api/v1/section`)
-        console.log(res.data.sections);
-        
-      }catch(err) {
-        console.log(err);
-        handleError(err, "Error while fetching sections");
-      }
-    }
-    fetchSections();
-  },[])
+  
 
   const getTypeIcon = (type: string) => {
     switch (type) {

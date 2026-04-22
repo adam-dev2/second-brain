@@ -10,6 +10,7 @@ import ResetPassword from "./pages/ResetPassword";
 import LandingPage from "./pages/LandingPage";
 import AuthPages from "./pages/AuthPages";
 import Protected from "./components/Protected";
+import Section from "./pages/Section";
 
 const App = () => {
   return (
@@ -25,8 +26,9 @@ const App = () => {
                 <Route path="cards" element={<Cards />} />
                 <Route path="search" element={<Search />} />
                 <Route path="profile" element={<Profile />} />
+                <Route path="sections/:id" element={<Section />} />
               </Route>
-            </Route>
+          </Route>
         </Routes>
   );
 };

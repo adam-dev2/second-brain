@@ -11,12 +11,14 @@ import {
 
 const router = express.Router();
 
-router.get("/metrics", AuthMiddleware, FetchMetrics);
-router.get("/cards", AuthMiddleware, FetchAllCards);
+router.use(AuthMiddleware);
 
-router.post("/card", AuthMiddleware, createCard);
-router.put("/editCard/:id", AuthMiddleware, EditCard);
-router.delete("/card/:id", AuthMiddleware, DeleteCard);
-router.post("/query", AuthMiddleware, Query);
+router.get("/metrics", FetchMetrics);
+router.get("/cards", FetchAllCards);
+
+router.post("/card", createCard);
+router.put("/editCard/:id", EditCard);
+router.delete("/card/:id", DeleteCard);
+router.post("/query", Query);
 
 export default router;
