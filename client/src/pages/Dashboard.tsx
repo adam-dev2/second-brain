@@ -4,10 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { loadingAtom } from "../store/atoms/loading";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
 import Cookies from "js-cookie";
 import { handleError } from "../utils/handleError";
 import DashboardSkeleton from "../components/DashboardSkeleton";
+import StatCard from "../ui-compo/StatCard";
+import SectionCard from "../ui-compo/SectionCard";
+import TagBar from "../ui-compo/TagBar";
+import Layout from "../layouts/Layout";
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface MetricsData {
@@ -58,7 +62,6 @@ const Dashboard = () => {
         });
         
         setMetrics(res.data.metrics);
-        toast.success("Metrics fetched successfully");
       } catch (err: unknown) {
         
         handleError(err, "Error while fetching metrics");
@@ -94,83 +97,80 @@ const Dashboard = () => {
   const { stats, topTags, recentCards } = metrics;
 
   return (
-    <div className="h-full w-full p-9 bg-gray-50">
-      <div className="flex items-center justify-between mb-2">
-        <div>
-          <h1 className="text-4xl font-semibold text-gray-800 tracking-tight">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Overview of your knowledge base</p>
-          <div className="text-sm text-gray-500 mt-2 opacity-85">
-            Last updated: {new Date().toLocaleDateString()}
-          </div>
+    <Layout>
+      {/* HEADER */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-black tracking-tight">Dashboard</h1>
+        <p className="text-neutral-400 mt-1 text-sm">Overview of your knowledge base</p>
+        <div className="text-xs text-neutral-600 mt-2">
+          Last updated: {new Date().toLocaleDateString()}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-gray-600 font-semibold text-lg ">Total Cards</p>
+      {/* STATS */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+        {[
+          { label: "Total Cards",     value: stats.totalCards },
+          { label: "Unique Tags",     value: stats.tags },
+          { label: "Shared Cards",    value: stats.aiSearches },
+          { label: "Added This Week", value: stats.thisWeek },
+        ].map(({ label, value }) => (
+          <div
+            key={label}
+            className="relative bg-neutral-900 border border-white/[0.08] rounded-2xl p-5 overflow-hidden"
+          >
+            {/* Corner accent */}
+            <div className="absolute top-0 right-0 w-20 h-20 border-t border-r border-white/[0.07] rounded-bl-2xl" />
+            <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-neutral-500 mb-3">
+              {label}
+            </p>
+            <p className="text-4xl font-black tracking-tight text-white">{value}</p>
           </div>
-          <h3 className="text-3xl font-bold text-gray-900">{stats.totalCards}</h3>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-gray-600 font-semibold text-lg ">Unique Tags</p>
-          </div>
-          <h3 className="text-3xl font-bold text-gray-900">{stats.tags}</h3>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-gray-600 font-semibold text-lg ">Shared cards</p>
-          </div>
-          <h3 className="text-3xl font-bold text-gray-900">{stats.aiSearches}</h3>
-        </div>
-
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-gray-600 font-semibold text-lg ">Added This Week</p>
-          </div>
-          <h3 className="text-3xl font-bold text-gray-900">{stats.thisWeek}</h3>
-        </div>
+        ))}
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-6 mb-2 ">
-        <div className="bg-white rounded-xl p-6 shadow-sm border col-span-1 lg:col-span-2 border-gray-200  h-[420px] mb-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-800">Recent Cards</h2>
+      {/* MAIN GRID */}
+      <div className="grid lg:grid-cols-3 gap-6">
+
+        {/* RECENT CARDS */}
+        <div className="relative lg:col-span-2 bg-neutral-900 border border-white/[0.08] rounded-2xl p-6 overflow-hidden">
+          {/* Corner accent */}
+          <div className="absolute bottom-0 left-0 w-20 h-20 border-b border-l border-white/[0.07] rounded-tr-2xl" />
+
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-bold tracking-tight">Recent Cards</h2>
             <button
-              onClick={() => {
-                navigate("/home/cards");
-              }}
-              className="cursor-pointer text-indigo-600 hover:text-indigo-700 font-medium text-sm"
+              onClick={() => navigate("/home/cards")}
+              className="text-xs text-neutral-500 hover:text-white transition-colors duration-200"
             >
               View All →
             </button>
           </div>
 
-          {recentCards.length > 0 ? (
-            <div className="space-y-1">
-              {recentCards.slice(0, 4).map((card) => (
+          <div className="space-y-1">
+            {recentCards.length > 0 ? (
+              recentCards.slice(0, 4).map((card) => (
                 <div
                   key={card.id}
-                  className="flex items-center gap-4 p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer group "
+                  className="flex items-center gap-4 p-3 rounded-xl border border-transparent hover:bg-neutral-800 hover:border-white/[0.08] transition-all duration-200 cursor-pointer group"
                 >
-                  <div className="p-2 bg-white rounded-lg shadow-sm">{getTypeIcon(card.type)}</div>
+                  <div className="p-2 bg-white/[0.08] rounded-lg shrink-0">
+                    {getTypeIcon(card.type)}
+                  </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 group-hover:text-indigo-600 transition-colors truncate">
+                    <h4 className="text-sm font-medium text-neutral-200 truncate">
                       {card.title}
                     </h4>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-xs text-gray-500">{card.createdAt}</span>
+                    <div className="flex items-center gap-2 mt-1 text-xs text-neutral-500">
+                      <span>{card.createdAt}</span>
                       {card.tags.length > 0 && (
                         <>
-                          <span className="text-gray-300">•</span>
+                          <span>·</span>
                           <div className="flex gap-1 flex-wrap">
                             {card.tags.map((tag) => (
                               <span
                                 key={tag}
-                                className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-xs rounded font-medium"
+                                className="px-2 py-0.5 bg-white/[0.08] text-white/50 rounded text-[11px]"
                               >
                                 {tag}
                               </span>
@@ -181,42 +181,50 @@ const Dashboard = () => {
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 text-sm text-center py-8">
-              No cards yet. Create your first card!
-            </p>
-          )}
+              ))
+            ) : (
+              <p className="text-neutral-500 text-sm text-center py-10">
+                No cards yet. Create your first card!
+              </p>
+            )}
+          </div>
         </div>
-        <div className="bg-white  rounded-xl p-6 shadow-sm border  h-[420px] pb-10 border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-800 mb-6">Top Tags</h2>
+
+        {/* TOP TAGS */}
+        <div className="relative bg-neutral-900 border border-white/[0.08] rounded-2xl p-6 overflow-hidden">
+          <div className="absolute bottom-0 left-0 w-20 h-20 border-b border-l border-white/[0.07] rounded-tr-2xl" />
+
+          <h2 className="text-sm font-bold tracking-tight mb-6">Top Tags</h2>
+
           {topTags.length > 0 ? (
-            <div className="space-y-6 w-full ">
+            <div className="space-y-5">
               {topTags.map((tag, idx) => (
                 <div key={idx}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-md font-medium text-gray-700">{tag.name}</span>
-                    <span className="text-sm font-semibold text-gray-900">{tag.count}</span>
+                  <div className="flex justify-between text-[13px] mb-1.5">
+                    <span className="text-neutral-300 font-medium">{tag.name}</span>
+                    <span className="text-neutral-500">{tag.count}</span>
                   </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
+                  <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
                     <div
-                      className={`bg-gray-600 h-2 rounded-full transition-all`}
+                      className={`h-full rounded-full transition-all duration-500 ${
+                        idx === 0 ? "bg-white" : "bg-white/30"
+                      }`}
                       style={{ width: `${(tag.count / topTags[0].count) * 100}%` }}
-                    ></div>
+                    />
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm text-center py-8">
+            <p className="text-neutral-500 text-sm text-center py-10">
               No tags yet. Start adding cards!
             </p>
           )}
         </div>
+
       </div>
-    </div>
-  );
+      </Layout>
+);
 };
 
 export default Dashboard;

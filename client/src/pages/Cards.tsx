@@ -17,6 +17,7 @@ import { hideIconAtom } from "../store/atoms/hideIcons";
 import { handleError } from "../utils/handleError";
 import CardSkeleton from "../components/CardSkeleton";
 import Pagination from "../components/Pagination"; // ← import
+import Layout from "../layouts/Layout";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -149,41 +150,51 @@ const Cards = () => {
   if (loading) return <CardSkeleton />;
 
   return (
-    <>
-      <div className="min-h-screen w-full p-9">
-        <div className="">
-          <h1 className="text-4xl font-semibold text-gray-800 tracking-tight py-4">Cards</h1>
-          <div className="flex items-center justify-between pb-4">
-            <div className="flex justify-start w-full mr-4">
+    <Layout>
+      <div>
+
+        {/* HEADER */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-black tracking-tight">Cards</h1>
+
+          <div className="flex items-center justify-between mt-4 gap-4 flex-wrap">
+
+            {/* SEARCH */}
+            <div className="flex-1 min-w-[200px]">
               <input
                 value={search}
                 type="text"
-                className="border border-gray-400 rounded-2xl bg-gray-50 p-2 outline-none placeholder:opacity-45 focus-within:scale-103 transition"
-                placeholder="eg: Title"
+                className="w-full bg-neutral-900 border border-white/[0.08] rounded-xl px-4 py-2 text-sm outline-none placeholder:text-neutral-500 focus:border-white/20 transition"
+                placeholder="Search cards..."
                 onChange={handleSearch}
               />
             </div>
-            <div className="flex flex-row items-center gap-3">
+
+            {/* ACTIONS */}
+            <div className="flex items-center gap-3">
               <button
                 onClick={handleClick}
-                className="cursor-pointer flex items-center gap-2 bg-zinc-900 text-gray-100 hover:text-gray-800 hover:border hover:border-gray-700 font-medium rounded-full py-2 px-4 hover:bg-zinc-200 hover:scale-[1.01] transition-all duration-200"
+                className="flex items-center gap-2 bg-white text-black text-sm font-medium px-4 py-2 rounded-full hover:scale-[1.03] transition"
               >
-                <Plus size={20} />
-                <span>Add</span>
+                <Plus size={18} />
+                Add
               </button>
+
               <button
                 onClick={handleShare}
-                className="cursor-pointer flex items-center gap-2 bg-red-50 text-red-400 font-medium rounded-full py-2 px-4 border border-red-400 hover:bg-red-100 hover:text-red-500 hover:scale-[1.03] transition-all duration-200"
+                className="flex items-center gap-2 border border-white/20 text-white text-sm px-4 py-2 rounded-full hover:bg-white/10 transition"
               >
-                <Share2 size={20} />
-                <span>Share</span>
+                <Share2 size={18} />
+                Share
               </button>
             </div>
+
           </div>
         </div>
 
+        {/* GRID */}
         <div
-          className={`grid gap-3 ${
+          className={`grid gap-4 ${
             isOpen
               ? "lg:grid-cols-2 xl:grid-cols-3 sm:grid-cols-1"
               : "md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-1"
@@ -204,29 +215,35 @@ const Cards = () => {
             ))}
         </div>
 
-        {/* ← Pagination sits right below the grid */}
+        {/* PAGINATION */}
         {pagination && !search && (
-          <Pagination
-            currentPage={pagination.currentPage}
-            totalPages={pagination.totalPages}
-            totalItems={pagination.totalCards}
-            limit={pagination.limit}
-            hasNextPage={pagination.hasNextPage}
-            hasPrevPage={pagination.hasPrevPage}
-            onPageChange={handlePageChange}
-            itemLabel="cards"
-          />
+          <div className="mt-6">
+            <Pagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              totalItems={pagination.totalCards}
+              limit={pagination.limit}
+              hasNextPage={pagination.hasNextPage}
+              hasPrevPage={pagination.hasPrevPage}
+              onPageChange={handlePageChange}
+              itemLabel="cards"
+            />
+          </div>
         )}
 
+        {/* MODALS */}
         {modal && <AddCard id={null} />}
         {searchModal && <ShareModal />}
+
+        {/* EMPTY STATE */}
         {allCards.length === 0 && (
-          <p className="text-gray-500 text-sm text-center py-8">
+          <p className="text-neutral-500 text-sm text-center py-10">
             No cards yet. Create your first card!
           </p>
         )}
+
       </div>
-    </>
+    </Layout>
   );
 };
 

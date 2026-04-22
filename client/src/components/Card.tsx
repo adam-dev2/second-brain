@@ -117,141 +117,127 @@ const Card = (props: Iprops) => {
   };
 
   return (
-    <>
-      <div className="group bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-gray-400 shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col relative overflow-hidden">
-        {props.index !== undefined && (
-          <div className="absolute top-4 right-4 w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
-            {props.index + 1}
-          </div>
-        )}
+  <div className="group relative bg-neutral-900 border border-white/[0.08] rounded-2xl p-5 overflow-hidden hover:border-white/[0.15] transition-all duration-300">
 
-        <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-gray-400 via-gray-600 to-gray-800"></div>
+    {/* subtle corner accent */}
+    <div className="absolute top-0 right-0 w-16 h-16 border-t border-r border-white/[0.06] rounded-bl-2xl" />
 
-        <div className="flex items-start justify-between gap-3 flex-1 mt-2">
-          <h1 className="flex-1 text-xl font-bold text-gray-900 line-clamp-2 group-hover:text-gray-700 transition-colors">
-            {props.title}
-          </h1>
-          {hideIcons && (
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleSheet}
-                className="p-1.5 hover:bg-gray-100 rounded-lg cursor-pointer hover:scale-110 transition-all"
-                aria-label="Edit card"
-              >
-                <EllipsisVertical size={16} className="text-gray-600 hover:text-gray-900" />
-              </button>
-              {sheet && (
-                <div className="ml-5 mt-10 w-40 bg-gray-50 shadow-2xl border border-gray-300 rounded-lg fixed z-20 flex flex-col py-2 text-sm" onMouseLeave={() => {setSheet(false);setShowSections(false);}}>
+    {/* index badge */}
+    {props.index !== undefined && (
+      <div className="absolute top-4 right-4 w-7 h-7 bg-white/[0.1] rounded-full flex items-center justify-center text-[11px] font-semibold text-white">
+        {props.index + 1}
+      </div>
+    )}
 
-                  {!showSections ? (
-                    <>
-                      <button
-                        onClick={handleEdit}
-                        className="px-3 py-1.5 text-left hover:bg-gray-100"
-                      >
-                        Edit
-                      </button>
+    {/* TITLE + MENU */}
+    <div className="flex items-start justify-between gap-3">
+      <h1 className="flex-1 text-sm font-medium text-neutral-200 line-clamp-2 group-hover:text-white transition">
+        {props.title}
+      </h1>
 
-                      <button
-                        onClick={handleDelete}
-                        className="px-3 py-1.5 text-left hover:bg-red-50 text-red-600"
-                      >
-                        Delete
-                      </button>
+      {hideIcons && (
+        <div className="relative">
+          <button
+            onClick={handleSheet}
+            className="p-1.5 rounded-lg hover:bg-white/[0.08] transition"
+          >
+            <EllipsisVertical size={16} className="text-neutral-400 hover:text-white" />
+          </button>
 
-                      <button
-                        onClick={handleSections}
-                        className="px-3 py-1.5 flex justify-between items-center hover:bg-gray-100"
-                      >
-                        Move
-                        <ChevronRight size={14} />
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      {/* Back button */}
-                      <button
-                        onClick={() => setShowSections(false)}
-                        className="px-3 py-1.5 text-left hover:bg-gray-100"
-                      >
-                        ← Back
-                      </button>
+          {sheet && (
+            <div
+              className="absolute right-0 mt-2 w-40 bg-neutral-900 border border-white/[0.08] rounded-lg shadow-xl z-20 text-sm"
+              onMouseLeave={() => {
+                setSheet(false);
+                setShowSections(false);
+              }}
+            >
+              {!showSections ? (
+                <>
+                  <button onClick={handleEdit} className="w-full px-3 py-2 text-left hover:bg-white/[0.06]">
+                    Edit
+                  </button>
+                  <button onClick={handleDelete} className="w-full px-3 py-2 text-left text-red-400 hover:bg-red-500/10">
+                    Delete
+                  </button>
+                  <button
+                    onClick={handleSections}
+                    className="w-full px-3 py-2 flex justify-between items-center hover:bg-white/[0.06]"
+                  >
+                    Move
+                    <ChevronRight size={14} />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setShowSections(false)}
+                    className="w-full px-3 py-2 text-left hover:bg-white/[0.06]"
+                  >
+                    ← Back
+                  </button>
 
-                      {/* Example sections */}
-                      {sections.map((section) => {
-                        return (
-                          <button
-                            key={section.id}
-                            className="px-3 py-1.5 text-left hover:bg-gray-100"
-                            onClick={() => {handleMove(section.id,props.id,section.label)}}
-                          >
-                            {section.label}
-                          </button>
-                        )
-                      }
-                    )}
-                    </>
-                  )}
-
-                </div>
+                  {sections.map((section) => (
+                    <button
+                      key={section.id}
+                      onClick={() => handleMove(section.id, props.id, section.label)}
+                      className="w-full px-3 py-2 text-left hover:bg-white/[0.06]"
+                    >
+                      {section.label}
+                    </button>
+                  ))}
+                </>
               )}
             </div>
           )}
         </div>
+      )}
+    </div>
 
-        <div className="flex items-center justify-between mt-4 gap-3">
-          <a
-            href={props.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-gray-700 hover:text-gray-900 text-sm truncate flex-1 hover:underline transition-colors font-medium flex items-center gap-1.5 group/link"
-          >
-            <ExternalLink className="w-4 h-4 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
-            Visit Link
-          </a>
-          <span
-            className={`px-3 py-1.5 text-xs font-bold rounded-full whitespace-nowrap flex items-center gap-1.5 shadow-sm ${
-              props.share ? "bg-gray-800 text-white" : "bg-gray-200 text-gray-800"
-            }`}
-          >
-            {props.share ? (
-              <>
-                <Globe className="w-3 h-3" />
-                Public
-              </>
-            ) : (
-              <>
-                <Lock className="w-3 h-3" />
-                Private
-              </>
-            )}
-          </span>
-        </div>
+    {/* LINK + STATUS */}
+    <div className="flex items-center justify-between mt-4 gap-3">
+      <a
+        href={props.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-neutral-400 hover:text-white text-xs truncate flex-1 flex items-center gap-1.5 transition"
+      >
+        <ExternalLink className="w-3.5 h-3.5" />
+        Visit Link
+      </a>
 
-        <div className="flex flex-wrap gap-2 mt-4">
-          {props.tags.map((tag, index) => (
-            <span
-              key={index}
-              className="bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg px-3 py-1.5 border border-gray-300 hover:border-gray-400 hover:shadow-md transition-all cursor-pointer"
-            >
-              #{tag}
-            </span>
-          ))}
-        </div>
+      <span
+        className={`px-2.5 py-1 text-[11px] rounded-full flex items-center gap-1 ${
+          props.share
+            ? "bg-white text-black"
+            : "bg-white/[0.08] text-neutral-300"
+        }`}
+      >
+        {props.share ? <Globe className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+        {props.share ? "Public" : "Private"}
+      </span>
+    </div>
 
-        <div className="flex justify-between items-center text-xs text-gray-500 pt-4 mt-4 border-t border-gray-200">
-          <span className="flex items-center gap-1.5 font-medium">
-            <span className="text-gray-400">Created:</span>
-            <span className="text-gray-700">{props.createdAt?.slice(0, 10)}</span>
-          </span>
-          <span className="flex items-center gap-1.5 font-medium">
-            <span className="text-gray-400">Updated:</span>
-            <span className="text-gray-700">{props.updatedAt?.slice(0, 10)}</span>
-          </span>
-        </div>
-      </div>
-    </>
-  );
+    {/* TAGS */}
+    <div className="flex flex-wrap gap-2 mt-4">
+      {props.tags.map((tag, index) => (
+        <span
+          key={index}
+          className="text-[11px] px-2 py-1 rounded-md bg-white/[0.06] text-neutral-300 hover:bg-white/[0.1] transition"
+        >
+          #{tag}
+        </span>
+      ))}
+    </div>
+
+    {/* FOOTER */}
+    <div className="flex justify-between text-[11px] text-neutral-500 mt-5 pt-3 border-t border-white/[0.06]">
+      <span>{props.createdAt?.slice(0, 10)}</span>
+      <span>{props.updatedAt?.slice(0, 10)}</span>
+    </div>
+
+  </div>
+);
 };
 
 export default Card;

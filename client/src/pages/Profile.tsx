@@ -8,6 +8,7 @@ import { handleError } from "../utils/handleError";
 import { loadingAtom } from "../store/atoms/loading";
 import LoadingOverlay from "../components/Loading";
 import { useRecoilValue, useSetRecoilState } from "recoil";
+import Layout from "../layouts/Layout";
 
 
 
@@ -130,121 +131,155 @@ const Profile: React.FC = () => {
   },[]);
 
   return (
-    <>
-      <div className="min-h-screen w-full bg-gray-50 flex flex-col items-center py-12 px-4">
-        <div className="w-full max-w-md bg-white shadow-sm border border-gray-300 rounded-2xl p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-semibold text-gray-800">Profile</h1>
-            <p className="text-gray-500 text-sm mt-1">Manage your personal information</p>
-          </div>
+  <Layout>
+    <div className="flex flex-col items-center">
 
-          <div className="flex flex-col items-center mb-6">
-            <div className="relative">
-              <img
-                src={
-                  user?.avatar ||
-                  `https://ui-avatars.com/api/?name=${user.username.toLowerCase()}&background=E0E7FF&color=312E81`
-                }
-                alt="avatar"
-                className="w-28 h-28 rounded-full object-cover border-2 border-gray-200 shadow-sm"
-              />
-            </div>
-          </div>
+      {/* CARD */}
+      <div className="w-full max-w-md bg-neutral-900 border border-white/[0.08] rounded-2xl p-8">
 
-          <div className="flex flex-col gap-5">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
-              <input
-                type="text"
-                name="username"
-                value={user?.username}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-100 focus:border-gray-400 outline-none transition"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={user?.email}
-                onChange={handleChange}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-100 focus:border-gray-400 outline-none transition"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <div className="relative">
-                <input
-                  type={toggle ? "text" : "password"}
-                  name="password"
-                  value={user?.password}
-                  placeholder="Enter new password"
-                  onChange={handleChange}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-gray-100 focus:border-gray-400 outline-none transition"
-                />
-                <button
-                  type="button"
-                  onClick={() => setToggle((t) => !t)}
-                  className="absolute right-3 top-2.5 text-gray-500 hover:text-gray-700"
-                >
-                  {toggle ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <button
-            onClick={handleSave}
-            className="w-full mt-8 bg-gray-600 text-white py-2.5 rounded-lg font-medium hover:bg-gray-700 transition active:scale-[0.98]"
-          >
-            Save Changes
-          </button>
+        {/* HEADER */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-semibold text-white">Profile</h1>
+          <p className="text-neutral-500 text-sm mt-1">
+            Manage your personal information
+          </p>
         </div>
-        <p className="text-gray-500 items-end">Last updated: 10-10-2025</p>
+
+        {/* AVATAR */}
+        <div className="flex justify-center mb-6">
+          <img
+            src={
+              user?.avatar ||
+              `https://ui-avatars.com/api/?name=${user.username.toLowerCase()}&background=111827&color=ffffff`
+            }
+            alt="avatar"
+            className="w-24 h-24 rounded-full object-cover border border-white/[0.08]"
+          />
+        </div>
+
+        {/* FORM */}
+        <div className="flex flex-col gap-5">
+
+          {/* USERNAME */}
+          <div>
+            <label className="block text-xs text-neutral-400 mb-1">
+              Username
+            </label>
+            <input
+              type="text"
+              name="username"
+              value={user?.username}
+              onChange={handleChange}
+              className="w-full bg-neutral-950 border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+            />
+          </div>
+
+          {/* EMAIL */}
+          <div>
+            <label className="block text-xs text-neutral-400 mb-1">
+              Email
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={user?.email}
+              onChange={handleChange}
+              className="w-full bg-neutral-950 border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+            />
+          </div>
+
+          {/* PASSWORD */}
+          <div>
+            <label className="block text-xs text-neutral-400 mb-1">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                type={toggle ? "text" : "password"}
+                name="password"
+                value={user?.password}
+                placeholder="Enter new password"
+                onChange={handleChange}
+                className="w-full bg-neutral-950 border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+              />
+              <button
+                type="button"
+                onClick={() => setToggle((t) => !t)}
+                className="absolute right-3 top-2 text-neutral-400 hover:text-white"
+              >
+                {toggle ? (
+                  <EyeOff className="w-4 h-4" />
+                ) : (
+                  <Eye className="w-4 h-4" />
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* SAVE BUTTON */}
+        <button
+          onClick={handleSave}
+          className="w-full mt-8 bg-white text-black py-2 rounded-lg text-sm font-medium hover:scale-[1.02] transition"
+        >
+          Save Changes
+        </button>
       </div>
 
-      {showModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm bg-opacity-40 z-50">
-          <div className="bg-white rounded-xl shadow-md w-full max-w-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-3">Confirm Current Password</h2>
-            <p className="text-sm text-gray-500 mb-4">
-              Enter your current password to confirm profile changes.
-            </p>
+      {/* FOOTER TEXT */}
+      <p className="text-neutral-500 text-xs mt-4">
+        Last updated: 10-10-2025
+      </p>
+    </div>
 
-            <input
-              type="password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Current password"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 mb-4 focus:ring-2 focus:ring-gray-100 focus:border-gray-400 outline-none transition placeholder:opacity-55"
-            />
+    {/* MODAL */}
+    {showModal && (
+      <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
+        <div className="bg-neutral-900 border border-white/[0.08] rounded-xl w-full max-w-sm p-6">
 
-            <div className="flex justify-end gap-3">
-              <button
-                onClick={() => setShowModal(false)}
-                className="cursor-pointer px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleConfirmAndSave}
-                disabled={loading}
-                className={`cursor-pointer px-4 py-2 rounded-lg text-white font-medium ${
-                  loading ? "bg-gray-400 cursor-not-allowed" : "bg-gray-700 hover:bg-gray-800"
-                }`}
-              >
-                {loading ? "Verifying..." : "Confirm"}
-              </button>
-            </div>
+          <h2 className="text-sm font-medium text-white mb-2">
+            Confirm Current Password
+          </h2>
+
+          <p className="text-xs text-neutral-500 mb-4">
+            Enter your current password to confirm changes.
+          </p>
+
+          <input
+            type="password"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            placeholder="Current password"
+            className="w-full bg-neutral-950 border border-white/[0.08] rounded-lg px-3 py-2 mb-4 text-sm text-white outline-none"
+          />
+
+          <div className="flex justify-end gap-2">
+            <button
+              onClick={() => setShowModal(false)}
+              className="px-3 py-1.5 text-xs rounded bg-white/[0.06] text-white hover:bg-white/[0.1]"
+            >
+              Cancel
+            </button>
+
+            <button
+              onClick={handleConfirmAndSave}
+              disabled={loading}
+              className={`px-3 py-1.5 text-xs rounded ${
+                loading
+                  ? "bg-white/[0.2] text-white/50"
+                  : "bg-white text-black hover:scale-[1.03]"
+              }`}
+            >
+              {loading ? "Verifying..." : "Confirm"}
+            </button>
           </div>
         </div>
-      )}
-      {Loading && <LoadingOverlay/>}
-    </>
-  );
+      </div>
+    )}
+
+    {Loading && <LoadingOverlay />}
+  </Layout>
+);
 };
 
 export default Profile;

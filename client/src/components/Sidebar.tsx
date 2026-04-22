@@ -84,14 +84,14 @@ const Sidebar = () => {
     <>
       {isMobile && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          className="fixed inset-0 bg-neutral-950/50 z-40 md:hidden"
           onClick={handleMobileOverlayClick}
         />
       )}
 
       {/* Mobile Sidebar Overlay */}
       <div
-        className={`md:hidden fixed top-0 left-0 h-full w-64 bg-black text-white flex flex-col border-r border-white/10 shadow-2xl transition-all duration-300 z-50 ${
+        className={`md:hidden fixed top-0 left-0 h-full w-64 bg-neutral-950 text-white flex flex-col border-r border-white/10 shadow-2xl transition-all duration-300 z-50 ${
           isMobile ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -100,7 +100,7 @@ const Sidebar = () => {
           <h2 className="font-semibold text-lg">Second Brain</h2>
         <button
             onClick={() => setIsMobile(false)}
-            className={`${isMobile?"fixed":"hidden"} top-4 left-60 p-2 rounded-lg bg-black text-white hover:bg-neutral-800 transition-all z-30 md:hidden`}
+            className={`${isMobile?"fixed":"hidden"} top-4 left-60 p-2 rounded-lg bg-neutral-950 text-white hover:bg-neutral-800 transition-all z-30 md:hidden`}
           >
             <ChevronLeft size={22} />
           </button>
@@ -116,15 +116,15 @@ const Sidebar = () => {
               className={({ isActive }) =>
                 `relative flex items-center gap-3 px-4 py-3 rounded-md transition-all text-sm ${
                   isActive
-                    ? "bg-white text-black font-semibold"
-                    : "text-white hover:bg-neutral-900"
+                    ? "bg-white/10 text-white font-medium border border-white/10"
+                    : "text-white hover:bg-neutral-800"
                 }`
               }
             >
               {({ isActive }) => (
                 <>
                   <Icon
-                    className={`shrink-0 ${isActive ? "text-black" : "text-white"}`}
+                    className={`shrink-0 ${isActive ? "text-white" : "text-neutral-400"}`}
                     size={20}
                   />
                   <span>{label}</span>
@@ -138,7 +138,7 @@ const Sidebar = () => {
         <div className="p-4 border-t border-white/10">
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-4 py-3 rounded-md border border-neutral-800 text-white hover:bg-black/90 cursor-pointer hover:scale-[1.02] transition transform"
+            className="flex items-center gap-3 w-full px-4 py-3 bg-neutral-900 rounded-md border border-neutral-800 text-white hover:bg-neutral-950/90 cursor-pointer hover:scale-[1.02] transition transform"
           >
             <LogOut size={20} />
             <span className="text-sm">Logout</span>
@@ -149,7 +149,7 @@ const Sidebar = () => {
       {/* Mobile Toggle Button */}
       <button
         onClick={() => setIsMobile(!isMobile)}
-        className="fixed top-4 p-2 rounded-lg border border-neutral-400 bg-black/20 text-black hover:bg-neutral-800 transition-all z-30 md:hidden"
+        className="fixed top-4 p-2 rounded-lg border border-neutral-400 bg-neutral-950/20 text-black hover:bg-neutral-800 transition-all z-30 md:hidden"
       >
         {isMobile ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
       </button>
@@ -158,12 +158,12 @@ const Sidebar = () => {
       <aside
         className={`${
           isOpen ? "w-64" : "w-20"
-        } fixed top-0 left-0 h-full bg-black text-white flex-col p-4 border-r border-white/10 shadow-2xl transition-all duration-300 z-10 hidden md:flex`}
+        } fixed top-0 left-0 h-full bg-neutral-950 text-white flex-col p-4 border-r border-white/8 backdrop-blur shadow-2xl transition-all duration-300 z-10 hidden md:flex`}
       >
         {/* Header with toggle */}
         <div className="flex items-center justify-between m-0 md:mb-10 md:mt-2 overflow-hidden">
           <h1
-            className={`text-sm sm:text-2xl font-bold tracking-wide text-white whitespace-nowrap transition-all duration-300 ${
+            className={`ext-sm font-semibold tracking-tight text-white/90 ${
               isOpen ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
             }`}
           >
@@ -176,12 +176,10 @@ const Sidebar = () => {
               key={path}
               to={path}
               className={({ isActive }) =>
-                `relative flex items-center ${
-                  isOpen ? "justify-start" : "justify-center"
-                } gap-3 p-2 rounded-md transition-all text-sm sm:text-base ${
+                `flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all ${
                   isActive
-                    ? "bg-white text-black font-semibold"
-                    : "text-white hover:bg-neutral-900"
+                    ? "bg-white/10 text-white border border-white/10"
+                    : "text-neutral-400 hover:text-white hover:bg-neutral-800"
                 }`
               }
             >
@@ -190,7 +188,7 @@ const Sidebar = () => {
                   <Icon
                     className={`shrink-0 ${
                       isOpen ? "ml-1" : ""
-                    } ${isActive ? "text-black" : "text-white"}`}
+                    } ${isActive ? "text-white" : "text-neutral-400"}`}
                     size={isOpen ? 20 : 24}
                   />
                   {isOpen && <span className="truncate">{label}</span>}
@@ -209,7 +207,7 @@ const Sidebar = () => {
         <div className="mt-auto pt-4 border-t border-white/10">
           <button
             onClick={handleLogout}
-            className="flex items-center justify-center sm:justify-start gap-3 w-full p-2 sm:p-3 rounded-md border border-neutral-800 shadow-2xl text-white hover:bg-black/90 cursor-pointer hover:scale-[1.02] transition transform"
+            className="flex  items-center justify-center sm:justify-start gap-3 w-full p-2 sm:p-3 rounded-md border border-neutral-800 shadow-2xl text-white hover:bg-neutral-950/90 cursor-pointer hover:scale-[1.02] transition transform bg-neutral-950/60 backdrop-blur-sm"
           >
             <LogOut size={20} />
             {isOpen && <span className="cursor-pointer text-sm sm:text-base">Logout</span>}
@@ -221,7 +219,7 @@ const Sidebar = () => {
           onClick={() => setIsOpen(!isOpen)}
           className={`md:block fixed hidden top-0 md:top-3 ${
             isOpen ? "left-60" : "left-5"
-          } p-2 rounded-lg bg-black transition-all`}
+          } p-2 rounded-lg bg-neutral-950 transition-all`}
         >
           {isOpen ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
         </button>
