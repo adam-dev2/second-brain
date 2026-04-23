@@ -118,7 +118,7 @@ const Tags = () => {
         <div className="relative mb-6" ref={dropdownRef}>
           <div
             onClick={() => setShowDropdown(true)}
-            className="w-full bg-neutral-900 border border-white/[0.08] rounded-xl px-3 py-2 cursor-text"
+            className="w-full dark:bg-neutral-900 bg-white/80 border dark:border-white/[0.08] border-black/20 rounded-xl px-3 py-2 cursor-text"
           >
             <div className="flex flex-wrap gap-2 items-center">
 
@@ -126,7 +126,7 @@ const Tags = () => {
               {selected.map((tag) => (
                 <span
                   key={tag}
-                  className="flex items-center gap-2 text-xs px-2 py-1 rounded-md bg-white/[0.08] text-neutral-300"
+                  className="flex items-center gap-2 text-xs px-2 py-1 rounded-md dark:bg-white/[0.08] bg-black/4 text-neutral-500"
                 >
                   {tag}
                   <button
@@ -150,7 +150,7 @@ const Tags = () => {
                 placeholder={
                   selected.length === 0 ? "Search or select tags..." : ""
                 }
-                className="bg-transparent outline-none flex-1 text-sm text-neutral-300 placeholder:text-neutral-500"
+                className="bg-transparent outline-none flex-1 text-sm text-neutral-500 placeholder:text-neutral-500"
               />
 
               <ChevronDown className="text-neutral-500" size={16} />
@@ -159,7 +159,7 @@ const Tags = () => {
 
           {/* DROPDOWN */}
           {showDropdown && (
-            <div className="absolute mt-2 w-full max-h-56 overflow-y-auto rounded-xl border border-white/[0.08] bg-neutral-900 shadow-xl z-20">
+            <div className="absolute mt-2 w-full max-h-56 overflow-y-auto rounded-xl border dark:border-white/[0.08] border-black/10 dark:bg-neutral-900 bg-white/80 shadow-xl z-20">
               {filteredTags.length > 0 ? (
                 filteredTags.map((tag) => (
                   <div
@@ -170,8 +170,8 @@ const Tags = () => {
                     }}
                     className={`px-4 py-2 text-sm cursor-pointer hover:bg-white/[0.06] ${
                       selected.includes(tag)
-                        ? "bg-white/[0.08] text-white"
-                        : "text-neutral-300"
+                        ? "dark:bg-white/[0.08] bg-black/10 dark:text-white text-black"
+                        : "text-neutral-500"
                     }`}
                   >
                     {tag}

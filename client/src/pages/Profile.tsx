@@ -100,7 +100,7 @@ const Profile: React.FC = () => {
       setloading(false)
       setLoading(false);
     }
-  };
+  };  
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -135,11 +135,11 @@ const Profile: React.FC = () => {
     <div className="flex flex-col items-center">
 
       {/* CARD */}
-      <div className="w-full max-w-md bg-neutral-900 border border-white/[0.08] rounded-2xl p-8">
+      <div className="w-full max-w-md bg-white dark:bg-neutral-900 border border-black/20 dark:border-white/[0.08] rounded-2xl p-8">
 
         {/* HEADER */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-semibold text-white">Profile</h1>
+          <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">Profile</h1>
           <p className="text-neutral-500 text-sm mt-1">
             Manage your personal information
           </p>
@@ -153,7 +153,7 @@ const Profile: React.FC = () => {
               `https://ui-avatars.com/api/?name=${user.username.toLowerCase()}&background=111827&color=ffffff`
             }
             alt="avatar"
-            className="w-24 h-24 rounded-full object-cover border border-white/[0.08]"
+            className="w-24 h-24 rounded-full object-cover border border-black/[0.08] dark:border-white/[0.08]"
           />
         </div>
 
@@ -162,7 +162,7 @@ const Profile: React.FC = () => {
 
           {/* USERNAME */}
           <div>
-            <label className="block text-xs text-neutral-400 mb-1">
+            <label className="block text-xs text-neutral-500 mb-1">
               Username
             </label>
             <input
@@ -170,13 +170,13 @@ const Profile: React.FC = () => {
               name="username"
               value={user?.username}
               onChange={handleChange}
-              className="w-full bg-neutral-950 border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+              className="w-full bg-neutral-100 dark:bg-neutral-950 border border-black/[0.08] dark:border-white/[0.08] rounded-lg px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-neutral-400 dark:focus:border-white/20 transition-colors"
             />
           </div>
 
           {/* EMAIL */}
           <div>
-            <label className="block text-xs text-neutral-400 mb-1">
+            <label className="block text-xs text-neutral-500 mb-1">
               Email
             </label>
             <input
@@ -184,13 +184,13 @@ const Profile: React.FC = () => {
               name="email"
               value={user?.email}
               onChange={handleChange}
-              className="w-full bg-neutral-950 border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+              className="w-full bg-neutral-100 dark:bg-neutral-950 border border-black/[0.08] dark:border-white/[0.08] rounded-lg px-3 py-2 text-sm text-neutral-900 dark:text-white outline-none focus:border-neutral-400 dark:focus:border-white/20 transition-colors"
             />
           </div>
 
           {/* PASSWORD */}
           <div>
-            <label className="block text-xs text-neutral-400 mb-1">
+            <label className="block text-xs text-neutral-500 mb-1">
               Password
             </label>
             <div className="relative">
@@ -200,18 +200,14 @@ const Profile: React.FC = () => {
                 value={user?.password}
                 placeholder="Enter new password"
                 onChange={handleChange}
-                className="w-full bg-neutral-950 border border-white/[0.08] rounded-lg px-3 py-2 text-sm text-white outline-none focus:border-white/20"
+                className="w-full bg-neutral-100 dark:bg-neutral-950 border border-black/[0.08] dark:border-white/[0.08] rounded-lg px-3 py-2 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 outline-none focus:border-neutral-400 dark:focus:border-white/20 transition-colors"
               />
               <button
                 type="button"
                 onClick={() => setToggle((t) => !t)}
-                className="absolute right-3 top-2 text-neutral-400 hover:text-white"
+                className="absolute right-3 top-2 text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
               >
-                {toggle ? (
-                  <EyeOff className="w-4 h-4" />
-                ) : (
-                  <Eye className="w-4 h-4" />
-                )}
+                {toggle ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
@@ -220,24 +216,24 @@ const Profile: React.FC = () => {
         {/* SAVE BUTTON */}
         <button
           onClick={handleSave}
-          className="w-full mt-8 bg-white text-black py-2 rounded-lg text-sm font-medium hover:scale-[1.02] transition"
+          className="w-full mt-8 bg-neutral-900 dark:bg-white text-white dark:text-black py-2 rounded-lg text-sm font-medium hover:scale-[1.02] transition"
         >
           Save Changes
         </button>
       </div>
 
       {/* FOOTER TEXT */}
-      <p className="text-neutral-500 text-xs mt-4">
+      <p className="text-neutral-400 dark:text-neutral-500 text-xs mt-4">
         Last updated: 10-10-2025
       </p>
     </div>
 
     {/* MODAL */}
     {showModal && (
-      <div className="fixed inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm z-50">
-        <div className="bg-neutral-900 border border-white/[0.08] rounded-xl w-full max-w-sm p-6">
+      <div className="fixed inset-0 flex items-center justify-center bg-black/30 dark:bg-black/50 backdrop-blur-sm z-50">
+        <div className="bg-white dark:bg-neutral-900 border border-black/[0.08] dark:border-white/[0.08] rounded-xl w-full max-w-sm p-6">
 
-          <h2 className="text-sm font-medium text-white mb-2">
+          <h2 className="text-sm font-medium text-neutral-900 dark:text-white mb-2">
             Confirm Current Password
           </h2>
 
@@ -250,13 +246,13 @@ const Profile: React.FC = () => {
             value={currentPassword}
             onChange={(e) => setCurrentPassword(e.target.value)}
             placeholder="Current password"
-            className="w-full bg-neutral-950 border border-white/[0.08] rounded-lg px-3 py-2 mb-4 text-sm text-white outline-none"
+            className="w-full bg-neutral-100 dark:bg-neutral-950 border border-black/[0.08] dark:border-white/[0.08] rounded-lg px-3 py-2 mb-4 text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500 outline-none focus:border-neutral-400 dark:focus:border-white/20 transition-colors"
           />
 
           <div className="flex justify-end gap-2">
             <button
               onClick={() => setShowModal(false)}
-              className="px-3 py-1.5 text-xs rounded bg-white/[0.06] text-white hover:bg-white/[0.1]"
+              className="px-3 py-1.5 text-xs rounded bg-black/[0.06] dark:bg-white/[0.06] text-neutral-600 dark:text-white hover:bg-black/[0.1] dark:hover:bg-white/[0.1] transition-colors"
             >
               Cancel
             </button>
@@ -264,10 +260,10 @@ const Profile: React.FC = () => {
             <button
               onClick={handleConfirmAndSave}
               disabled={loading}
-              className={`px-3 py-1.5 text-xs rounded ${
+              className={`px-3 py-1.5 text-xs rounded transition ${
                 loading
-                  ? "bg-white/[0.2] text-white/50"
-                  : "bg-white text-black hover:scale-[1.03]"
+                  ? "bg-black/[0.1] dark:bg-white/[0.2] text-neutral-400 dark:text-white/50"
+                  : "bg-neutral-900 dark:bg-white text-white dark:text-black hover:scale-[1.03]"
               }`}
             >
               {loading ? "Verifying..." : "Confirm"}

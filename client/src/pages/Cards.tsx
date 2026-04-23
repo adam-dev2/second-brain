@@ -164,7 +164,7 @@ const Cards = () => {
               <input
                 value={search}
                 type="text"
-                className="w-full bg-neutral-900 border border-white/[0.08] rounded-xl px-4 py-2 text-sm outline-none placeholder:text-neutral-500 focus:border-white/20 transition"
+                className="w-full dark:bg-neutral-900 bg-white/60 border dark:border-white/[0.08] border-black/20 rounded-xl px-4 py-2 text-sm outline-none placeholder:text-neutral-500 dark:focus:border-white/20 focus:border-black/20 transition"
                 placeholder="Search cards..."
                 onChange={handleSearch}
               />
@@ -174,7 +174,7 @@ const Cards = () => {
             <div className="flex items-center gap-3">
               <button
                 onClick={handleClick}
-                className="flex items-center gap-2 bg-white text-black text-sm font-medium px-4 py-2 rounded-full hover:scale-[1.03] transition"
+                className="flex items-center gap-2 dark:bg-white bg-black/90 dark:text-black text-white text-sm font-medium px-4 py-2 rounded-full hover:scale-[1.03] transition-all"
               >
                 <Plus size={18} />
                 Add
@@ -182,7 +182,7 @@ const Cards = () => {
 
               <button
                 onClick={handleShare}
-                className="flex items-center gap-2 border border-white/20 text-white text-sm px-4 py-2 rounded-full hover:bg-white/10 transition"
+                className="flex items-center gap-2 border dark:border-white/20 border-black/30 dark:text-white text-black text-sm px-4 py-2 rounded-full dark:hover:bg-white/90 hover:scale-[1.03] bg-white/10 transition cursor-pointer"
               >
                 <Share2 size={18} />
                 Share

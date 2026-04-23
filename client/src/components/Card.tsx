@@ -117,21 +117,19 @@ const Card = (props: Iprops) => {
   };
 
   return (
-  <div className="group relative bg-neutral-900 border border-white/[0.08] rounded-2xl p-5 overflow-hidden hover:border-white/[0.15] transition-all duration-300">
+  <div className="group relative bg-white/70 dark:bg-neutral-900 border border-black/20 dark:border-white/[0.08] rounded-2xl p-5 overflow-hidden hover:border-black/25 dark:hover:border-white/[0.15] transition-all duration-300">
 
-    {/* subtle corner accent */}
-    <div className="absolute top-0 right-0 w-16 h-16 border-t border-r border-white/[0.06] rounded-bl-2xl" />
+    <div className="absolute top-0 right-0 w-16 h-16 border-t border-r border-black/8 dark:border-white/[0.06] rounded-bl-2xl" />
 
     {/* index badge */}
     {props.index !== undefined && (
-      <div className="absolute top-4 right-4 w-7 h-7 bg-white/[0.1] rounded-full flex items-center justify-center text-[11px] font-semibold text-white">
+      <div className="absolute top-4 right-4 w-7 h-7 bg-black/[0.08] dark:bg-white/[0.1] rounded-full flex items-center justify-center text-[11px] font-semibold text-neutral-700 dark:text-white">
         {props.index + 1}
       </div>
     )}
 
-    {/* TITLE + MENU */}
     <div className="flex items-start justify-between gap-3">
-      <h1 className="flex-1 text-sm font-medium text-neutral-200 line-clamp-2 group-hover:text-white transition">
+      <h1 className="flex-1 text-sm font-medium text-neutral-600 dark:text-neutral-200 line-clamp-2 group-hover:text-neutral-900 dark:group-hover:text-white transition">
         {props.title}
       </h1>
 
@@ -139,14 +137,17 @@ const Card = (props: Iprops) => {
         <div className="relative">
           <button
             onClick={handleSheet}
-            className="p-1.5 rounded-lg hover:bg-white/[0.08] transition"
+            className="p-1.5 rounded-lg hover:bg-black/[0.06] dark:hover:bg-white/[0.08] transition"
           >
-            <EllipsisVertical size={16} className="text-neutral-400 hover:text-white" />
+            <EllipsisVertical
+              size={16}
+              className="text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
+            />
           </button>
 
           {sheet && (
             <div
-              className="absolute right-0 mt-2 w-40 bg-neutral-900 border border-white/[0.08] rounded-lg shadow-xl z-20 text-sm"
+              className="absolute right-0 mt-2 w-40 bg-white dark:bg-neutral-900 border border-black/[0.08] dark:border-white/[0.08] rounded-lg shadow-xl z-20 text-sm text-neutral-700 dark:text-neutral-200"
               onMouseLeave={() => {
                 setSheet(false);
                 setShowSections(false);
@@ -154,15 +155,15 @@ const Card = (props: Iprops) => {
             >
               {!showSections ? (
                 <>
-                  <button onClick={handleEdit} className="w-full px-3 py-2 text-left hover:bg-white/[0.06]">
+                  <button onClick={handleEdit} className="w-full px-3 py-2 text-left hover:bg-black/[0.04] dark:hover:bg-white/[0.06]">
                     Edit
                   </button>
-                  <button onClick={handleDelete} className="w-full px-3 py-2 text-left text-red-400 hover:bg-red-500/10">
+                  <button onClick={handleDelete} className="w-full px-3 py-2 text-left text-red-500 dark:text-red-400 hover:bg-red-500/10">
                     Delete
                   </button>
                   <button
                     onClick={handleSections}
-                    className="w-full px-3 py-2 flex justify-between items-center hover:bg-white/[0.06]"
+                    className="w-full px-3 py-2 flex justify-between items-center hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                   >
                     Move
                     <ChevronRight size={14} />
@@ -172,7 +173,7 @@ const Card = (props: Iprops) => {
                 <>
                   <button
                     onClick={() => setShowSections(false)}
-                    className="w-full px-3 py-2 text-left hover:bg-white/[0.06]"
+                    className="w-full px-3 py-2 text-left hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                   >
                     ← Back
                   </button>
@@ -181,7 +182,7 @@ const Card = (props: Iprops) => {
                     <button
                       key={section.id}
                       onClick={() => handleMove(section.id, props.id, section.label)}
-                      className="w-full px-3 py-2 text-left hover:bg-white/[0.06]"
+                      className="w-full px-3 py-2 text-left hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
                     >
                       {section.label}
                     </button>
@@ -200,7 +201,7 @@ const Card = (props: Iprops) => {
         href={props.link}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-neutral-400 hover:text-white text-xs truncate flex-1 flex items-center gap-1.5 transition"
+        className="text-neutral-400 hover:text-neutral-900 dark:hover:text-white text-xs truncate flex-1 flex items-center gap-1.5 transition"
       >
         <ExternalLink className="w-3.5 h-3.5" />
         Visit Link
@@ -209,11 +210,15 @@ const Card = (props: Iprops) => {
       <span
         className={`px-2.5 py-1 text-[11px] rounded-full flex items-center gap-1 ${
           props.share
-            ? "bg-white text-black"
-            : "bg-white/[0.08] text-neutral-300"
+            ? "bg-neutral-900 dark:bg-white text-white dark:text-black"
+            : "bg-black/[0.06] dark:bg-white/[0.08] text-neutral-500 dark:text-neutral-300"
         }`}
       >
-        {props.share ? <Globe className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+        {props.share ? (
+          <Globe className="w-3 h-3" />
+        ) : (
+          <Lock className="w-3 h-3" />
+        )}
         {props.share ? "Public" : "Private"}
       </span>
     </div>
@@ -223,15 +228,15 @@ const Card = (props: Iprops) => {
       {props.tags.map((tag, index) => (
         <span
           key={index}
-          className="text-[11px] px-2 py-1 rounded-md bg-white/[0.06] text-neutral-300 hover:bg-white/[0.1] transition"
+          className="text-[11px] px-2 py-1 rounded-md bg-black/[0.06] dark:bg-white/[0.06] text-neutral-500 dark:text-neutral-300 hover:bg-black/[0.1] dark:hover:bg-white/[0.1] transition"
         >
           #{tag}
         </span>
       ))}
     </div>
 
-    {/* FOOTER */}
-    <div className="flex justify-between text-[11px] text-neutral-500 mt-5 pt-3 border-t border-white/[0.06]">
+    {/* DATES */}
+    <div className="flex justify-between text-[11px] text-neutral-400 dark:text-neutral-500 mt-5 pt-3 border-t border-black/[0.06] dark:border-white/[0.06]">
       <span>{props.createdAt?.slice(0, 10)}</span>
       <span>{props.updatedAt?.slice(0, 10)}</span>
     </div>

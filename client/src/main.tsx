@@ -6,6 +6,7 @@ import { Toaster } from "react-hot-toast";
 import { RecoilRoot } from "recoil";
 import {BrowserRouter} from 'react-router-dom'
 import { AuthProvider } from "./context/AuthContext.tsx";
+import { ThemeProvider } from "./context/ThemeContext.tsx";
 
 
 createRoot(document.getElementById("root")!).render(
@@ -13,6 +14,7 @@ createRoot(document.getElementById("root")!).render(
     <>
       <RecoilRoot>
         <BrowserRouter>
+         <ThemeProvider>
         <AuthProvider>
           <App />
           <Toaster
@@ -49,6 +51,7 @@ createRoot(document.getElementById("root")!).render(
             }}
           />
         </AuthProvider>
+        </ThemeProvider>
         </BrowserRouter>
       </RecoilRoot>
 

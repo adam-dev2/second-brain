@@ -114,46 +114,46 @@ const Search = () => {
 
         {/* HEADER */}
         <div className="mb-10">
-          <h1 className="text-3xl font-black tracking-tight mb-2">
+          <h1 className="text-3xl font-black tracking-tight mb-2 text-neutral-900 dark:text-white">
             Elastic Search
           </h1>
-          <p className="text-neutral-500 text-sm">
+          <p className="text-neutral-500 dark:text-neutral-500 text-sm">
             Find cards by meaning, not just keywords
           </p>
 
           {/* SEARCH BAR */}
-          <div className="mt-6 bg-neutral-900 border border-white/[0.08] rounded-2xl p-3">
+          <div className="mt-6 bg-neutral-100 dark:bg-neutral-900 border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-3">
             <div className="flex gap-3 flex-wrap">
 
               <div className="flex-1 relative">
-                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 dark:text-neutral-500" />
                 <input
                   onKeyDown={handleKeyDown}
                   value={search}
                   type="text"
-                  className="w-full pl-10 pr-3 py-3 bg-transparent outline-none text-sm text-white placeholder:text-neutral-500"
+                  className="w-full pl-10 pr-3 py-3 bg-transparent outline-none text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
                   placeholder="Ask anything... e.g., 'authentication security patterns'"
                   onChange={handleChange}
                 />
               </div>
 
               {/* LIMIT */}
-              <div className="flex items-center gap-2 px-3 py-2 bg-white/[0.06] rounded-xl border border-white/[0.08]">
-                <span className="text-neutral-400 text-xs">Top</span>
+              <div className="flex items-center gap-2 px-3 py-2 bg-black/[0.04] dark:bg-white/[0.06] rounded-xl border border-black/[0.08] dark:border-white/[0.08]">
+                <span className="text-neutral-500 dark:text-neutral-400 text-xs">Top</span>
                 <input
                   type="number"
                   min="1"
                   max="50"
                   value={limit}
                   onChange={(e) => setLimit(e.target.value)}
-                  className="w-12 bg-transparent border border-white/[0.08] rounded px-1 py-0.5 outline-none text-center text-white text-xs"
+                  className="w-12 bg-transparent border border-black/[0.08] dark:border-white/[0.08] rounded px-1 py-0.5 outline-none text-center text-neutral-900 dark:text-white text-xs"
                 />
               </div>
 
               {/* BUTTON */}
               <button
                 onClick={handleSearch}
-                className="px-5 py-3 bg-white text-black text-sm font-medium rounded-xl hover:scale-[1.03] transition"
+                className="px-5 py-3 bg-neutral-900 dark:bg-white text-white dark:text-black text-sm font-medium rounded-xl hover:scale-[1.03] transition"
               >
                 Search
               </button>
@@ -164,15 +164,14 @@ const Search = () => {
         {/* RESULTS HEADER */}
         {hasSearched && (
           <div className="mb-6">
-            <h2 className="text-xl font-semibold text-white">
+            <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">
               Search Results{" "}
               {queryCards.length > 0 && (
-                <span className="text-neutral-500 text-sm">
+                <span className="text-neutral-400 dark:text-neutral-500 text-sm">
                   ({queryCards.length})
                 </span>
               )}
             </h2>
-
             {queryCards.length > 0 && (
               <p className="text-neutral-500 text-sm mt-1">
                 Sorted by relevance using AI semantic matching
@@ -183,9 +182,9 @@ const Search = () => {
 
         {/* EMPTY (BEFORE SEARCH) */}
         {!hasSearched && (
-          <div className="text-center py-16 border border-dashed border-white/[0.08] rounded-2xl">
-            <SearchIcon className="w-10 h-10 text-neutral-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-white mb-2">
+          <div className="text-center py-16 border border-dashed border-black/[0.08] dark:border-white/[0.08] rounded-2xl">
+            <SearchIcon className="w-10 h-10 text-neutral-300 dark:text-neutral-600 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-neutral-900 dark:text-white mb-2">
               Start exploring your content
             </h3>
             <p className="text-neutral-500 text-sm">
@@ -196,9 +195,9 @@ const Search = () => {
 
         {/* NO RESULTS */}
         {hasSearched && queryCards.length === 0 && (
-          <div className="text-center py-16 border border-dashed border-white/[0.08] rounded-2xl">
-            <SearchIcon className="w-10 h-10 text-neutral-600 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-white mb-2">
+          <div className="text-center py-16 border border-dashed border-black/[0.08] dark:border-white/[0.08] rounded-2xl">
+            <SearchIcon className="w-10 h-10 text-neutral-300 dark:text-neutral-600 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-neutral-900 dark:text-white mb-2">
               No Results Found
             </h3>
             <p className="text-neutral-500 text-sm mb-4">
@@ -206,7 +205,7 @@ const Search = () => {
             </p>
             <button
               onClick={() => setHasSearched(false)}
-              className="text-sm text-neutral-300 underline"
+              className="text-sm text-neutral-500 dark:text-neutral-300 underline"
             >
               Try again
             </button>
@@ -230,9 +229,9 @@ const Search = () => {
 
         {/* PAGINATION */}
         {hasSearched && pagination && pagination.totalPages > 1 && (
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-neutral-900 border border-white/[0.08] rounded-2xl p-5">
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-neutral-100 dark:bg-neutral-900 border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5">
 
-            <div className="text-xs text-neutral-500">
+            <div className="text-xs text-neutral-400 dark:text-neutral-500">
               Showing{" "}
               {(pagination.currentPage - 1) * pagination.limit + 1} to{" "}
               {Math.min(
@@ -244,21 +243,16 @@ const Search = () => {
 
             <div className="flex items-center gap-2">
               <button
-                onClick={() =>
-                  handlePageChange(pagination.currentPage - 1)
-                }
+                onClick={() => handlePageChange(pagination.currentPage - 1)}
                 disabled={!pagination.hasPrevPage}
-                className="px-3 py-1.5 text-xs rounded bg-white/[0.06] text-white disabled:opacity-40"
+                className="px-3 py-1.5 text-xs rounded bg-black/[0.06] dark:bg-white/[0.06] text-neutral-700 dark:text-white disabled:opacity-40 hover:bg-black/[0.1] dark:hover:bg-white/[0.1] transition-colors"
               >
                 Prev
               </button>
-
               <button
-                onClick={() =>
-                  handlePageChange(pagination.currentPage + 1)
-                }
+                onClick={() => handlePageChange(pagination.currentPage + 1)}
                 disabled={!pagination.hasNextPage}
-                className="px-3 py-1.5 text-xs rounded bg-white/[0.06] text-white disabled:opacity-40"
+                className="px-3 py-1.5 text-xs rounded bg-black/[0.06] dark:bg-white/[0.06] text-neutral-700 dark:text-white disabled:opacity-40 hover:bg-black/[0.1] dark:hover:bg-white/[0.1] transition-colors"
               >
                 Next
               </button>

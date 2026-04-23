@@ -7,9 +7,6 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { handleError } from "../utils/handleError";
 import DashboardSkeleton from "../components/DashboardSkeleton";
-import StatCard from "../ui-compo/StatCard";
-import SectionCard from "../ui-compo/SectionCard";
-import TagBar from "../ui-compo/TagBar";
 import Layout from "../layouts/Layout";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -117,14 +114,14 @@ const Dashboard = () => {
         ].map(({ label, value }) => (
           <div
             key={label}
-            className="relative bg-neutral-900 border border-white/[0.08] rounded-2xl p-5 overflow-hidden"
+            className="relative bg-white/90  dark:bg-neutral-900 border dark:border-white/8 border-black/18 rounded-2xl p-5 overflow-hidden"
           >
             {/* Corner accent */}
             <div className="absolute top-0 right-0 w-20 h-20 border-t border-r border-white/[0.07] rounded-bl-2xl" />
-            <p className="text-[10px] font-semibold tracking-[0.18em] uppercase text-neutral-500 mb-3">
+            <p className="text-[10px] font-semibold tracking-[0.18em] uppercase dark:text-neutral-500 text-neutral-800 mb-3">
               {label}
             </p>
-            <p className="text-4xl font-black tracking-tight text-white">{value}</p>
+            <p className="text-4xl font-black tracking-tight dark:text-white text-black/80">{value}</p>
           </div>
         ))}
       </div>
@@ -133,9 +130,9 @@ const Dashboard = () => {
       <div className="grid lg:grid-cols-3 gap-6">
 
         {/* RECENT CARDS */}
-        <div className="relative lg:col-span-2 bg-neutral-900 border border-white/[0.08] rounded-2xl p-6 overflow-hidden">
+        <div className="relative lg:col-span-2 bg-white/90  dark:bg-neutral-900 border dark:border-white/[0.08] border-black/18 rounded-2xl p-6 overflow-hidden">
           {/* Corner accent */}
-          <div className="absolute bottom-0 left-0 w-20 h-20 border-b border-l border-white/[0.07] rounded-tr-2xl" />
+          <div className="absolute bottom-0 left-0 w-20 h-20 border-b border-l dark:border-white/[0.08] border-black/18 rounded-tr-2xl" />
 
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-bold tracking-tight">Recent Cards</h2>
@@ -152,13 +149,13 @@ const Dashboard = () => {
               recentCards.slice(0, 4).map((card) => (
                 <div
                   key={card.id}
-                  className="flex items-center gap-4 p-3 rounded-xl border border-transparent hover:bg-neutral-800 hover:border-white/[0.08] transition-all duration-200 cursor-pointer group"
+                  className="flex items-center gap-4 p-3 rounded-xl border border-transparent dark:hover:bg-neutral-800 dark:hover:border-white/[0.08] hover:bg-white/80 hover:border-black/25  transition-all duration-200 cursor-pointer group"
                 >
-                  <div className="p-2 bg-white/[0.08] rounded-lg shrink-0">
+                  <div className="p-2 dark:bg-white/[0.08] bg-black/[0.08] rounded-lg shrink-0">
                     {getTypeIcon(card.type)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-sm font-medium text-neutral-200 truncate">
+                    <h4 className="text-sm font-medium dark:text-neutral-200 text-neutral-800 truncate">
                       {card.title}
                     </h4>
                     <div className="flex items-center gap-2 mt-1 text-xs text-neutral-500">
@@ -170,7 +167,7 @@ const Dashboard = () => {
                             {card.tags.map((tag) => (
                               <span
                                 key={tag}
-                                className="px-2 py-0.5 bg-white/[0.08] text-white/50 rounded text-[11px]"
+                                className="px-2 py-0.5 dark:bg-white/[0.08] bg-black/60 text-white/50 rounded text-[11px]"
                               >
                                 {tag}
                               </span>
@@ -183,7 +180,7 @@ const Dashboard = () => {
                 </div>
               ))
             ) : (
-              <p className="text-neutral-500 text-sm text-center py-10">
+              <p className="dark:text-neutral-500  text-sm text-center py-10">
                 No cards yet. Create your first card!
               </p>
             )}
@@ -191,7 +188,7 @@ const Dashboard = () => {
         </div>
 
         {/* TOP TAGS */}
-        <div className="relative bg-neutral-900 border border-white/[0.08] rounded-2xl p-6 overflow-hidden">
+        <div className="relative bg-white/90  dark:bg-neutral-900 border dark:border-white/8 border-black/18 rounded-2xl p-6 overflow-hidden">
           <div className="absolute bottom-0 left-0 w-20 h-20 border-b border-l border-white/[0.07] rounded-tr-2xl" />
 
           <h2 className="text-sm font-bold tracking-tight mb-6">Top Tags</h2>
@@ -201,13 +198,13 @@ const Dashboard = () => {
               {topTags.map((tag, idx) => (
                 <div key={idx}>
                   <div className="flex justify-between text-[13px] mb-1.5">
-                    <span className="text-neutral-300 font-medium">{tag.name}</span>
+                    <span className="dark:text-neutral-300 text-neutral-600 font-medium">{tag.name}</span>
                     <span className="text-neutral-500">{tag.count}</span>
                   </div>
                   <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
-                        idx === 0 ? "bg-white" : "bg-white/30"
+                        idx === 0 ? "dark:bg-white bg-black/80" : "dark:bg-white/30 bg-black/20"
                       }`}
                       style={{ width: `${(tag.count / topTags[0].count) * 100}%` }}
                     />

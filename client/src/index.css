@@ -2,16 +2,27 @@
 ::selection {
   background-color: gray;
 }
+@custom-variant dark (&:where(.dark, .dark *));
 
 .skeleton {
   background: linear-gradient(
     90deg,
-    rgba(255,255,255,0.06) 25%,
-    rgba(255,255,255,0.12) 37%,
-    rgba(255,255,255,0.06) 63%
+    rgba(0, 0, 0, 0.06) 25%,
+    rgba(0, 0, 0, 0.12) 37%,
+    rgba(0, 0, 0, 0.06) 63%
   );
   background-size: 400% 100%;
   animation: shimmer 1.4s ease infinite;
+}
+
+.dark .skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 25%,
+    rgba(255, 255, 255, 0.12) 37%,
+    rgba(255, 255, 255, 0.06) 63%
+  );
+  background-size: 400% 100%;
 }
 
 @keyframes shimmer {

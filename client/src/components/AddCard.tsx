@@ -186,144 +186,154 @@ const AddCard = (props:Iprops) => {
     }
   };
 
-  return (
-    <div>
-      {loading ? (
-        <Loading />
-      ) : (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm bg-opacity-40 z-50">
-          <div
-            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 
-                      bg-gray-50 backdrop-blur-2xl w-96 p-6 rounded-xl shadow-lg border border-gray-400"
+ return (
+  <div>
+    {loading ? (
+      <Loading />
+    ) : (
+      <div className="fixed inset-0 flex items-center justify-center bg-black/5 backdrop-blur-xs z-50">
+        <div className="bg-white dark:bg-neutral-900 border border-black/[0.08] dark:border-white/10 w-96 p-6 rounded-xl shadow-2xl">
+
+          {/* Close button */}
+          <button
+            className="cursor-pointer w-full flex justify-end text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors"
+            onClick={() => {
+              setModal(!modal);
+              setFormData({
+                title: "",
+                link: "",
+                tags: [],
+                share: false,
+                type: "",
+                heading: "Add Card",
+                button: "Save Card",
+              });
+            }}
           >
-            <button
-              className="cursor-pointer text-end z-10 w-full flex justify-end m-0"
-              onClick={() => {
-                setModal(!modal);
-                setFormData({
-                  title: "",
-                  link: "",
-                  tags: [],
-                  share: false,
-                  type: "",
-                  heading: "Add Card",
-                  button: "Save Card",
-                });
-              }}
-            >
-              <X className="hover:scale-105 transition" size={20} />
-            </button>
-            <div className="text-center text-gray-900 mb-4 flex">
-              <h1 className="flex-1 text-2xl font-semibold">{formData.heading}</h1>
+            <X className="hover:scale-105 transition" size={20} />
+          </button>
+
+          {/* Heading */}
+          <div className="text-center mb-5">
+            <h1 className="text-2xl font-semibold text-neutral-900 dark:text-white">
+              {formData.heading}
+            </h1>
+          </div>
+
+          <form
+            onSubmit={formData.heading === "Add Card" ? handleSubmit : handleEditSubmit}
+            className="space-y-4"
+          >
+            {/* Title */}
+            <input
+              value={formData.title}
+              name="title"
+              onChange={handleChange}
+              type="text"
+              placeholder="Title"
+              className="w-full px-4 py-3 bg-neutral-100 dark:bg-neutral-800 border border-black/[0.08] dark:border-white/10 rounded-xl
+                         text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 outline-none
+                         focus:border-neutral-400 dark:focus:border-neutral-500 transition-colors"
+            />
+
+            {/* Link */}
+            <div>
+              <input
+                value={formData.link}
+                name="link"
+                onChange={handleChange}
+                type="url"
+                placeholder="Link (https://example.com)"
+                className="w-full px-4 py-3 bg-neutral-100 dark:bg-neutral-800 border border-black/[0.08] dark:border-white/10 rounded-xl
+                           text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 outline-none
+                           focus:border-neutral-400 dark:focus:border-neutral-500 transition-colors"
+              />
+              {domainName && (
+                <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1.5 pl-1">
+                  Domain:{" "}
+                  <span className="font-semibold text-neutral-700 dark:text-neutral-200">
+                    {domainName}
+                  </span>
+                </p>
+              )}
             </div>
 
-            <form
-              onSubmit={formData.heading === "Add Card" ? handleSubmit : handleEditSubmit}
-              className="space-y-5"
-            >
-              {/* Title */}
-              <div className="relative">
-                <input
-                  value={formData.title}
-                  name="title"
-                  onChange={handleChange}
-                  type="text"
-                  placeholder="Title"
-                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl 
-                         focus:border-gray-500 focus:bg-white transition-all outline-none text-gray-900"
-                />
-              </div>
-
-              {/* Link */}
-              <div className="relative">
-                <input
-                  value={formData.link}
-                  name="link"
-                  onChange={handleChange}
-                  type="url"
-                  placeholder="Link (https://example.com)"
-                  className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-200 rounded-xl 
-                         focus:border-gray-500 focus:bg-white transition-all outline-none text-gray-900"
-                />
-                {domainName && (
-                  <p className="text-sm text-gray-600 mt-1">
-                    Domain: <span className="font-semibold text-gray-800">{domainName}</span>
-                  </p>
-                )}
-              </div>
-
-              {/* Share Toggle */}
-              
-
-              {/* Tags Input */}
-              <div>
-                <div
-                  className="flex flex-wrap items-center gap-2 border border-gray-300 rounded-lg px-3 py-2 
-                         focus-within:ring-2 focus-within:ring-gray-500 bg-white"
+            {/* Tags Input */}
+            <div className="flex flex-wrap items-center gap-2 border border-black/[0.08] dark:border-white/10 rounded-xl px-3 py-2.5 bg-neutral-100 dark:bg-neutral-800 focus-within:border-neutral-400 dark:focus-within:border-neutral-500 transition-colors">
+              {formData.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="bg-neutral-200 dark:bg-neutral-700 text-neutral-700 dark:text-neutral-200 px-2.5 py-1 rounded-full text-sm flex items-center gap-1.5"
                 >
-                  {formData.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="bg-gray-200 text-gray-700 px-2 py-1 rounded-full text-sm flex items-center gap-1"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => removeTag(tag)}
-                        className="text-gray-500 hover:text-red-500"
-                      >
-                        ✕
-                      </button>
-                    </span>
-                  ))}
-                  <input
-                    type="text"
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Add tag & press Enter"
-                    className="flex-1 outline-none py-1 text-gray-700"
-                  />
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-700 font-medium"></span>
-                <button
-                  type="button"
-                  onClick={() => setFormData((prev) => ({ ...prev, share: !prev.share }))}
-                  className={`cursor-pointer px-3 py-1.5 rounded-full text-sm font-semibold transition ${
-                    formData.share ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                  }`}
-                >
-                  {formData.share ? "Public" : "Private"}
-                </button>
-              </div>
-              {/* Submit */}
+                  {tag}
+                  <button
+                    type="button"
+                    onClick={() => removeTag(tag)}
+                    className="text-neutral-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                  >
+                    ✕
+                  </button>
+                </span>
+              ))}
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Add tag & press Enter"
+                className="flex-1 outline-none py-1 bg-transparent text-neutral-900 dark:text-white placeholder-neutral-400 dark:placeholder-neutral-500 min-w-24"
+              />
+            </div>
+
+            {/* Share Toggle */}
+            <div className="flex items-center justify-between px-1">
+              <span className="text-neutral-500 dark:text-neutral-400 text-sm">Visibility</span>
               <button
-                type="submit"
-                className="cursor-pointer w-full bg-linear-to-r from-gray-600 via-zinc-600 to-gray-700 
-                       text-white py-3.5 rounded-xl font-semibold hover:shadow-lg hover:scale-[1.02] 
-                       transition-all flex items-center justify-center gap-2 group"
+                type="button"
+                onClick={() => setFormData((prev) => ({ ...prev, share: !prev.share }))}
+                className={`cursor-pointer px-3 py-1.5 rounded-full text-sm font-semibold transition-colors ${
+                  formData.share
+                    ? "bg-green-500/15 text-green-600 dark:text-green-400 border border-green-500/20"
+                    : "bg-red-500/15 text-red-600 dark:text-red-400 border border-red-500/20"
+                }`}
               >
-                {formData.button}
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                {formData.share ? "Public" : "Private"}
               </button>
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm text-gray-700 shadow-sm flex items-start gap-2">
-                <span className="text-gray-500 text-base">💡</span>
-                <p>
-                  <span className="font-medium">Tip:</span> Use a descriptive and relevant name, it
-                  helps improve
-                  <span className="font-semibold text-gray-800"> search accuracy</span> and results
-                  when using
-                  <span className="font-semibold text-gray-800"> Elasticsearch</span>.
-                </p>
-              </div>
-            </form>
-          </div>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              className="cursor-pointer w-full bg-neutral-900 dark:bg-neutral-800 border border-black/[0.08] dark:border-white/10
+                         hover:bg-neutral-700 text-white py-3 rounded-xl font-semibold
+                         hover:scale-[1.02] transition-all flex items-center justify-center gap-2 group"
+            >
+              {formData.button}
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+
+            {/* Tip */}
+            <div className="bg-neutral-100 dark:bg-neutral-800 border border-black/[0.08] dark:border-white/10 rounded-xl p-4 text-sm text-neutral-500 dark:text-neutral-400 flex items-start gap-2">
+              <span className="text-base">💡</span>
+              <p>
+                <span className="font-medium text-neutral-700 dark:text-neutral-300">Tip:</span>{" "}
+                Use a descriptive name — it improves{" "}
+                <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                  search accuracy
+                </span>{" "}
+                when using{" "}
+                <span className="font-semibold text-neutral-800 dark:text-neutral-200">
+                  Elasticsearch
+                </span>
+                .
+              </p>
+            </div>
+          </form>
         </div>
-      )}
-    </div>
-  );
+      </div>
+    )}
+  </div>
+);
 };
 
 export default AddCard;
