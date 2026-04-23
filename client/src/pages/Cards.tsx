@@ -55,9 +55,12 @@ const Cards = () => {
   const searchModal = useRecoilValue(searchModalAtom);
   const setSearchModal = useSetRecoilState(searchModalAtom);
   const setHideIcons = useSetRecoilState(hideIconAtom);
-
+  
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const loadStartTime = useRef<number>(Date.now());
+
+  
 
   const handleClick = () => setModal((prev) => !prev);
 
@@ -83,9 +86,10 @@ const Cards = () => {
     setHideIcons(true);
     const token = Cookies.get("token");
     setLoading(true);
+    loadStartTime.current = Date.now();
     try {
       const res = await axios.get(`${backendUrl}/api/v1/content/cards`, {
-        params: { page, limit: 10 }, // ← pass page & limit as query params
+        params: { page, limit: 9 }, // ← pass page & limit as query params
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`,
@@ -95,12 +99,16 @@ const Cards = () => {
       setAllCards(res.data.cards);
       setOriginalCards(res.data.cards);
       setPagination(res.data.pagination); // ← store pagination meta
-      toast.success("Fetched all cards successfully");
+      // toast.success("Fetched all cards successfully");
     } catch (err) {
       console.error(err);
       toast.error("Failed to fetch cards");
     } finally {
-      setLoading(false);
+      const elapsed = Date.now() - loadStartTime.current;
+      const remaining = Math.max(0, 2000 - elapsed);
+      setTimeout(() => {
+        setLoading(false);
+      }, remaining);
     }
   };
 
@@ -136,7 +144,7 @@ const Cards = () => {
         withCredentials: true,
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
-      toast.success("Shareable Link generated");
+      // toast.success("Shareable Link generated");
       setSearchModal(true);
       setShareLink(`https://secondbrain.madebyadam.xyz/${res.data.ShareableLink}`);
     } catch (err: unknown) {
@@ -147,7 +155,9 @@ const Cards = () => {
     }
   };
 
-  if (loading) return <CardSkeleton />;
+  if (loading) {
+    return <CardSkeleton />;
+  }
 
   return (
     <Layout>

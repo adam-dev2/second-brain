@@ -40,7 +40,7 @@ const Sidebar = () => {
     try {
       await logout();
 
-      toast.success("Logged out successfully");
+      // toast.success("Logged out successfully");
       navigate("/auth");
 
       setFormData({

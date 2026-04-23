@@ -16,9 +16,11 @@ import { hideIconAtom } from "../store/atoms/hideIcons";
 import { handleError } from "../utils/handleError";
 import CardSkeleton from "../components/CardSkeleton";
 import { useParams } from "react-router-dom";
-import { sectionsAtom } from "../store/atoms/sections";
 import { secitonCardsAtom } from "../store/atoms/sectionCards";
 import Layout from "../layouts/Layout";
+import DeleteConfirmation from "../components/DeletConfirmation";
+import { deleteSectionAtom } from "../store/atoms/deleteSection";
+import { sectionsAtom } from "../store/atoms/sections";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 
@@ -34,11 +36,15 @@ const Section = () => {
   const setSearchModal = useSetRecoilState(searchModalAtom);
   const setHideIcons = useSetRecoilState(hideIconAtom);
   const { id } = useParams();
-  const sectionNameRef = useRef("")
-  const sections = useRecoilValue(sectionsAtom);
-  const sectionCards = useRecoilValue(secitonCardsAtom)
-  const setSectionCards = useSetRecoilState(secitonCardsAtom)
-  const processingToastId = useRef<string | undefined>(undefined)
+  const sectionNameRef = useRef("");
+  const loadStartTime = useRef<number>(Date.now());
+  const sectionCards = useRecoilValue(secitonCardsAtom);
+  const setSectionCards = useSetRecoilState(secitonCardsAtom);
+  const processingToastId = useRef<string | undefined>(undefined);
+  const deleteSection = useRecoilValue(deleteSectionAtom);
+  const setSections = useSetRecoilState(sectionsAtom)
+  const setDeleteSection = useSetRecoilState(deleteSectionAtom)
+
   
 
   const handleClick = () => {
@@ -72,11 +78,6 @@ const Section = () => {
         id: processingToastId.current,
         position: "top-right",
       });
-    });
-    sections.find((section) => {
-        if(section.id === id) {
-            sectionNameRef.current = section.label
-        }
     })
     return () => es.close();
   },[]);
@@ -86,6 +87,7 @@ const Section = () => {
     const token = Cookies.get("token");
     const fetchCards = async () => {
       setLoading(true);
+      loadStartTime.current = Date.now();
       try {
         const res = await axios.get(`${backendUrl}/api/v1/section/${id}`, {
           withCredentials: true,
@@ -95,12 +97,17 @@ const Section = () => {
           },
         });
         setSectionCards(res.data.cards)
-        toast.success("Fetched all cards successfully");
+        sectionNameRef.current = res.data.sectionname
+        // toast.success("Fetched all cards successfully");
       } catch (err) {
         console.error(err);
         toast.error("Failed to fetch cards");
       } finally {
-        setLoading(false);
+        const elapsed = Date.now() - loadStartTime.current;
+        const remaining = Math.max(0,2000 - elapsed);
+        setTimeout(() => {
+          setLoading(false)
+      },remaining)
       }
     };
     fetchCards();
@@ -132,7 +139,6 @@ const Section = () => {
         },
       });
       console.log(res.data.ShareableLink);
-      toast.success("Shareable Link generated");
       setSearchModal(true);
       setShareLink(`${backendUrl}/${res.data.ShareableLink}`);
     } catch (err: unknown) {
@@ -142,6 +148,44 @@ const Section = () => {
       setLoading(false);
     }
   };
+
+  const handleOnClose = () => {
+    setDeleteSection((prev) => !prev);
+  }
+  const handleDeleteAll = () => {
+
+  }
+
+  const handleMoveAndDelete = async (e: React.MouseEvent,sectionId:string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const token = Cookies.get("token");
+    setLoading(true);
+    if(!sectionId) {
+      toast.error("Section Id is required");
+      return
+    }
+    try{
+      const response = await axios.delete(
+        `${backendUrl}/api/v1/section/${sectionId}`,
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      console.log(response.data.message);
+      toast.success("Deleted successfully");
+      setSections((prev) => prev.filter((section) => section.id !== sectionId));
+    }catch (err: unknown) {
+      handleError(err, "Error while sharing brain");
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }
 
   if (loading) {
     return <CardSkeleton />;
@@ -163,7 +207,7 @@ const Section = () => {
             <input
               value={search}
               type="text"
-              className="w-full bg-neutral-900 border border-white/[0.08] rounded-xl px-4 py-2 text-sm outline-none placeholder:text-neutral-500 focus:border-white/20 transition"
+              className="w-full dark:bg-neutral-900 bg-white/80 border dark:border-white/[0.08] border-black/20 rounded-xl px-4 py-2 text-sm outline-none placeholder:text-neutral-500 dark:focus:border-white/20 focus:border-black/20 transition"
               placeholder="Search cards..."
               onChange={handleSearch}
             />
@@ -173,7 +217,7 @@ const Section = () => {
           <div className="flex items-center gap-3">
             <button
               onClick={handleClick}
-              className="flex items-center gap-2 bg-white text-black text-sm font-medium px-4 py-2 rounded-full hover:scale-[1.03] transition"
+              className="flex items-center gap-2 dark:bg-white bg-black dark:text-black text-white text-sm font-medium px-4 py-2 rounded-full hover:scale-[1.03] transition"
             >
               <Plus size={18} />
               Add
@@ -181,7 +225,7 @@ const Section = () => {
 
             <button
               onClick={handleShare}
-              className="flex items-center gap-2 border border-white/20 text-white text-sm px-4 py-2 rounded-full hover:bg-white/10 transition"
+              className="flex dark:bg-black text-neutral-900 bg-white/80 items-center gap-2 border dark:border-black/80 dark:text-white/80 cursor-pointer text-sm px-4 py-2 rounded-full dark:hover:bg-white/10 hover:-black/70 hover:scale-[1.03] transition"
             >
               <Share2 size={18} />
               Share
@@ -226,6 +270,12 @@ const Section = () => {
       )}
 
     </div>
+      {deleteSection && <DeleteConfirmation 
+        onClose={handleOnClose} 
+        onDeleteAll={handleDeleteAll} 
+        onMoveAndDelete={() => {handleMoveAndDelete(id!)}} 
+      />
+      }
   </Layout>
 );
 };

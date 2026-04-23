@@ -10,7 +10,7 @@ import { editCardAtom } from "../store/atoms/editcard";
 import { loadingAtom } from "../store/atoms/loading";
 import { hideIconAtom } from "../store/atoms/hideIcons";
 import { handleError } from "../utils/handleError";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { sectionsAtom } from "../store/atoms/sections";
 import { secitonCardsAtom } from "../store/atoms/sectionCards";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -40,6 +40,22 @@ const Card = (props: Iprops) => {
   const sections = useRecoilValue(sectionsAtom);
   const setSectionCards = useSetRecoilState(secitonCardsAtom);
   const sectionCards = useRecoilValue(secitonCardsAtom);
+  const sheetRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (sheetRef.current && !sheetRef.current.contains(e.target as Node)) {
+        setSheet(false);
+        setShowSections(false);
+      }
+    };
+
+    if (sheet) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [sheet]);
 
   const handleEdit = async () => {
     const findCard = allCards.find((item) => item._id === props.id);
@@ -117,7 +133,7 @@ const Card = (props: Iprops) => {
   };
 
   return (
-  <div className="group relative bg-white/70 dark:bg-neutral-900 border border-black/20 dark:border-white/[0.08] rounded-2xl p-5 overflow-hidden hover:border-black/25 dark:hover:border-white/[0.15] transition-all duration-300">
+  <div className="group relative bg-white/70 dark:bg-neutral-900 border border-black/20 dark:border-white/[0.08] rounded-2xl p-5 hover:border-black/25 dark:hover:border-white/[0.15] transition-all duration-300">
 
     <div className="absolute top-0 right-0 w-16 h-16 border-t border-r border-black/8 dark:border-white/[0.06] rounded-bl-2xl" />
 
@@ -147,6 +163,7 @@ const Card = (props: Iprops) => {
 
           {sheet && (
             <div
+              ref={sheetRef}
               className="absolute right-0 mt-2 w-40 bg-white dark:bg-neutral-900 border border-black/[0.08] dark:border-white/[0.08] rounded-lg shadow-xl z-20 text-sm text-neutral-700 dark:text-neutral-200"
               onMouseLeave={() => {
                 setSheet(false);
@@ -178,7 +195,16 @@ const Card = (props: Iprops) => {
                     ← Back
                   </button>
 
-                  {sections.map((section) => (
+                  {sections.length === 0 ? (
+                      <div className="px-3 py-3 text-center">
+                        <p className="text-[11px] text-neutral-400 dark:text-neutral-500">
+                          No sections yet
+                        </p>
+                        <p className="text-[11px] text-neutral-400 dark:text-neutral-500 mt-0.5">
+                          Create one in the Sections panel
+                        </p>
+                      </div>
+                    ) : (sections.map((section) => (
                     <button
                       key={section.id}
                       onClick={() => handleMove(section.id, props.id, section.label)}
@@ -186,7 +212,7 @@ const Card = (props: Iprops) => {
                     >
                       {section.label}
                     </button>
-                  ))}
+                  )))}
                 </>
               )}
             </div>

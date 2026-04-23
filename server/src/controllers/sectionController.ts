@@ -166,11 +166,16 @@ export const fetchSectionCardsbyId = async(req:Request,res:Response) => {
         handleMessage(res,400,"Section Id is required")
     }
     try{
+        const findSectionName = await Section.findById(sectionId);
+        if(!findSectionName) {
+            handleMessage(res,400,"section id not found");
+        }
+
+
         const findSectionCards = await Content.find({
             sectionId,
             userId
         })
-        console.log(findSectionCards.length);
         const parseInformation = findSectionCards.map((card) => {
             return {
                 id:card._id,
@@ -187,6 +192,7 @@ export const fetchSectionCardsbyId = async(req:Request,res:Response) => {
         
         handleMessage(res,200,{
             message:"fetched section cards succesfully",
+            sectionname:findSectionName?.name,
             cards:parseInformation
         })
     }catch(err) {

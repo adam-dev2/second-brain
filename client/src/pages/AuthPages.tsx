@@ -72,7 +72,7 @@ const AuthPages = () => {
         setIsLogin(true);
       } else {
         await login({ email: formData.email, password: formData.password });
-        toast.success("Login successful!");
+        // toast.success("Login successful!");
         navigate("/home/dashboard");
       }
     } catch (err) {

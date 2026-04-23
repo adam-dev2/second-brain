@@ -64,7 +64,7 @@ const Tags = () => {
           },
         });
         setAllCards(res.data.cards);
-        toast.success("Fetched all cards successfully");
+        // toast.success("Fetched all cards successfully");
       } catch (err) {
         console.error(err);
         toast.error("Failed to fetch cards");

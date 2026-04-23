@@ -8,6 +8,8 @@ import { handleError } from "../utils/handleError";
 import Cookies from "js-cookie";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { sectionsAtom } from "../store/atoms/sections";
+import DeleteConfirmation from "./DeletConfirmation";
+import { deleteSectionAtom } from "../store/atoms/deleteSection";
 
 interface Section {
   id: string;
@@ -29,7 +31,8 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
   const setSections = useSetRecoilState(sectionsAtom);
   const sections = useRecoilValue(sectionsAtom);
   const inputRef = useRef<HTMLInputElement>(null);
-  const location = useLocation(); // ✅ added
+  const location = useLocation();
+  const setDeleteSection = useSetRecoilState(deleteSectionAtom)
 
   useEffect(() => {
     if (adding) {
@@ -230,14 +233,17 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
                           <div className="flex items-center gap-2">
                             <Hash
                               size={12}
-                              className={isActive ? "text-white" : "text-neutral-500"} // ✅ was text-black
+                              className={isActive ? "text-white" : "text-neutral-500"} 
                             />
                             <span className="truncate">{section.label}</span>
                           </div>
                           <Trash2
                             size={14}
                             className="text-red-400 hover:text-red-500 transition-colors"
-                            onClick={(e) => handleDelete(e, section.id)} // ✅ passes event
+                            onClick={(e) => {
+                              // handleDelete(e, section.id)
+                              setDeleteSection(true)
+                            }}
                           />
                         </div>
                       ) : (

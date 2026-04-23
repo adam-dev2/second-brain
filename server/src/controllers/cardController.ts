@@ -417,7 +417,7 @@ export const FetchAllCards = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
     const page = Math.max(1, parseInt(req.query.page as string) || 1);
-    const limit = Math.max(1, parseInt(req.query.limit as string) || 10);
+    const limit = Math.max(1, parseInt(req.query.limit as string) || 9);
     
     const maxLimit = 100;
     const finalLimit = Math.min(limit, maxLimit);
