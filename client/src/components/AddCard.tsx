@@ -12,6 +12,7 @@ import { loadingAtom } from "../store/atoms/loading";
 import Loading from "./Loading";
 import { handleError } from "../utils/handleError";
 import { secitonCardsAtom } from "../store/atoms/sectionCards";
+import ScrapingToggle from "./ScrapingToggle";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface Iprops {
@@ -286,8 +287,7 @@ const AddCard = (props:Iprops) => {
             </div>
 
             {/* Share Toggle */}
-            <div className="flex items-center justify-between px-1">
-              <span className="text-neutral-500 dark:text-neutral-400 text-sm">Visibility</span>
+            <div className="flex items-center justify-end px-1">
               <button
                 type="button"
                 onClick={() => setFormData((prev) => ({ ...prev, share: !prev.share }))}
@@ -332,7 +332,7 @@ const AddCard = (props:Iprops) => {
         </div>
       </div>
     )}
-  </div>
+  </div>  
 );
 };
 

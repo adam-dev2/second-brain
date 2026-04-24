@@ -28,14 +28,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authenticated, setAuthenticated] = useState(false);
 
   const verifyUser = async () => {
-    const token = Cookies.get('token');
-    
     try {
-      const res = await axios.get(`${backendUrl}/api/v1/me`, {
-        withCredentials: true,
-        headers:{
-          Authorization:`Bearer ${token}`
-        }
+      const res = await axios.get(`${backendUrl}/api/v1/auth/me`, {
+        withCredentials: true
       });
       setAuthenticated(true);
       setUser(res.data.user);

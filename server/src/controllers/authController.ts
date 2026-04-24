@@ -96,7 +96,7 @@ export const LoginController = async (req: Request, res: Response) => {
     const cookieOptions: CookieOptions = {
       httpOnly: true,
       secure: isProduction,
-      maxAge: 60 * 60 * 1000,
+      maxAge: 7 * 60 * 60 * 1000,
       sameSite: isProduction ? 'lax' : 'lax',  
       path: "/",
       ...(isProduction && { domain: ".madebyadam.xyz" }),

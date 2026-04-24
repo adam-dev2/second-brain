@@ -1,5 +1,5 @@
 import express from 'express'
-import { createSection, deleteSectionById,  fetchSectionCardsbyId, getSections, singleCardMove, updateSectionbyId } from '../controllers/sectionController.js';
+import { createSection, deleteSectionById,  deleteSectionWithCards,  fetchSectionCardsbyId, getSections, singleCardMove, updateSectionbyId } from '../controllers/sectionController.js';
 import { AuthMiddleware } from '../middlewares/auth.js';
 
 const router = express.Router();
@@ -10,6 +10,7 @@ router.get('/',getSections);
 router.post('/',createSection);
 router.get('/:id',fetchSectionCardsbyId);
 router.patch('/:id',updateSectionbyId);
+router.delete('/delete-all',deleteSectionWithCards)
 router.delete('/:id',deleteSectionById);
 router.post('/move-card',singleCardMove);
 

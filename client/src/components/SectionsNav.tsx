@@ -51,9 +51,6 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
             "Content-Type": "application/json",
           },
         });
-        if (res.data.sections.length === 0) {
-          toast.success("No Sections Available");
-        }
         setSections(res.data.sections);
       } catch (err) {
         handleError(err, "Error while fetching sections");

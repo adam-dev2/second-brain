@@ -1,5 +1,5 @@
 import React, { useState, type FormEvent } from "react";
-import { Mail, Lock, User, ArrowRight, EyeOff, Eye, Zap } from "lucide-react";
+import { Mail, Lock, User, ArrowRight, EyeOff, Eye } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";

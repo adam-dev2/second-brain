@@ -70,7 +70,7 @@ const ResetPassword = () => {
   return (
     <>
       <div className="min-h-screen bg-linear-to-br from-gray-600 via-zinc-600 to-gray-700 flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden">
+        <div className="w-full max-w-md bg-black rounded-3xl shadow-2xl overflow-hidden">
           <div className="p-8">
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">

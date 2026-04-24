@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { Section } from "../models/Section.js";
 import { ObjectId } from "mongoose";
 import Content from "../models/Content.js";
+import { DeleteCard } from "./cardController.js";
 
 
 const handleError = (res:Response,err:any) => {
@@ -197,5 +198,29 @@ export const fetchSectionCardsbyId = async(req:Request,res:Response) => {
         })
     }catch(err) {
         handleError(res,err)
+    }
+}
+
+const deleteCard = async(userId:string,cardId:string) => {
+    return Content.findOneAndDelete({_id:cardId,userId})
+}
+
+export const deleteSectionWithCards = async(req:Request,res:Response) => {
+    const {sectionId,cardIds} = req.body;
+    const userId = req.user?.id!
+    if(!sectionId || cardIds.length === 0) {
+        handleMessage(res,400,"Both SectionId and CardId's are required");
+    }
+    try {
+        const findSectionandDelete = await Section.findByIdAndDelete(sectionId);
+        if(!findSectionandDelete) {
+            handleMessage(res,404,'Section with this ID not found');
+        }
+
+        await Promise.all(
+            cardIds.map((cardId: string) => deleteCard(userId, cardId))
+        )
+    }catch(err) {
+        handleError(res,err);
     }
 }

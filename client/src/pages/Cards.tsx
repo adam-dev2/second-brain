@@ -66,7 +66,7 @@ const Cards = () => {
 
   const processingToastId = useRef<string | undefined>(undefined)
   useEffect(() => {
-    const es = new EventSource(`${backendUrl}/events`, { withCredentials: true });
+    const es = new EventSource(`${backendUrl}/api/v1/events`, { withCredentials: true });
     es.addEventListener("startCardProcessing", (e) => {
       const data = JSON.parse(e.data);
       processingToastId.current = toast.loading(`${data.message}`, { position: "top-right" });

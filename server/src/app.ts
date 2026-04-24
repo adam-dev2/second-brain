@@ -13,7 +13,6 @@ import brainRoutes from "./routes/brainRoutes.js";
 import sectionRoutes from "./routes/sectionRoutes.js"
 import eventRoutes from "./routes/eventRoutes.js";
 import cookieParser from "cookie-parser";
-import { verifyUserController } from "./controllers/verifyUserController.js";
 
 const app = express();
 
@@ -40,8 +39,7 @@ app.use(passport.initialize());
 
 app.get("/api/v1/health", (req, res) => res.json({ status: "ok" }));
 
-app.use(eventRoutes);
-app.use('/api/v1/me',verifyUserController);
+app.use("/api/v1/events",eventRoutes);
 app.use("/api/v1/auth", oauthRoutes);
 app.use("/api/v1/content", cardRoutes);
 app.use("/api/v1/user", userRoutes);

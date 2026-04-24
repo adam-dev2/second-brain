@@ -15,7 +15,7 @@ import { sharelink } from "../store/atoms/sharelink";
 import { hideIconAtom } from "../store/atoms/hideIcons";
 import { handleError } from "../utils/handleError";
 import CardSkeleton from "../components/CardSkeleton";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { secitonCardsAtom } from "../store/atoms/sectionCards";
 import Layout from "../layouts/Layout";
 import DeleteConfirmation from "../components/DeletConfirmation";
@@ -42,8 +42,10 @@ const Section = () => {
   const setSectionCards = useSetRecoilState(secitonCardsAtom);
   const processingToastId = useRef<string | undefined>(undefined);
   const deleteSection = useRecoilValue(deleteSectionAtom);
+  const sections = useRecoilValue(sectionsAtom)
   const setSections = useSetRecoilState(sectionsAtom)
-  const setDeleteSection = useSetRecoilState(deleteSectionAtom)
+  const setDeleteSection = useSetRecoilState(deleteSectionAtom);
+  const navigate = useNavigate();
 
   
 
@@ -51,7 +53,7 @@ const Section = () => {
     setModal((prev) => !prev);
   };
   useEffect(() => {
-    const es = new EventSource(`${backendUrl}/events`, {
+    const es = new EventSource(`${backendUrl}/api/v1/events`, {
       withCredentials: true,
     });
 
@@ -98,7 +100,6 @@ const Section = () => {
         });
         setSectionCards(res.data.cards)
         sectionNameRef.current = res.data.sectionname
-        // toast.success("Fetched all cards successfully");
       } catch (err) {
         console.error(err);
         toast.error("Failed to fetch cards");
@@ -156,9 +157,7 @@ const Section = () => {
 
   }
 
-  const handleMoveAndDelete = async (e: React.MouseEvent,sectionId:string) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleMoveAndDelete = async (sectionId:string) => {
     const token = Cookies.get("token");
     setLoading(true);
     if(!sectionId) {
@@ -176,9 +175,19 @@ const Section = () => {
           },
         }
       );
+      handleOnClose()
       console.log(response.data.message);
-      toast.success("Deleted successfully");
-      setSections((prev) => prev.filter((section) => section.id !== sectionId));
+      const updatedSections = sections.filter((section) => {
+        if(section.id != sectionId) {
+          return section
+        }
+      })
+      setSections(updatedSections);
+      if(updatedSections.length === 0) {
+        return navigate('/home/dashboard')
+      }
+      const targetSectionPath = updatedSections[updatedSections.length - 1].path
+      navigate(`${targetSectionPath}`)
     }catch (err: unknown) {
       handleError(err, "Error while sharing brain");
       throw err;
