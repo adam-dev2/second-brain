@@ -214,7 +214,7 @@ const Cards = () => {
           {Array.isArray(allCards) &&
             allCards.map((item, idx) => (
               <Card
-                key={idx}
+                key={item._id}
                 title={item.title}
                 link={item.link}
                 tags={item.tags}

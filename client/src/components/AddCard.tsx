@@ -121,7 +121,7 @@ const AddCard = (props:Iprops) => {
         button: "Save Card",
       });
       setSectionCards((prev) =>[...prev, response.data.card])
-      setModal(!modal);
+      setModal(prev => !prev);
     } catch (err: unknown) {
       console.log(err);
       handleError(err, "Failed to Save card");
