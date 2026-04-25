@@ -59,12 +59,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    await axios.post(
+    const res = await axios.post(
       `${backendUrl}/api/v1/auth/logout`,
       {},
       { withCredentials: true }
     );
-
+    if(res.status != 200 ) {
+      navigate('/auth')
+    }
     setAuthenticated(false);
     setUser(null);
   };
