@@ -87,7 +87,10 @@ const AddCard = (props:Iprops) => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const token = Cookies.get("token");
-    setLoading(true);
+    // setLoading(true);
+    if(!formData.title || !formData.link || !formData.tags || !formData.share){
+      return toast.error('all fields are required')
+    }
     try {
       const response = await axios.post(
         `${backendUrl}/api/v1/content/card`,
@@ -121,7 +124,7 @@ const AddCard = (props:Iprops) => {
         button: "Save Card",
       });
       setSectionCards((prev) =>[...prev, response.data.card])
-      setModal(prev => !prev);
+      setModal(!modal);
     } catch (err: unknown) {
       console.log(err);
       handleError(err, "Failed to Save card");
@@ -134,6 +137,7 @@ const AddCard = (props:Iprops) => {
     e.preventDefault();
     const token = Cookies.get("token");
     setLoading(true);
+    
     try {
       const response = await axios.put(
         `${backendUrl}/api/v1/content/editCard/${editCardId}`,
