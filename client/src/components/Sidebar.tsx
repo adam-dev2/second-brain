@@ -68,8 +68,7 @@ const Sidebar = () => {
     { path: "/home/dashboard", label: "Dashboard", icon: LayoutDashboard },
     { path: "/home/cards", label: "Cards", icon: FileStack },
     { path: "/home/tags", label: "Tags", icon: Tags },
-    { path: "/home/search", label: "Search", icon: Search },
-    { path: "/home/profile", label: "Profile", icon: UserRoundPen },
+    { path: "/home/search", label: "Search", icon: Search }
   ];
 
  return (

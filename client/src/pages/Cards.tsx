@@ -105,7 +105,7 @@ const Cards = () => {
       toast.error("Failed to fetch cards");
     } finally {
       const elapsed = Date.now() - loadStartTime.current;
-      const remaining = Math.max(0, 2000 - elapsed);
+      const remaining = Math.max(0, 1000 - elapsed);
       setTimeout(() => {
         setLoading(false);
       }, remaining);
@@ -146,7 +146,8 @@ const Cards = () => {
       });
       // toast.success("Shareable Link generated");
       setSearchModal(true);
-      setShareLink(`https://secondbrain.madebyadam.xyz/${res.data.ShareableLink}`);
+      const baseUrl = window.location.origin;
+      setShareLink(`${baseUrl}/${res.data.ShareableLink}`);
     } catch (err: unknown) {
       handleError(err, "Error while sharing brain");
       throw err;

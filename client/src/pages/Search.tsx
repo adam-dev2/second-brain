@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { sidebarAtom } from "../store/atoms/sidebar";
 import { hideIconAtom } from "../store/atoms/hideIcons";
-import { Search as SearchIcon, ExternalLink, Lock, Globe } from "lucide-react";
+import { Search as SearchIcon } from "lucide-react";
 import { handleError } from "../utils/handleError";
 import SearchResultsSkeleton from "../components/SearchResultsSkeleton";
 import Layout from "../layouts/Layout";

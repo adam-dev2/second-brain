@@ -8,7 +8,6 @@ import { handleError } from "../utils/handleError";
 import Cookies from "js-cookie";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { sectionsAtom } from "../store/atoms/sections";
-import DeleteConfirmation from "./DeletConfirmation";
 import { deleteSectionAtom } from "../store/atoms/deleteSection";
 
 interface Section {
@@ -57,30 +56,11 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
       }
     };
     fetchSections();
-  }, [setSections]); // ✅ fixed dep array
+  }, [setSections]);
 
-  const handleDelete = async (e: React.MouseEvent, sectionId: string) => {
-    e.preventDefault();
-    e.stopPropagation(); // ✅ prevents NavLink navigation on delete click
-    const token = Cookies.get("token");
-    try {
-      const response = await axios.delete(
-        `${backendUrl}/api/v1/section/${sectionId}`,
-        {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log(response.data.message);
-      toast.success("Deleted successfully");
-      setSections((prev) => prev.filter((section) => section.id !== sectionId));
-    } catch (err) {
-      handleError(err, "Error while deleting section");
-    }
-  };
+  const handleDelete = () => {
+    setDeleteSection(true)
+  }
 
   const handleAddClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -237,10 +217,7 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
                           <Trash2
                             size={14}
                             className="text-red-400 hover:text-red-500 transition-colors"
-                            onClick={(e) => {
-                              // handleDelete(e, section.id)
-                              setDeleteSection(true)
-                            }}
+                            onClick={handleDelete}
                           />
                         </div>
                       ) : (

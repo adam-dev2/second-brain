@@ -1,28 +1,18 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import LoadingOverlay from "./Loading";
-import { useEffect } from "react";
-
 
 const Protected = () => {
-  const { loading, authenticated,verifyUser } = useAuth();
-  useEffect(() => {
-    verifyUser();
-  },[]);
-
-  const publicPaths = [
-    "/auth/google/callback",
-    "/auth/github/callback",
-    "/auth"
-  ];
-
-  if (publicPaths.includes(location.pathname)) {
-    return <Outlet />;
-  }
+  const { loading, authenticated } = useAuth();
+  const location = useLocation();
 
   if (loading) return <LoadingOverlay />;
 
-  return authenticated ? <Outlet /> : <Navigate to="/auth" replace />;
+  if (!authenticated) {
+    return <Navigate to="/auth" state={{ from: location }} replace />;
+  }
+
+  return <Outlet />;
 };
 
 export default Protected;

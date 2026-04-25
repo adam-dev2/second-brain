@@ -12,7 +12,6 @@ import { loadingAtom } from "../store/atoms/loading";
 import Loading from "./Loading";
 import { handleError } from "../utils/handleError";
 import { secitonCardsAtom } from "../store/atoms/sectionCards";
-import ScrapingToggle from "./ScrapingToggle";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface Iprops {
@@ -33,7 +32,7 @@ const AddCard = (props:Iprops) => {
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
   const setSectionCards = useSetRecoilState(secitonCardsAtom)
-  const [toggleScrapping,setToggleScrapping] = useState(false);
+  // const [toggleScrapping,setToggleScrapping] = useState(false);
 
   useEffect(() => {
     if (formData.link) {
@@ -144,7 +143,7 @@ const AddCard = (props:Iprops) => {
           tags: formData.tags,
           share: formData.share,
           type: domainName,
-          scrape:toggleScrapping
+          // scrape:toggleScrapping
         },
         {
           withCredentials: true,

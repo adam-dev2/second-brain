@@ -23,6 +23,16 @@ import { deleteSectionAtom } from "../store/atoms/deleteSection";
 import { sectionsAtom } from "../store/atoms/sections";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
+interface ISectionCard {
+  id: string;
+  title: string;
+  link: string;
+  tags: string[];
+  share: boolean;
+  sectionId:string,
+  createdAt: string;
+  updatedAt: string;
+}
 
 const Section = () => {
   const setShareLink = useSetRecoilState(sharelink);
@@ -44,7 +54,8 @@ const Section = () => {
   const deleteSection = useRecoilValue(deleteSectionAtom);
   const sections = useRecoilValue(sectionsAtom)
   const setSections = useSetRecoilState(sectionsAtom)
-  const setDeleteSection = useSetRecoilState(deleteSectionAtom);
+  const setDeleteSection = useSetRecoilState(deleteSectionAtom)
+  const [cacheSectionCards, setCacheSectionCards] = useState<ISectionCard[]>([]);
   const navigate = useNavigate();
 
   
@@ -53,7 +64,10 @@ const Section = () => {
     setModal((prev) => !prev);
   };
   useEffect(() => {
-    const es = new EventSource(`${backendUrl}/api/v1/events`, {
+    setCacheSectionCards(sectionCards);
+  }, [sectionCards]);
+  useEffect(() => {
+    const es = new EventSource(`${backendUrl}/events`, {
       withCredentials: true,
     });
 
@@ -84,12 +98,15 @@ const Section = () => {
     return () => es.close();
   },[]);
   useEffect(() => {
-    console.log(searchModal);
     setHideIcons(true);
     const token = Cookies.get("token");
     const fetchCards = async () => {
       setLoading(true);
       loadStartTime.current = Date.now();
+      
+      if(!sections.some(section => section.id === id)) {
+        return navigate('/home/dashboard')
+      }
       try {
         const res = await axios.get(`${backendUrl}/api/v1/section/${id}`, {
           withCredentials: true,
@@ -114,18 +131,21 @@ const Section = () => {
     fetchCards();
   }, [id]);
 
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearch(value);
-    console.log(value.length, value.trim() !== "");
-    if (value.trim() !== "") {
-      const filtered = sectionCards.filter((item) =>
-        item.title.toLowerCase().includes(value.toLowerCase())
-      );
-      setSectionCards(filtered);
-    } else {
-      setSectionCards(sectionCards);
+
+    if (value.trim() === "") {
+      setCacheSectionCards(sectionCards); 
+      return;
     }
+
+    const filtered = sectionCards.filter((item) =>
+      item.title.toLowerCase().includes(value.toLowerCase())
+    );
+
+    setCacheSectionCards(filtered);
   };
 
   const handleShare = async () => {
@@ -177,22 +197,28 @@ const Section = () => {
       );
       handleOnClose()
       console.log(response.data.message);
-      const updatedSections = sections.filter((section) => {
-        if(section.id != sectionId) {
-          return section
-        }
-      })
-      setSections(updatedSections);
-      if(updatedSections.length === 0) {
-        return navigate('/home/dashboard')
-      }
-      const targetSectionPath = updatedSections[updatedSections.length - 1].path
-      navigate(`${targetSectionPath}`)
+      toast.success("Deleted successfully");
+      const updatedSections = sections.filter(
+      (section) => section.id !== sectionId
+    );
+    setSections(updatedSections);
+    if (updatedSections.length === 0) {
+      navigate("/home/dashboard");
+      return;
+    }
+    const currentIndex = sections.findIndex(
+      (section) => section.id === sectionId
+    );
+    const targetIndex = currentIndex > 0 ? currentIndex - 1 : 0;
+    const targetSection = updatedSections[targetIndex];
+
+    navigate(targetSection.path);
     }catch (err: unknown) {
       handleError(err, "Error while sharing brain");
       throw err;
     } finally {
       setLoading(false);
+      handleOnClose();
     }
   }
 
@@ -252,8 +278,8 @@ const Section = () => {
             : "md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-1"
         }`}
       >
-        {Array.isArray(sectionCards) &&
-          sectionCards.map((item, idx) => (
+        {Array.isArray(cacheSectionCards) &&
+          cacheSectionCards.map((item, idx) => (
             <Card
               key={idx}
               title={item.title}
@@ -272,7 +298,7 @@ const Section = () => {
       {searchModal && <ShareModal />}
 
       {/* EMPTY STATE */}
-      {sectionCards.length === 0 && (
+      {cacheSectionCards.length === 0 && (
         <p className="text-neutral-500 text-sm text-center py-10">
           No cards yet. Create your first card!
         </p>

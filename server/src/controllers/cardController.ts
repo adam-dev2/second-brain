@@ -220,21 +220,6 @@ export const createCard = async (req: Request, res: Response) => {
           error: message,
         });
       });
-
-      const parseInformation = {
-          id:newCard._id,
-          title:newCard.title,
-          link:newCard.link,
-          tags:newCard.tags,
-          share:newCard.share,
-          sectionId:newCard.sectionId,
-          createdAt:newCard.createdAt,
-          updatedAt:newCard.updatedAt
-      }
-    return res.status(201).json({
-      message: "Card created successfully (processing in background)",
-      card: parseInformation,
-    });
   } catch (err: unknown) {
     if (err instanceof Error) {
       console.error("Error creating card:", err);
