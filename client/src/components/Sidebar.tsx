@@ -7,7 +7,6 @@ import {
   FileStack,
   Tags,
   Search,
-  UserRoundPen,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRecoilValue, useSetRecoilState } from "recoil";
