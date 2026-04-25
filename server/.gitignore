@@ -3,3 +3,8 @@ node_modules
 /dist
 __tests__
 jest.config.cjs
+
+src/config/redis.ts
+src/queues/
+src/services/agenda.ts
+src/workers/
