@@ -21,17 +21,6 @@ import Layout from "../layouts/Layout";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-interface IOrgCard {
-  _id: string;
-  title: string;
-  link: string;
-  tags: string[];
-  share: boolean;
-  type: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 interface PaginationMeta {
   totalCards: number;
   totalPages: number;
@@ -50,11 +39,11 @@ const Cards = () => {
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
   const [search, setSearch] = useState("");
-  const [originalCards, setOriginalCards] = useState<IOrgCard[]>([]);
   const isOpen = useRecoilValue(sidebarAtom);
   const searchModal = useRecoilValue(searchModalAtom);
   const setSearchModal = useSetRecoilState(searchModalAtom);
   const setHideIcons = useSetRecoilState(hideIconAtom);
+  const [debouncedSearch,setDebouncedSearch] = useState("");
   
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -82,58 +71,60 @@ const Cards = () => {
     return () => es.close();
   },[]);
 
-  const fetchCards = async (page: number) => {
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+      setCurrentPage(1); // reset page on new search
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  const fetchCards = async (page: number, searchQuery = "") => {
     setHideIcons(true);
     const token = Cookies.get("token");
     setLoading(true);
     loadStartTime.current = Date.now();
+
     try {
       const res = await axios.get(`${backendUrl}/api/v1/content/cards`, {
-        params: { page, limit: 9 }, // ← pass page & limit as query params
+        params: { 
+          page, 
+          limit: 9,
+          search: searchQuery
+        },
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
+
       setAllCards(res.data.cards);
-      setOriginalCards(res.data.cards);
-      setPagination(res.data.pagination); // ← store pagination meta
-      // toast.success("Fetched all cards successfully");
+      setPagination(res.data.pagination);
+
     } catch (err) {
       console.error(err);
       toast.error("Failed to fetch cards");
     } finally {
       const elapsed = Date.now() - loadStartTime.current;
       const remaining = Math.max(0, 1000 - elapsed);
-      setTimeout(() => {
-        setLoading(false);
-      }, remaining);
+      setTimeout(() => setLoading(false), remaining);
     }
   };
 
-  // ← re-fetch whenever currentPage changes
   useEffect(() => {
-    fetchCards(currentPage);
-  }, [currentPage]);
+    fetchCards(currentPage, debouncedSearch);
+  }, [currentPage, debouncedSearch]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
-    setSearch(""); // clear search on page change
+    setSearch("");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearch(value);
-    if (value.trim() !== "") {
-      const filtered = originalCards.filter((item) =>
-        item.title.toLowerCase().includes(value.toLowerCase())
-      );
-      setAllCards(filtered);
-    } else {
-      setAllCards(originalCards);
-    }
+    setSearch(e.target.value);
   };
 
   const handleShare = async () => {
@@ -175,7 +166,7 @@ const Cards = () => {
               <input
                 value={search}
                 type="text"
-                className="w-full dark:bg-neutral-900 bg-white/60 border dark:border-white/[0.08] border-black/20 rounded-xl px-4 py-2 text-sm outline-none placeholder:text-neutral-500 dark:focus:border-white/20 focus:border-black/20 transition"
+                className="w-full dark:bg-neutral-900 bg-white/60 border dark:border-white/8 border-black/20 rounded-xl px-4 py-2 text-sm outline-none placeholder:text-neutral-500 dark:focus:border-white/20 focus:border-black/20 transition"
                 placeholder="Search cards..."
                 onChange={handleSearch}
               />
@@ -227,7 +218,7 @@ const Cards = () => {
         </div>
 
         {/* PAGINATION */}
-        {pagination && !search && (
+        {pagination && (
           <div className="mt-6">
             <Pagination
               currentPage={pagination.currentPage}

@@ -88,7 +88,7 @@ const AddCard = (props:Iprops) => {
     e.preventDefault();
     const token = Cookies.get("token");
     // setLoading(true);
-    if(!formData.title || !formData.link || !formData.tags || !formData.share){
+    if(!formData.title || !formData.link || !formData.tags){
       return toast.error('all fields are required')
     }
     try {
@@ -124,7 +124,7 @@ const AddCard = (props:Iprops) => {
         button: "Save Card",
       });
       setSectionCards((prev) =>[...prev, response.data.card])
-      setModal(!modal);
+      setModal((prev) => !prev);
     } catch (err: unknown) {
       console.log(err);
       handleError(err, "Failed to Save card");
@@ -315,22 +315,6 @@ const AddCard = (props:Iprops) => {
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
 
-            {/* Tip */}
-            <div className="bg-neutral-100 dark:bg-neutral-800 border border-black/[0.08] dark:border-white/10 rounded-xl p-4 text-sm text-neutral-500 dark:text-neutral-400 flex items-start gap-2">
-              <span className="text-base">💡</span>
-              <p>
-                <span className="font-medium text-neutral-700 dark:text-neutral-300">Tip:</span>{" "}
-                Use a descriptive name — it improves{" "}
-                <span className="font-semibold text-neutral-800 dark:text-neutral-200">
-                  search accuracy
-                </span>{" "}
-                when using{" "}
-                <span className="font-semibold text-neutral-800 dark:text-neutral-200">
-                  Elasticsearch
-                </span>
-                .
-              </p>
-            </div>
           </form>
         </div>
       </div>

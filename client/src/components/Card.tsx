@@ -43,19 +43,30 @@ const Card = (props: Iprops) => {
   const sheetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (sheetRef.current && !sheetRef.current.contains(e.target as Node)) {
-        setSheet(false);
-        setShowSections(false);
-      }
-    };
-
-    if (sheet) {
-      document.addEventListener("mousedown", handleClickOutside);
+  const handleClickOutside = (e: MouseEvent) => {
+    if (sheetRef.current && !sheetRef.current.contains(e.target as Node)) {
+      setSheet(false);
+      setShowSections(false);
     }
+  };
 
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [sheet]);
+  const handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Escape") {
+      setSheet(false);
+      setShowSections(false);
+    }
+  };
+
+  if (sheet) {
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+  }
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+    document.removeEventListener("keydown", handleKeyDown);
+  };
+}, [sheet]);
 
   const handleEdit = async () => {
     const findCard = allCards.find((item) => item._id === props.id);
@@ -165,10 +176,6 @@ const Card = (props: Iprops) => {
             <div
               ref={sheetRef}
               className="absolute right-0 mt-2 w-40 bg-white dark:bg-neutral-900 border border-black/[0.08] dark:border-white/[0.08] rounded-lg shadow-xl z-20 text-sm text-neutral-700 dark:text-neutral-200"
-              onMouseLeave={() => {
-                setSheet(false);
-                setShowSections(false);
-              }}
             >
               {!showSections ? (
                 <>

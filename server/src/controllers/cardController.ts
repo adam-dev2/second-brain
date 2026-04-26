@@ -166,6 +166,7 @@ export const FetchMetrics = async (req: Request, res: Response) => {
   }
 };
 
+
 export const createCard = async (req: Request, res: Response) => {
   const { link, title, type, share, tags = [],sectionId=null } = req.body;
 
@@ -403,19 +404,31 @@ export const FetchAllCards = async (req: Request, res: Response) => {
     }
     const page = Math.max(1, parseInt(req.query.page as string) || 1);
     const limit = Math.max(1, parseInt(req.query.limit as string) || 9);
+    const search = (req.query.search as string).trim();
     
     const maxLimit = 100;
     const finalLimit = Math.min(limit, maxLimit);
     const skip = (page - 1) * finalLimit;
+    const query:any = {
+      userId:userID
+    }
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { link: { $regex: search, $options: "i" } },
+        { type: { $regex: search, $options: "i" } }
+      ];
+    }
 
     const [cards, totalCards] = await Promise.all([
-      Content.find({ userId: userID })
+      Content.find(query)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(finalLimit)
         .lean(),
       
-      Content.countDocuments({ userId: userID })
+      Content.countDocuments(query)
     ]);
 
     const totalPages = Math.ceil(totalCards / finalLimit);
