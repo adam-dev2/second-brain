@@ -18,8 +18,6 @@ import CardSkeleton from "../components/CardSkeleton";
 import { useNavigate, useParams } from "react-router-dom";
 import { secitonCardsAtom } from "../store/atoms/sectionCards";
 import Layout from "../layouts/Layout";
-import DeleteConfirmation from "../components/DeletConfirmation";
-import { deleteSectionAtom } from "../store/atoms/deleteSection";
 import { sectionsAtom } from "../store/atoms/sections";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -51,10 +49,7 @@ const Section = () => {
   const sectionCards = useRecoilValue(secitonCardsAtom);
   const setSectionCards = useSetRecoilState(secitonCardsAtom);
   const processingToastId = useRef<string | undefined>(undefined);
-  const deleteSection = useRecoilValue(deleteSectionAtom);
   const sections = useRecoilValue(sectionsAtom)
-  const setSections = useSetRecoilState(sectionsAtom)
-  const setDeleteSection = useSetRecoilState(deleteSectionAtom)
   const [cacheSectionCards, setCacheSectionCards] = useState<ISectionCard[]>([]);
   const navigate = useNavigate();
 

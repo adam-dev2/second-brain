@@ -1,6 +1,4 @@
 import { AlertTriangle } from "lucide-react";
-import { useRecoilValue } from "recoil";
-import { deleteSectionAtom } from "../store/atoms/deleteSection";
 
 interface Props {
   onClose: () => void;
@@ -9,7 +7,6 @@ interface Props {
 }
 
 const DeleteConfirmation = ({onClose, onDeleteAll, onMoveAndDelete}: Props) => {
-  const deleteSection = useRecoilValue(deleteSectionAtom);
   
   
   return (
