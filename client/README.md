@@ -1,102 +1,890 @@
-# Client (Frontend) - Second Brain
+# Second Brain Client (Frontend)
 
-A React + TypeScript + Vite application for managing and organizing your personal knowledge base with AI-powered semantic search capabilities.
+A modern, responsive React-based frontend application for managing personal knowledge bases with AI-powered semantic search capabilities. This client provides a user-friendly interface to organize, search, and share digital content like articles, videos, tweets, and documents.
 
-## 📋 Quick Navigation
+## 📋 Table of Contents
 
-- [Folder Structure](#-folder-structure)
+- [Project Overview](#-project-overview)
+- [Features](#-features)
 - [Tech Stack](#-tech-stack)
-- [Architecture Overview](#-architecture-overview)
-- [API Integration](#-api-integration)
+- [Prerequisites](#-prerequisites)
+- [Installation & Setup](#-installation--setup)
+- [Available Scripts](#-available-scripts)
+- [Project Structure](#-project-structure)
+- [Architecture](#-architecture)
 - [State Management](#-state-management)
 - [Components](#-components)
-- [Pages/Routes](#-pagesroutes)
-- [Getting Started](#-getting-started)
+- [Pages & Routing](#-pages--routing)
+- [API Integration](#-api-integration)
+- [Styling & UI](#-styling--ui)
+- [Deployment](#-deployment)
+- [Troubleshooting](#-troubleshooting)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ---
 
-## 📁 Folder Structure
+## 🎯 Project Overview
 
-```
-client/
-├── src/
-│   ├── App.tsx                 # Main app router setup
-│   ├── main.tsx                # Entry point (React + Recoil + Router)
-│   ├── index.css               # Global styles
-│   ├── App.css                 # App component styles
-│   │
-│   ├── components/             # Reusable UI components
-│   │   ├── AddCard.tsx         # Modal to add new cards
-│   │   ├── Card.tsx            # Individual card component with edit/delete
-│   │   ├── Loading.tsx         # Loading spinner overlay
-│   │   ├── Protected.tsx       # Route protection wrapper
-│   │   ├── ShareModal.tsx      # Share link generation modal
-│   │   └── Sidebar.tsx         # Navigation sidebar
-│   │
-│   ├── pages/                  # Full page components
-│   │   ├── AuthPages.tsx       # Login/Signup page
-│   │   ├── Cards.tsx           # All cards view with search
-│   │   ├── Dashboard.tsx       # Home dashboard with metrics
-│   │   ├── LandingPage.tsx     # Public landing page
-│   │   ├── Profile.tsx         # User profile management
-│   │   ├── ResetPassword.tsx   # Password reset page
-│   │   ├── Search.tsx          # AI semantic search page
-│   │   ├── Share.tsx           # Public share page view
-│   │   └── Tags.tsx            # Filter cards by tags
-│   │
-│   ├── layouts/
-│   │   └── DashboardLayout.tsx # Main dashboard layout wrapper
-│   │
-│   ├── context/
-│   │   └── AuthContext.tsx     # Authentication context provider
-│   │
-│   ├── store/
-│   │   └── atoms/              # Recoil state management
-│   │       ├── allcards.ts     # All user cards state
-│   │       ├── counter.ts      # Generic counter
-│   │       ├── editcard.ts     # Currently editing card data
-│   │       ├── formData.ts     # Form input data
-│   │       ├── hideIcons.ts    # Toggle icon visibility
-│   │       ├── loading.ts      # Global loading state
-│   │       ├── modal.ts        # Add card modal state
-│   │       ├── resetpassword.ts# Password reset form data
-│   │       ├── search.ts       # Search input state
-│   │       ├── searchModal.ts  # AI search modal state
-│   │       ├── sharelink.ts    # Share link state
-│   │       ├── sidebar.ts      # Sidebar open/close
-│   │       └── signupform.ts   # Signup form data
-│   │
-│   ├── utils/
-│   │   └── handleError.ts      # Centralized error handling
-│   │
-│   ├── assets/                 # Static assets
-│   └── context/
-│
-├── index.html                  # HTML entry point
-├── package.json                # Dependencies & scripts
-├── vite.config.ts             # Vite configuration
-├── tsconfig.json              # TypeScript config
-└── .env                        # Environment variables
-```
+Second Brain is a personal knowledge management application that allows users to save, organize, and retrieve information from various sources. The client-side application provides:
+
+- **Content Management**: Save links, articles, videos, and tweets
+- **AI-Powered Search**: Semantic search using vector embeddings
+- **Organization**: Tag-based categorization and filtering
+- **Sharing**: Public share links for selected content
+- **Real-time Updates**: Live processing status via Server-Sent Events
+- **Responsive Design**: Works seamlessly on desktop and mobile devices
+
+The application follows a modern React architecture with TypeScript, using Recoil for state management and Tailwind CSS for styling.
+
+---
+
+## ✨ Features
+
+### Core Functionality
+- **User Authentication**: Secure login/signup with JWT and Google OAuth
+- **Card Management**: Create, edit, delete, and organize content cards
+- **Semantic Search**: AI-powered search using natural language queries
+- **Tag System**: Organize content with customizable tags
+- **Public Sharing**: Generate shareable links for content collections
+- **Dashboard Analytics**: View usage statistics and trends
+- **Real-time Processing**: Live updates during content processing
+
+### User Experience
+- **Responsive Design**: Optimized for all screen sizes
+- **Dark/Light Theme**: Theme toggle with system preference detection
+- **Loading States**: Smooth loading indicators and skeleton screens
+- **Error Handling**: Comprehensive error messages and recovery
+- **Toast Notifications**: User-friendly feedback for all actions
+- **Keyboard Navigation**: Full keyboard accessibility support
+
+### Technical Features
+- **Type-Safe**: Full TypeScript implementation
+- **Performance Optimized**: Lazy loading, code splitting, and efficient re-renders
+- **SEO Friendly**: Proper meta tags and semantic HTML
+- **PWA Ready**: Service worker and manifest configuration
+- **Cross-browser Compatible**: Tested on modern browsers
 
 ---
 
 ## 🛠 Tech Stack
 
-| Category | Technology |
-|----------|------------|
-| **Framework** | React 18.3 |
-| **Language** | TypeScript |
-| **Build Tool** | Vite |
-| **Styling** | Tailwind CSS + Lucide React icons |
-| **State Management** | Recoil |
-| **Routing** | React Router v7 |
-| **HTTP Client** | Axios |
-| **Auth** | JWT (via cookies) |
-| **Notifications** | React Hot Toast |
-| **Animation** | Motion (Framer Motion alternative) |
+### Core Framework
+- **React 18.3**: Modern React with concurrent features and hooks
+- **TypeScript 5.9**: Type-safe JavaScript with strict configuration
+- **Vite 5.x**: Fast build tool with HMR and optimized bundling
+
+### State Management
+- **Recoil 0.7.7**: Facebook's state management library for React
+- **React Context**: Authentication and theme context providers
+
+### UI & Styling
+- **Tailwind CSS 4.1**: Utility-first CSS framework
+- **Lucide React**: Modern icon library
+- **Motion 12.x**: Animation library for smooth transitions
+- **React Hot Toast**: Toast notification system
+
+### HTTP & Data
+- **Axios 1.12**: HTTP client with interceptors and error handling
+- **JS-Cookie 3.0**: Secure cookie management for authentication
+
+### Development Tools
+- **ESLint 9.x**: Code linting with React and TypeScript rules
+- **Prettier 3.x**: Code formatting
+- **TypeScript ESLint**: TypeScript-specific linting rules
+
+### Build & Deployment
+- **Vite Plugin React**: React-specific Vite optimizations
+- **Vercel**: Deployment platform with automatic builds
 
 ---
+
+## 📋 Prerequisites
+
+Before running the client application, ensure you have:
+
+- **Node.js**: Version 18.x or higher
+- **npm**: Version 8.x or higher (comes with Node.js)
+- **Backend Server**: The Second Brain backend API running (see server README)
+
+### System Requirements
+- **RAM**: Minimum 4GB, recommended 8GB
+- **Storage**: 500MB free space for node_modules
+- **Network**: Internet connection for API calls and dependencies
+
+---
+
+## 🚀 Installation & Setup
+
+### 1. Clone and Navigate
+```bash
+# Navigate to the client directory
+cd client
+```
+
+### 2. Install Dependencies
+```bash
+npm install
+```
+This will install all dependencies listed in `package.json`.
+
+### 3. Environment Configuration
+Create a `.env` file in the client root directory:
+
+```env
+# Backend API URL
+VITE_BACKEND_URL=http://localhost:3000
+
+# For production deployment
+# VITE_BACKEND_URL=https://your-backend-domain.com
+```
+
+**Environment Variables Explained:**
+- `VITE_BACKEND_URL`: The base URL of the Second Brain backend API
+- All Vite environment variables must be prefixed with `VITE_` to be accessible in the client code
+
+### 4. Start Development Server
+```bash
+npm run dev
+```
+The application will be available at `http://localhost:5173`
+
+### 5. Build for Production
+```bash
+npm run build
+```
+This creates an optimized build in the `dist/` directory.
+
+---
+
+## 📜 Available Scripts
+
+| Script | Command | Description |
+|--------|---------|-------------|
+| `dev` | `vite` | Start development server with hot reload |
+| `build` | `tsc -b && vite build` | Type-check and build for production |
+| `lint` | `eslint .` | Run ESLint for code quality checks |
+| `preview` | `vite preview` | Preview the production build locally |
+| `format` | `prettier --write "src/**/*.{ts,tsx,js,jsx,json,css,md}"` | Format code with Prettier |
+
+### Script Details
+
+#### Development Server (`npm run dev`)
+- Starts Vite dev server on port 5173
+- Enables hot module replacement (HMR)
+- Provides fast refresh for React components
+- Includes source maps for debugging
+
+#### Build Process (`npm run build`)
+- Runs TypeScript compiler for type checking
+- Bundles code with Vite for optimal performance
+- Minifies CSS and JavaScript
+- Generates static assets with hashed filenames
+
+#### Linting (`npm run lint`)
+- Checks code against ESLint rules
+- Includes React, TypeScript, and accessibility rules
+- Reports errors and warnings in the terminal
+
+---
+
+## 📁 Project Structure
+
+```
+client/
+├── public/                    # Static assets served directly
+│   ├── favicon.ico           # Browser favicon
+│   └── robots.txt            # Search engine crawling rules
+│
+├── src/                      # Source code
+│   ├── assets/              # Imported assets (images, fonts)
+│   │   └── react.svg        # React logo asset
+│   │
+│   ├── components/          # Reusable UI components
+│   │   ├── AddCard.tsx      # Modal for creating/editing cards
+│   │   ├── Card.tsx         # Individual card display component
+│   │   ├── CardSkeleton.tsx # Loading skeleton for cards
+│   │   ├── DashboardSkeleton.tsx # Dashboard loading skeleton
+│   │   ├── DeletConfirmation.tsx # Delete confirmation dialog
+│   │   ├── Loading.tsx      # Global loading overlay
+│   │   ├── Pagination.tsx   # Pagination component
+│   │   ├── Protected.tsx    # Route protection wrapper
+│   │   ├── SearchResultsSkeleton.tsx # Search results skeleton
+│   │   ├── SectionsNav.tsx  # Section navigation component
+│   │   ├── ShareModal.tsx   # Share link generation modal
+│   │   ├── Sidebar.tsx      # Main navigation sidebar
+│   │   └── ThemeToggle.tsx  # Dark/light theme toggle
+│   │
+│   ├── context/             # React Context providers
+│   │   ├── AuthContext.tsx  # Authentication state management
+│   │   └── ThemeContext.tsx # Theme state management
+│   │
+│   ├── layouts/             # Layout components
+│   │   ├── DashboardLayout.tsx # Main dashboard layout
+│   │   └── Layout.tsx       # Root layout component
+│   │
+│   ├── pages/               # Page-level components
+│   │   ├── AuthPages.tsx    # Login and signup pages
+│   │   ├── Cards.tsx        # Cards management page
+│   │   ├── Dashboard.tsx    # Home dashboard
+│   │   ├── LandingPage.tsx  # Public landing page
+│   │   ├── MoveCards.tsx    # Move cards between sections
+│   │   ├── ResetPassword.tsx # Password reset page
+│   │   ├── Search.tsx       # AI search page
+│   │   ├── Section.tsx      # Section-specific page
+│   │   ├── Share.tsx        # Public share page
+│   │   └── Tags.tsx         # Tag filtering page
+│   │
+│   ├── store/               # State management
+│   │   └── atoms/           # Recoil atoms
+│   │       ├── allcards.ts  # All user cards state
+│   │       ├── counter.ts   # Generic counter atom
+│   │       ├── deleteSection.ts # Section deletion state
+│   │       ├── editcard.ts  # Card editing state
+│   │       ├── formData.ts  # Form data state
+│   │       ├── hideIcons.ts # Icon visibility toggle
+│   │       ├── loading.ts   # Global loading state
+│   │       ├── modal.ts     # Modal open/close state
+│   │       ├── resetpassword.ts # Password reset state
+│   │       ├── search.ts    # Search input state
+│   │       ├── searchModal.ts # Search modal state
+│   │       └── ...          # Additional atoms
+│   │
+│   ├── ui-compo/            # UI-specific components
+│   │   ├── CardUI.tsx       # Card UI wrapper
+│   │   ├── SectionCard.tsx  # Section card component
+│   │   └── StatCard.tsx     # Statistics card component
+│   │
+│   ├── utils/               # Utility functions
+│   │   └── handleError.ts   # Centralized error handling
+│   │
+│   ├── App.tsx              # Main app component with routing
+│   ├── App.css              # App-specific styles
+│   ├── AuthSuccess.tsx      # Authentication success component
+│   ├── index.css            # Global CSS styles
+│   └── main.tsx             # Application entry point
+│
+├── index.html               # HTML template
+├── package.json             # Dependencies and scripts
+├── tsconfig.json            # TypeScript configuration
+├── tsconfig.app.json        # App-specific TypeScript config
+├── tsconfig.node.json       # Node-specific TypeScript config
+├── vite.config.ts           # Vite build configuration
+├── vercel.json              # Vercel deployment config
+├── eslint.config.js         # ESLint configuration
+└── tailwind.config.js       # Tailwind CSS configuration
+```
+
+---
+
+## 🏗 Architecture
+
+### Application Flow
+
+```
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   User Action   │───▶│  Component       │───▶│  State Update   │
+│                 │    │  Handler         │    │  (Recoil)       │
+└─────────────────┘    └──────────────────┘    └─────────┬───────┘
+                                                          │
+                                                          ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   API Call      │───▶│  Backend         │───▶│  Response       │
+│   (Axios)       │    │  Processing      │    │  Handling       │
+└─────────────────┘    └──────────────────┘    └─────────┬───────┘
+                                                          │
+                                                          ▼
+┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
+│   UI Update     │◀───│  State Update   │◀───│  Toast/Loading  │
+│                 │    │  (Recoil)       │    │  Feedback        │
+└─────────────────┘    └──────────────────┘    └─────────────────┘
+```
+
+### Component Hierarchy
+
+```
+App (Router)
+├── Layout (Root wrapper)
+│   ├── LandingPage (Public)
+│   └── Protected (Auth guard)
+│       └── DashboardLayout (Authenticated wrapper)
+│           ├── Sidebar (Navigation)
+│           └── Outlet (Page content)
+│               ├── Dashboard
+│               ├── Cards
+│               ├── Search
+│               ├── Tags
+│               └── Profile
+```
+
+### Data Flow Patterns
+
+1. **User Interaction** → Component event handler
+2. **State Update** → Recoil atom setter
+3. **API Request** → Axios with JWT authentication
+4. **Response Processing** → Error handling and state updates
+5. **UI Re-render** → React's reconciliation based on state changes
+
+---
+
+## 🎯 State Management
+
+The application uses **Recoil** for global state management, organized into atoms stored in `src/store/atoms/`.
+
+### Core Atoms
+
+| Atom | Type | Purpose | Usage |
+|------|------|---------|-------|
+| `allcardsAtom` | `Card[]` | Stores all user cards | Cards display, search, filtering |
+| `loadingAtom` | `boolean` | Global loading state | Loading overlays, disabled states |
+| `modalAtom` | `boolean` | Add card modal state | Modal open/close |
+| `sidebarAtom` | `boolean` | Sidebar visibility | Responsive navigation |
+| `editCardAtom` | `Card \| null` | Currently editing card | Edit modal data |
+| `searchAtom` | `string` | Search input value | Real-time filtering |
+| `authAtom` | `AuthState` | Authentication state | Route protection |
+| `themeAtom` | `Theme` | Current theme | Dark/light mode |
+
+### State Usage Example
+
+```typescript
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { allcardsAtom, loadingAtom } from '../store/atoms';
+
+function CardsList() {
+  const cards = useRecoilValue(allcardsAtom);
+  const setLoading = useSetRecoilState(loadingAtom);
+
+  const fetchCards = async () => {
+    setLoading(true);
+    try {
+      const response = await axios.get('/api/cards');
+      setAllCards(response.data);
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div>
+      {cards.map(card => <Card key={card.id} {...card} />)}
+    </div>
+  );
+}
+```
+
+### State Persistence
+
+- **Authentication**: Stored in HTTP-only cookies via backend
+- **UI State**: Not persisted (resets on refresh)
+- **Form Data**: Temporary state during form interactions
+
+---
+
+## 🧩 Components
+
+### Layout Components
+
+#### `DashboardLayout.tsx`
+**Purpose**: Main layout wrapper for authenticated pages
+**Props**: None
+**Features**:
+- Responsive sidebar navigation
+- Outlet for nested routes
+- Theme-aware styling
+
+#### `Protected.tsx`
+**Purpose**: Route protection component
+**Props**: `{ children: ReactNode }`
+**Logic**: Checks authentication state and redirects to login if needed
+
+#### `Sidebar.tsx`
+**Purpose**: Main navigation component
+**Props**: None
+**Features**:
+- Navigation links to all pages
+- User profile dropdown
+- Logout functionality
+- Responsive collapse/expand
+
+### Feature Components
+
+#### `Card.tsx`
+**Purpose**: Display individual content cards
+**Props**:
+```typescript
+interface CardProps {
+  id: string;
+  title: string;
+  link: string;
+  tags: string[];
+  type: 'document' | 'video' | 'tweet' | 'link';
+  createdAt: Date;
+  isPublic: boolean;
+}
+```
+**Features**:
+- Edit and delete actions
+- External link opening
+- Tag display
+- Type-specific icons
+- Share status indicator
+
+#### `AddCard.tsx`
+**Purpose**: Modal for creating/editing cards
+**Props**: `{ isOpen: boolean; onClose: () => void; editCard?: Card }`
+**Features**:
+- Form validation
+- Tag input with autocomplete
+- URL domain extraction
+- Real-time preview
+
+#### `ShareModal.tsx`
+**Purpose**: Generate public share links
+**Props**: `{ isOpen: boolean; onClose: () => void; selectedCards: string[] }`
+**Features**:
+- Multi-card selection
+- Link generation
+- Copy to clipboard
+- QR code display (future)
+
+#### `Loading.tsx`
+**Purpose**: Global loading overlay
+**Props**: `{ message?: string }`
+**Features**:
+- Full-screen overlay
+- Custom loading messages
+- Prevents user interaction
+
+### UI Components
+
+#### `CardSkeleton.tsx`
+**Purpose**: Loading placeholder for cards
+**Features**: Mimics card layout during loading
+
+#### `ThemeToggle.tsx`
+**Purpose**: Dark/light theme switcher
+**Features**:
+- System preference detection
+- Local storage persistence
+- Smooth transitions
+
+---
+
+## 📄 Pages & Routing
+
+### Route Configuration
+
+```typescript
+// App.tsx routing setup
+<BrowserRouter>
+  <Routes>
+    <Route path="/" element={<Layout />}>
+      <Route index element={<LandingPage />} />
+      <Route path="auth" element={<AuthPages />} />
+      <Route path=":shareId" element={<Share />} />
+      <Route path="reset-password/:token" element={<ResetPassword />} />
+      
+      <Route path="home" element={<Protected><DashboardLayout /></Protected>}>
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="cards" element={<Cards />} />
+        <Route path="search" element={<Search />} />
+        <Route path="tags" element={<Tags />} />
+        <Route path="profile" element={<Profile />} />
+      </Route>
+    </Route>
+  </Routes>
+</BrowserRouter>
+```
+
+### Page Details
+
+#### `LandingPage.tsx`
+**Route**: `/`
+**Purpose**: Public marketing page
+**Features**:
+- Hero section with call-to-action
+- Feature highlights
+- Login/signup links
+- SEO optimized
+
+#### `AuthPages.tsx`
+**Route**: `/auth`
+**Purpose**: User authentication
+**Features**:
+- Login/signup form toggle
+- Email/password validation
+- Google OAuth integration
+- Password reset link
+
+#### `Dashboard.tsx`
+**Route**: `/home/dashboard`
+**Purpose**: User home page with analytics
+**Features**:
+- Statistics cards (total cards, tags, searches)
+- Recent activity
+- Weekly charts
+- Quick actions
+
+#### `Cards.tsx`
+**Route**: `/home/cards`
+**Purpose**: Main cards management page
+**Features**:
+- All cards display with pagination
+- Search and filter
+- Add new card button
+- Bulk actions (share, delete)
+- Real-time updates via SSE
+
+#### `Search.tsx`
+**Route**: `/home/search`
+**Purpose**: AI-powered semantic search
+**Features**:
+- Natural language query input
+- Result limit slider
+- Similarity scores
+- Card preview in results
+
+#### `Tags.tsx`
+**Route**: `/home/tags`
+**Purpose**: Tag-based filtering
+**Features**:
+- Multi-select tag filter
+- Tag statistics
+- Filtered card display
+
+#### `Share.tsx`
+**Route**: `/:shareId`
+**Purpose**: Public shared content viewer
+**Features**:
+- Public access (no auth required)
+- Card display without edit actions
+- Social sharing buttons
+
+---
+
+## 🔌 API Integration
+
+### Base Configuration
+
+```typescript
+// Environment-based API URL
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+// Axios instance with defaults
+const api = axios.create({
+  baseURL: backendUrl,
+  withCredentials: true, // For cookie-based auth
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+```
+
+### Authentication Headers
+
+```typescript
+// Automatic JWT inclusion via cookies
+// Backend sets HttpOnly cookie on login
+// Frontend includes credentials automatically
+```
+
+### API Endpoints
+
+#### Authentication (`/api/v1/auth/`)
+| Method | Endpoint | Payload | Response | Usage |
+|--------|----------|---------|----------|-------|
+| POST | `/login` | `{email, password}` | `{user, token}` | User login |
+| POST | `/signup` | `{email, password, username}` | `{user, token}` | User registration |
+| POST | `/logout` | - | - | User logout |
+| POST | `/forgetPassword` | `{email}` | - | Password reset request |
+| POST | `/resetPassword/:token` | `{password}` | - | Password reset |
+| GET | `/google` | - | Redirect | Google OAuth start |
+| GET | `/google/callback` | - | `{user, token}` | Google OAuth callback |
+
+#### Content Management (`/api/v1/content/`)
+| Method | Endpoint | Payload | Response | Usage |
+|--------|----------|---------|----------|-------|
+| GET | `/cards` | - | `Card[]` | Fetch all user cards |
+| POST | `/card` | `{title, link, tags, type}` | `Card` | Create new card |
+| PUT | `/editCard/:id` | `{title, link, tags, type}` | `Card` | Update card |
+| DELETE | `/card/:id` | - | - | Delete card |
+| GET | `/metrics` | - | `Metrics` | Dashboard statistics |
+| POST | `/query` | `{query, limit}` | `SearchResult[]` | AI semantic search |
+
+#### User Management (`/api/v1/user/`)
+| Method | Endpoint | Payload | Response | Usage |
+|--------|----------|---------|----------|-------|
+| GET | `/` | - | `User` | Get user profile |
+| PUT | `/profile` | `{username, email, avatar}` | `User` | Update profile |
+| POST | `/userconfirmation` | `{password}` | - | Verify password |
+
+#### Sharing (`/api/v1/brain/`)
+| Method | Endpoint | Payload | Response | Usage |
+|--------|----------|---------|----------|-------|
+| POST | `/share` | `{cardIds}` | `{shareId}` | Create share link |
+| GET | `/:shareId` | - | `Card[]` | Get shared cards |
+
+#### Verification (`/api/v1/me`)
+| Method | Endpoint | Payload | Response | Usage |
+|--------|----------|---------|----------|-------|
+| GET | `/` | - | `User` | Verify authentication |
+
+### Real-time Events (SSE)
+
+```typescript
+// Server-Sent Events for live updates
+const eventSource = new EventSource(`${backendUrl}/events`, {
+  withCredentials: true,
+});
+
+// Event listeners
+eventSource.addEventListener('cardProcessed', (event) => {
+  const data = JSON.parse(event.data);
+  // Update UI with processing completion
+});
+
+eventSource.addEventListener('cardFailed', (event) => {
+  const data = JSON.parse(event.data);
+  // Show error notification
+});
+```
+
+### Error Handling
+
+```typescript
+// Centralized error handler
+export const handleError = (error: unknown, fallbackMessage?: string) => {
+  if (axios.isAxiosError(error)) {
+    const message = error.response?.data?.message || fallbackMessage;
+    toast.error(message);
+  } else {
+    toast.error(fallbackMessage || 'An unexpected error occurred');
+  }
+};
+```
+
+---
+
+## 🎨 Styling & UI
+
+### Tailwind CSS Configuration
+
+The application uses Tailwind CSS v4 with custom configuration:
+
+```javascript
+// tailwind.config.js
+export default {
+  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        primary: '#3b82f6',
+        secondary: '#64748b',
+        // Custom theme colors
+      },
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
+    },
+  },
+  plugins: [],
+};
+```
+
+### Theme System
+
+```typescript
+// Theme context provider
+const ThemeProvider: React.FC<{children: ReactNode}> = ({ children }) => {
+  const [theme, setTheme] = useState<Theme>('system');
+  
+  // Detect system preference
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => setTheme(mediaQuery.matches ? 'dark' : 'light');
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+  
+  return (
+    <ThemeContext.Provider value={{ theme, setTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+```
+
+### Responsive Design
+
+- **Mobile-first approach** with Tailwind's responsive prefixes
+- **Breakpoint system**: `sm:`, `md:`, `lg:`, `xl:`
+- **Flexible layouts** using CSS Grid and Flexbox
+- **Touch-friendly** buttons and interactions
+
+### Animation & Motion
+
+```typescript
+import { motion } from 'motion/react';
+
+// Smooth card entrance
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.3 }}
+>
+  <Card {...card} />
+</motion.div>
+```
+
+---
+
+## 🚀 Deployment
+
+### Vercel Deployment
+
+1. **Connect Repository**: Link GitHub repo to Vercel
+2. **Build Settings**:
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+   - Install Command: `npm install`
+3. **Environment Variables**:
+   - `VITE_BACKEND_URL`: Your production backend URL
+4. **Deploy**: Automatic on push to main branch
+
+### Manual Build Process
+
+```bash
+# Build for production
+npm run build
+
+# Preview build locally
+npm run preview
+
+# Deploy dist/ folder to your hosting provider
+```
+
+### Build Optimization
+
+- **Code Splitting**: Automatic route-based splitting
+- **Asset Optimization**: Image compression and WebP conversion
+- **CSS Minification**: Tailwind purging unused styles
+- **JavaScript Minification**: Terser compression
+- **Source Maps**: Generated for debugging
+
+---
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### Build Errors
+**Problem**: `npm run build` fails with TypeScript errors
+**Solution**:
+```bash
+# Check TypeScript errors
+npx tsc --noEmit
+
+# Fix import issues
+npm run lint
+```
+
+#### API Connection Issues
+**Problem**: Unable to connect to backend API
+**Solutions**:
+- Verify `VITE_BACKEND_URL` in `.env`
+- Check backend server is running
+- Confirm CORS configuration
+- Check network/firewall settings
+
+#### Authentication Problems
+**Problem**: Login succeeds but requests fail
+**Solutions**:
+- Verify cookies are enabled
+- Check backend JWT configuration
+- Clear browser cookies and retry
+
+#### Performance Issues
+**Problem**: Slow loading or laggy UI
+**Solutions**:
+- Check network tab for large assets
+- Verify build is optimized
+- Check for memory leaks in React DevTools
+- Enable React DevTools Profiler
+
+### Development Tips
+
+#### Hot Reload Not Working
+```bash
+# Clear Vite cache
+rm -rf node_modules/.vite
+
+# Restart dev server
+npm run dev
+```
+
+#### ESLint Errors
+```bash
+# Auto-fix linting issues
+npm run lint -- --fix
+
+# Format code
+npm run format
+```
+
+#### Dependency Issues
+```bash
+# Clear node_modules and reinstall
+rm -rf node_modules package-lock.json
+npm install
+```
+
+---
+
+## 🤝 Contributing
+
+### Development Workflow
+
+1. **Fork** the repository
+2. **Create** a feature branch: `git checkout -b feature/your-feature`
+3. **Make** your changes with proper TypeScript types
+4. **Test** thoroughly: `npm run lint && npm run build`
+5. **Commit** with descriptive messages
+6. **Push** to your fork and create a Pull Request
+
+### Code Standards
+
+- **TypeScript**: Strict mode enabled, no `any` types
+- **ESLint**: All rules must pass
+- **Prettier**: Code formatted automatically
+- **Commits**: Conventional commit format
+- **Tests**: Unit tests for utilities and components
+
+### Component Guidelines
+
+- Use functional components with hooks
+- Proper TypeScript interfaces for props
+- Consistent naming: PascalCase for components
+- Extract reusable logic to custom hooks
+- Include JSDoc comments for complex functions
+
+### State Management Guidelines
+
+- Use Recoil atoms for global state
+- Prefer local state for component-specific data
+- Avoid prop drilling with context when possible
+- Document atom purposes and types
+
+---
+
+## 📄 License
+
+This project is part of the Second Brain application. See the main repository for licensing information.
+
+---
+
+*For backend documentation, see the [Server README](../server/README.md)*
 
 ## 🏗 Architecture Overview
 

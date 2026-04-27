@@ -1,9 +1,8 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
-import Cookies from "js-cookie";
 
 interface AuthUser {
   id: string;
@@ -28,21 +27,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authenticated, setAuthenticated] = useState(false);
 
   const verifyUser = async () => {
-    const token = Cookies.get('token');
-    
     try {
-      const res = await axios.get(`${backendUrl}/api/v1/me`, {
+      const res = await axios.get(`${backendUrl}/api/v1/auth/me`, {
         withCredentials: true
       });
       setAuthenticated(true);
       setUser(res.data.user);
     } catch (err) {
+      console.log(err);
+      
       setAuthenticated(false);
       setUser(null);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    verifyUser();
+  },[])
 
   const login = async (data: { email: string; password: string }) => {
     const res = await axios.post(`${backendUrl}/api/v1/auth/login`, data, {
@@ -56,12 +59,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async () => {
-    await axios.post(
+    const res = await axios.post(
       `${backendUrl}/api/v1/auth/logout`,
       {},
       { withCredentials: true }
     );
-
+    if(res.status != 200 ) {
+      navigate('/auth')
+    }
     setAuthenticated(false);
     setUser(null);
   };

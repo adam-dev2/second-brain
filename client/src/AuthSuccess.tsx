@@ -9,6 +9,6 @@ export default function AuthSuccess() {
       localStorage.setItem("token", token);
       navigate("/home/dashboard");
     }
-  }, []);
+  },[]);
   return <div>Logging you in...</div>;
 }

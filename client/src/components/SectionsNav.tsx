@@ -1,7 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Layers, ChevronDown, Plus, Hash, Check, Trash, Trash2 } from "lucide-react";
+import { Layers, ChevronDown, Plus, Hash, Check, Trash2 } from "lucide-react";
+import axios from "axios";
+import { handleError } from "../utils/handleError";
+import Cookies from "js-cookie";
+import { useRecoilValue, useSetRecoilState } from "recoil";
+import { sectionsAtom } from "../store/atoms/sections";
+import { deleteSectionAtom } from "../store/atoms/deleteSection";
 
 interface Section {
   id: string;
@@ -14,39 +20,73 @@ interface SectionsNavProps {
   sections: Section[];
 }
 
-const SectionsNav = ({ isOpen, sections: initialSections }: SectionsNavProps) => {
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+const SectionsNav = ({ isOpen }: SectionsNavProps) => {
   const [dropdown, setDropdown] = useState(false);
   const [adding, setAdding] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [sections, setSections] = useState<Section[]>(initialSections);
+  const setSections = useSetRecoilState(sectionsAtom);
+  const sections = useRecoilValue(sectionsAtom);
   const inputRef = useRef<HTMLInputElement>(null);
+  const location = useLocation();
+  const setDeleteSection = useSetRecoilState(deleteSectionAtom);
 
-  // Auto-focus input whenever it appears
   useEffect(() => {
     if (adding) {
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [adding]);
 
+  useEffect(() => {
+    const token = Cookies.get("token");
+    const fetchSections = async () => {
+      try {
+        const res = await axios.get(`${backendUrl}/api/v1/section`, {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        setSections(res.data.sections);
+      } catch (err) {
+        handleError(err, "Error while fetching sections");
+      }
+    };
+    fetchSections();
+  }, [setSections]);
+
   const handleAddClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // don't toggle the dropdown
-    setDropdown(true);   // ensure dropdown is open
+    e.stopPropagation();
+    setDropdown(true);
     setAdding(true);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const trimmed = inputValue.trim();
     if (!trimmed) {
       setAdding(false);
       setInputValue("");
       return;
     }
-    const newSection: Section = {
-      id: `section-${Date.now()}`,
-      path: `/sections/section-${Date.now()}`,
-      label: trimmed,
-    };
-    setSections((prev) => [...prev, newSection]);
+    const token = Cookies.get("token");
+    try {
+      const response = await axios.post(
+        `${backendUrl}/api/v1/section`,
+        { name: trimmed },
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setSections((prev) => [...prev, response.data.section]);
+    } catch (err) {
+      handleError(err, "Error while adding section");
+    }
     setInputValue("");
     setAdding(false);
   };
@@ -61,8 +101,7 @@ const SectionsNav = ({ isOpen, sections: initialSections }: SectionsNavProps) =>
 
   return (
     <div className="flex flex-col">
-
-      {/* ── Header row ── */}
+      {/* Header row */}
       <button
         onClick={() => setDropdown((prev) => !prev)}
         className={`flex items-center ${
@@ -70,8 +109,8 @@ const SectionsNav = ({ isOpen, sections: initialSections }: SectionsNavProps) =>
         } gap-3 p-2 rounded-md text-sm text-white hover:bg-neutral-900 transition-colors duration-150 cursor-pointer w-full`}
       >
         <div className="flex items-center gap-3">
-          <Layers size={isOpen ? 20 : 24} className="shrink-0 text-white" />
-          {isOpen && <span className="truncate font-medium">Sections</span>}
+          <Layers size={isOpen ? 20 : 24} className="shrink-0 text-neutral-400" />
+          {isOpen && <span className="truncate font-small opacity-60">Sections</span>}
         </div>
 
         {isOpen && (
@@ -91,7 +130,7 @@ const SectionsNav = ({ isOpen, sections: initialSections }: SectionsNavProps) =>
         )}
       </button>
 
-      {/* ── Animated dropdown ── */}
+      {/* Animated dropdown */}
       <AnimatePresence initial={false}>
         {dropdown && (
           <motion.div
@@ -103,8 +142,7 @@ const SectionsNav = ({ isOpen, sections: initialSections }: SectionsNavProps) =>
             style={{ overflow: "hidden" }}
           >
             <div className="flex flex-col gap-0.5 mt-1 pb-1">
-
-              {/* ── Inline input — appears at the top ── */}
+              {/* Inline input */}
               <AnimatePresence>
                 {adding && isOpen && (
                   <motion.div
@@ -135,44 +173,54 @@ const SectionsNav = ({ isOpen, sections: initialSections }: SectionsNavProps) =>
                 )}
               </AnimatePresence>
 
-              {/* ── Empty state ── */}
+              {/* Empty state */}
               {sections.length === 0 && isOpen && !adding && (
-                <p className="text-xs text-neutral-500 px-9 py-2">
-                  No sections yet
-                </p>
+                <p className="text-xs text-neutral-500 px-9 py-2">No sections yet</p>
               )}
 
-              {/* ── Section items ── */}
-              {sections.map((section, i) => (
-                <motion.div
-                  key={section.id}
-                  initial={{ opacity: 0, x: -6 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.04, duration: 0.18, ease: "easeOut" }}
-                >
-                  <NavLink
-                    to={`/sections/${section.id}`}
-                    className={({ isActive }) =>
-                      `flex items-center ${
-                        isOpen ? "pl-9 pr-2" : "justify-center"
-                      } py-1.5 rounded-md cursor-pointer transition-colors duration-150 text-sm ${
-                        isActive
-                          ? "bg-white text-black font-semibold"
-                          : "text-neutral-300 hover:text-white hover:bg-neutral-800"
-                      }`
-                    }
+              {sections.map((section, i) => {
+                const isActive = location.pathname === `/home/sections/${section.id}`;
+                return (
+                  <motion.div
+                    key={section.id}
+                    initial={{ opacity: 0, x: -6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.04, duration: 0.18, ease: "easeOut" }}
                   >
-                    {({ isActive }) =>
-                      isOpen ? (
+                    <NavLink
+                      to={`/home/sections/${section.id}`}
+                      className={`flex items-center ${
+                        isOpen ? "pl-9 pr-2" : "justify-center"
+                      } py-1.5 rounded-md cursor-pointer text-sm ${
+                        isActive
+                          ? "bg-white/10 text-white border border-white/10"
+                          : "text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors duration-150"
+                      }`}
+                    >
+                      {isOpen ? (
                         <div className="flex items-center gap-2 w-full justify-between">
                           <div className="flex items-center gap-2">
                             <Hash
                               size={12}
-                              className={isActive ? "text-black" : "text-neutral-500"}
+                              className={isActive ? "text-white" : "text-neutral-500"} 
                             />
                             <span className="truncate">{section.label}</span>
                           </div>
-                          <Trash2 size={14} className="text-red-500 hover:text-red-600 hover:scale-103 transform transition-all" />
+                          <Trash2
+                            size={14}
+                            className="text-red-400 hover:text-red-500 transition-colors cursor-pointer"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setDeleteSection((prev) => ({
+                                deletion:!prev.deletion,
+                                sectionId:section.id
+                              }));
+
+                              console.log(section.id);
+                              
+                            }}
+                          />
                         </div>
                       ) : (
                         <span
@@ -180,12 +228,11 @@ const SectionsNav = ({ isOpen, sections: initialSections }: SectionsNavProps) =>
                             isActive ? "bg-white" : "bg-neutral-500"
                           }`}
                         />
-                      )
-                    }
-                  </NavLink>
-                </motion.div>
-              ))}
-
+                      )}
+                    </NavLink>
+                  </motion.div>
+                );
+              })}
             </div>
           </motion.div>
         )}

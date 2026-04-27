@@ -1,79 +1,121 @@
-import { useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { FcGoogle } from "react-icons/fc";
 import {
-  Search,
-  Tag,
-  Share2,
-  Lock,
-  BarChart3,
-  Clock,
-  Zap,
-  Github,
-  ArrowRight,
-  BookmarkPlus,
-  LogOut,
-  ChevronLeft,
-  ChevronRight,
-  LayoutDashboard,
-  FileStack,
-  Tags,
-  User,
-  FileText,
-  Video,
-  Twitter,
-  Link2,
-  Bookmark,
-  Settings,
+  Search, Tag, Share2, Lock, BarChart3, Clock, Zap, Github,
+  ArrowRight, LogOut, ChevronLeft, ChevronRight,
+  LayoutDashboard, FileStack, Tags, FileText, Video,
+  Twitter, Link2, Bookmark, Settings, Sparkles, Star,
+  ArrowUpRight,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-const LandingPage = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { scrollY } = useScroll();
-  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
-  const scale = useTransform(scrollY, [0, 300], [1, 0.8]);
-  const navigtate = useNavigate();
+/* ─── Typography via Google Fonts ─── */
+// Add to your index.html or _document.tsx:
+// <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
+/* ─── Constants ─── */
+const SPRING = { type: "spring", stiffness: 320, damping: 28 } as const;
+const EASE_OUT = [0.22, 1, 0.36, 1] as const;
+
+/* ─── Helpers ─── */
+function useReveal(delay = 0) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-60px 0px" });
+  return { ref, inView, delay };
+}
+
+function Reveal({
+  children,
+  delay = 0,
+  className = "",
+  y = 24,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+  y?: number;
+}) {
+  const { ref, inView } = useReveal(delay);
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      initial={{ opacity: 0, y }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.75, delay, ease: EASE_OUT }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* ─── Animated counter ─── */
+function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true });
+
+  useEffect(() => {
+    if (!inView) return;
+    const duration = 1400;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const p = Math.min((now - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      setCount(Math.floor(ease * target));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [inView, target]);
+
+  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
+}
+
+/* ════════════════════════════════════════ LANDING PAGE ═════════════════════ */
+export default function LandingPage() {
+  const navigate = useNavigate();
+  const [scrolled, setScrolled] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activeCard, setActiveCard] = useState<number | null>(null);
+  const heroRef = useRef(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
+
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 30);
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
+
+  /* ── data ── */
   const features = [
-    {
-      icon: <Search className="w-6 h-6" />,
-      title: "Elastic Search",
-      description:
-        "Lightning-fast search powered by Elasticsearch to find your bookmarks instantly",
-    },
-    {
-      icon: <Tag className="w-6 h-6" />,
-      title: "Smart Tagging",
-      description: "Organize with custom tags and see your most-used tags at a glance",
-    },
-    {
-      icon: <Share2 className="w-6 h-6" />,
-      title: "Share Your Brain",
-      description: "Make your second brain public and share knowledge with anyone",
-    },
-    {
-      icon: <Lock className="w-6 h-6" />,
-      title: "Privacy Control",
-      description: "Toggle between private and public for each bookmark with one click",
-    },
-    {
-      icon: <BarChart3 className="w-6 h-6" />,
-      title: "KPI Dashboard",
-      description: "Track your bookmarking habits with insightful metrics and analytics",
-    },
-    {
-      icon: <Clock className="w-6 h-6" />,
-      title: "Recent Activity",
-      description: "View your top 5 recent bookmarks for quick access to latest saves",
-    },
+    { icon: <Search className="w-4 h-4" />, title: "Elastic Search", desc: "Sub-100ms full-text search across all your saved content. Find anything, instantly." },
+    { icon: <Tag className="w-4 h-4" />, title: "Smart Tagging", desc: "Hierarchical tags with auto-suggestions. See your most-used at a glance." },
+    { icon: <Share2 className="w-4 h-4" />, title: "Share Your Brain", desc: "Make curated collections public. Let others explore your knowledge graph." },
+    { icon: <Lock className="w-4 h-4" />, title: "Privacy Control", desc: "Granular visibility per bookmark. Private by default, public when you choose." },
+    { icon: <BarChart3 className="w-4 h-4" />, title: "KPI Dashboard", desc: "Beautiful analytics on your saving habits, top domains, and activity streaks." },
+    { icon: <Clock className="w-4 h-4" />, title: "Recent Activity", desc: "Your 5 most recent bookmarks pinned for one-tap access. Always within reach." },
   ];
 
   const stats = [
-    { label: "Bookmarks Created", value: "10K+", icon: <Bookmark className="w-8 h-8 md:w-10 md:h-10" /> },
-    { label: "Active Users", value: "2.5K+", icon: <User className="w-8 h-8 md:w-10 md:h-10" /> },
-    { label: "Shared Brains", value: "1.2K+", icon: <Share2 className="w-8 h-8 md:w-10 md:h-10" /> },
-    { label: "Tags Used", value: "50K+", icon: <Tag className="w-8 h-8 md:w-10 md:h-10" /> },
+    { label: "Bookmarks saved", value: 10000, suffix: "+" },
+    { label: "Active users", value: 2500, suffix: "+" },
+    { label: "Shared brains", value: 1200, suffix: "+" },
+    { label: "Tags created", value: 50000, suffix: "+" },
+  ];
+
+  const sampleCards = [
+    { title: "Design Inspiration Board", link: "dribbble.com/shots/12345", tags: ["design", "ui", "inspiration"], time: "2d ago", color: "#6366f1" },
+    { title: "Next.js Performance Tips", link: "vercel.com/blog/nextjs-performance", tags: ["nextjs", "performance"], time: "5d ago", color: "#0ea5e9" },
+    { title: "Building a Second Brain", link: "aliabdaal.com/second-brain", tags: ["productivity", "learning"], time: "1w ago", color: "#10b981" },
+  ];
+
+  const testimonials = [
+    { quote: "This changed how I manage knowledge. Everything I save is now actually findable.", name: "Alex Chen", role: "Product Designer", co: "Figma" },
+    { quote: "The search speed is insane. I went from losing bookmarks to actually using them daily.", name: "Priya Sharma", role: "Software Engineer", co: "Stripe" },
+    { quote: "Finally a tool that doesn't feel like a chore. The tagging UX is incredibly smart.", name: "Jordan Miles", role: "Content Creator", co: "YouTube" },
   ];
 
   const sidebarLinks = [
@@ -81,454 +123,830 @@ const LandingPage = () => {
     { label: "Cards", icon: FileStack, active: false },
     { label: "Tags", icon: Tags, active: false },
     { label: "Search", icon: Search, active: false },
-    { label: "Profile", icon: Settings, active: false },
+    { label: "Settings", icon: Settings, active: false },
   ];
 
-  const mockRecentCards = [
-    {
-      id: 1,
-      title: "React Performance Optimization",
-      type: "document",
-      tags: ["react", "performance"],
-      date: "2 hours ago",
-    },
-    {
-      id: 2,
-      title: "Advanced TypeScript Patterns",
-      type: "video",
-      tags: ["typescript", "tutorial"],
-      date: "5 hours ago",
-    },
-    {
-      id: 3,
-      title: "Design System Best Practices",
-      type: "document",
-      tags: ["design", "ui"],
-      date: "1 day ago",
-    },
-    {
-      id: 4,
-      title: "API Design Guidelines",
-      type: "tweet",
-      tags: ["api", "backend"],
-      date: "2 days ago",
-    },
+  const recentCards = [
+    { id: 1, title: "React Performance Optimization", type: "document", tags: ["react", "perf"], date: "2h ago" },
+    { id: 2, title: "Advanced TypeScript Patterns", type: "video", tags: ["typescript"], date: "5h ago" },
+    { id: 3, title: "Design System Best Practices", type: "document", tags: ["design"], date: "1d ago" },
+    { id: 4, title: "API Design Guidelines", type: "tweet", tags: ["api"], date: "2d ago" },
   ];
 
-  const mockTopTags = [
-    { name: "react", count: 45 },
-    { name: "typescript", count: 38 },
-    { name: "design", count: 32 },
-    { name: "backend", count: 28 },
-    { name: "tutorial", count: 24 },
-  ];
-
-  const sampleCards = [
-    {
-      title: "Design Inspiration Board",
-      link: "dribbble.com/shots/12345",
-      tags: ["design", "ui", "inspiration"],
-    },
-    {
-      title: "Next.js Performance Tips",
-      link: "vercel.com/blog/nextjs-performance",
-      tags: ["nextjs", "performance", "dev"],
-    },
-    {
-      title: "Building a Second Brain",
-      link: "aliabdaal.com/second-brain",
-      tags: ["productivity", "notes", "learning"],
-    },
+  const topTags = [
+    { name: "react", count: 45, max: 45 },
+    { name: "typescript", count: 38, max: 45 },
+    { name: "design", count: 32, max: 45 },
+    { name: "backend", count: 28, max: 45 },
+    { name: "tutorial", count: 24, max: 45 },
   ];
 
   const getTypeIcon = (type: string) => {
     switch (type) {
-      case "document":
-        return <FileText className="w-4 h-4" />;
-      case "video":
-        return <Video className="w-4 h-4" />;
-      case "tweet":
-        return <Twitter className="w-4 h-4" />;
-      default:
-        return <Link2 className="w-4 h-4" />;
+      case "document": return <FileText className="w-3 h-3" />;
+      case "video": return <Video className="w-3 h-3" />;
+      case "tweet": return <Twitter className="w-3 h-3" />;
+      default: return <Link2 className="w-3 h-3" />;
     }
   };
 
+  /* ══════════════════════════════════════════ JSX ══════════════════════════ */
   return (
-    <div className="min-h-screen bg-black text-white overflow-x-hidden">
-      <div className="fixed inset-0 bg-linear-to-br from-gray-900 via-black to-gray-900 opacity-50" />
-      <div className="fixed inset-0 bg-[radial-linear(circle_at_50%_50%,rgba(255,255,255,0.05),transparent_50%)]" />
+    <div
+      className="min-h-screen text-white overflow-x-hidden"
+      style={{
+        background: "#05050a",
+        fontFamily: "'DM Sans', system-ui, sans-serif",
+      }}
+    >
+      {/* ── Global CSS Styles ── */}
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap');
 
-      <motion.section
-        className="relative min-h-screen flex items-center justify-center px-4 sm:px-6 md:px-8"
-        style={{ opacity, scale }}
+        * { -webkit-font-smoothing: antialiased; }
+
+        .serif { font-family: 'Instrument Serif', Georgia, serif; }
+        .mono { font-family: 'DM Mono', monospace; }
+
+        .noise-bg::before {
+          content: '';
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          z-index: 0;
+          opacity: 0.025;
+          background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+          background-size: 180px 180px;
+        }
+
+        .grid-bg {
+          background-image:
+            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+          background-size: 40px 40px;
+        }
+
+        .glow-ring {
+          box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 0 40px rgba(99,102,241,0.08);
+        }
+
+        .feature-card:hover .feature-icon {
+          background: rgba(99,102,241,0.15);
+          border-color: rgba(99,102,241,0.3);
+          color: #818cf8;
+        }
+
+        .stat-num {
+          font-family: 'Instrument Serif', serif;
+          font-size: clamp(2.5rem, 6vw, 4rem);
+          letter-spacing: -0.02em;
+          line-height: 1;
+          background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.55) 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .tag-pill {
+          font-family: 'DM Mono', monospace;
+          font-size: 10px;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes pulse-ring {
+          0% { transform: scale(0.95); opacity: 0.4; }
+          70% { transform: scale(1.1); opacity: 0; }
+          100% { transform: scale(0.95); opacity: 0; }
+        }
+        .float { animation: float 4s ease-in-out infinite; }
+        .float-delay { animation: float 4s ease-in-out infinite 1.3s; }
+        .float-delay2 { animation: float 4s ease-in-out infinite 2.1s; }
+      `}</style>
+
+      {/* ── noise layer ── */}
+      <div className="noise-bg" />
+
+      {/* ═══════════════ NAV ═══════════════ */}
+      <motion.header
+        className="fixed top-0 left-0 right-0 z-50"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.6, ease: EASE_OUT }}
       >
-        <div className="max-w-6xl mx-auto text-center z-10 w-full">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="mb-6"
+        <div
+          className="flex items-center justify-between px-6 sm:px-10 py-4 mx-auto max-w-6xl"
+          style={{
+            borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "1px solid transparent",
+            background: scrolled ? "rgba(5,5,10,0.85)" : "transparent",
+            backdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none",
+            transition: "all 0.4s ease",
+          }}
+        >
+          {/* Logo */}
+          <div className="flex items-center gap-2.5">
+            <div className="relative">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{ background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)" }}
+              >
+                <Bookmark className="w-3.5 h-3.5 text-white" />
+              </div>
+            </div>
+            <span className="text-sm font-semibold tracking-tight text-white/90">Second Brain</span>
+          </div>
+
+          {/* Nav links */}
+          <nav className="hidden md:flex items-center gap-8 text-xs text-white/40 font-medium">
+            {["Features", "Dashboard", "Testimonials"].map((l) => (
+              <a
+                key={l}
+                href={`#${l.toLowerCase()}`}
+                className="hover:text-white/90 transition-colors duration-200 tracking-wide"
+              >
+                {l}
+              </a>
+            ))}
+          </nav>
+
+          {/* CTA */}
+          <button
+            onClick={() => navigate("/auth")}
+            className="group flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200"
+            style={{
+              background: "rgba(99,102,241,0.12)",
+              border: "1px solid rgba(99,102,241,0.25)",
+              color: "#a5b4fc",
+            }}
+            onMouseEnter={e => {
+              (e.target as HTMLElement).closest('button')!.style.background = "rgba(99,102,241,0.2)";
+              (e.target as HTMLElement).closest('button')!.style.borderColor = "rgba(99,102,241,0.5)";
+            }}
+            onMouseLeave={e => {
+              (e.target as HTMLElement).closest('button')!.style.background = "rgba(99,102,241,0.12)";
+              (e.target as HTMLElement).closest('button')!.style.borderColor = "rgba(99,102,241,0.25)";
+            }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full mb-8">
-              <Bookmark className="w-4 h-4 text-white shrink-0" />
-              <span className="text-xs sm:text-sm text-gray-300">Your Digital Knowledge Hub</span>
+            Get started <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        </div>
+      </motion.header>
+
+      {/* ═══════════════ HERO ═══════════════ */}
+      <section ref={heroRef} className="relative flex flex-col items-center justify-center min-h-screen px-4 pt-24 pb-16 overflow-hidden">
+        {/* Grid bg */}
+        <div className="absolute inset-0 grid-bg opacity-60" />
+
+        {/* Radial vignette */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse 80% 70% at 50% 100%, #05050a 10%, transparent 70%)" }}
+        />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse 80% 60% at 50% -20%, rgba(99,102,241,0.08) 0%, transparent 60%)" }}
+        />
+
+        <motion.div
+          style={{ y: heroY, opacity: heroOpacity }}
+          className="relative z-10 flex flex-col items-center w-full max-w-5xl mx-auto"
+        >
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: EASE_OUT }}
+            className="mb-10"
+          >
+            <div
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-medium tracking-wider"
+              style={{
+                background: "rgba(99,102,241,0.08)",
+                border: "1px solid rgba(99,102,241,0.2)",
+                color: "#818cf8",
+              }}
+            >
+              <Sparkles className="w-3 h-3" />
+              Your digital knowledge hub
             </div>
           </motion.div>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold mb-6 bg-linear-to-r from-white via-gray-300 to-gray-500 bg-clip-text text-transparent"
-          >
-            Second Brain
-          </motion.h1>
+          {/* Headline */}
+          <div className="text-center mb-8 w-full">
+            <div className="overflow-hidden mb-1">
+              <motion.h1
+                initial={{ y: "105%" }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.9, delay: 0.1, ease: EASE_OUT }}
+                className="serif text-white leading-none"
+                style={{ fontSize: "clamp(64px, 12vw, 136px)", letterSpacing: "-0.03em" }}
+              >
+                Second
+              </motion.h1>
+            </div>
+            <div className="overflow-hidden">
+              <motion.h1
+                initial={{ y: "105%" }}
+                animate={{ y: 0 }}
+                transition={{ duration: 0.9, delay: 0.22, ease: EASE_OUT }}
+                className="serif leading-none italic"
+                style={{
+                  fontSize: "clamp(64px, 12vw, 136px)",
+                  letterSpacing: "-0.03em",
+                  WebkitTextStroke: "1.5px rgba(255,255,255,0.2)",
+                  color: "transparent",
+                }}
+              >
+                Brain.
+              </motion.h1>
+            </div>
+          </div>
 
+          {/* Subheadline */}
           <motion.p
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-            className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-gray-400 mb-8 md:mb-12 max-w-3xl mx-auto px-2"
+            transition={{ duration: 0.7, delay: 0.48, ease: EASE_OUT }}
+            className="text-center text-base text-white/40 font-light max-w-[360px] leading-relaxed mb-10"
           >
-            Think less about <span className="font-bold text-gray-200">remembering</span>. Let your{" "}
-            <span className="font-bold text-gray-200">second brain</span> do it for you.
+            Stop losing what matters. Save, tag, search, and share your entire knowledge base — all in one place.
           </motion.p>
 
+          {/* CTAs */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center w-full px-2"
+            transition={{ duration: 0.7, delay: 0.6, ease: EASE_OUT }}
+            className="flex flex-col sm:flex-row items-center gap-3 mb-16"
           >
-            <button onClick={() => navigtate('/auth')} className="group w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white text-black rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-gray-200 transition-all text-sm sm:text-base">
-              <Github className="w-5 h-5 shrink-0" />
-              <span>Sign in with GitHub</span>
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform hidden sm:inline" />
+            <button
+              onClick={() => navigate("/auth")}
+              className="group flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200"
+              style={{ background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)", boxShadow: "0 0 0 1px rgba(99,102,241,0.5), 0 8px 32px rgba(99,102,241,0.3)" }}
+            >
+              <Github className="w-4 h-4" />
+              Continue with GitHub
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </button>
-            <button onClick={() => navigtate('/auth')} className="group w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-white/20 transition-all text-sm sm:text-base">
-              <FcGoogle className="w-5 h-5 shrink-0" />
-              <span>Sign in with Google</span>
+            <button
+              onClick={() => navigate("/auth")}
+              className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm font-medium text-white/70 transition-all duration-200 hover:text-white"
+              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)" }}
+            >
+              <FcGoogle className="w-4 h-4" />
+              Continue with Google
             </button>
           </motion.div>
 
+          {/* Hero Cards */}
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.8 }}
-            className="mt-12 md:mt-16 relative w-full"
+            transition={{ duration: 0.9, delay: 0.72, ease: EASE_OUT }}
+            className="w-full grid grid-cols-1 sm:grid-cols-3 gap-3"
           >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 max-w-4xl mx-auto px-2">
-              {sampleCards.map((card, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 + i * 0.1 }}
-                  whileHover={{ y: -5, scale: 1.02 }}
-                  className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4 hover:border-white/20 transition-all"
+            {sampleCards.map((card, i) => (
+              <motion.div
+                key={i}
+                className={`relative rounded-2xl p-5 cursor-pointer overflow-hidden float${i === 1 ? "-delay" : i === 2 ? "-delay2" : ""}`}
+                style={{
+                  background: "rgba(255,255,255,0.025)",
+                  border: "1px solid rgba(255,255,255,0.07)",
+                }}
+                whileHover={{ y: -6, scale: 1.02 }}
+                transition={{ ...SPRING }}
+                onHoverStart={() => setActiveCard(i)}
+                onHoverEnd={() => setActiveCard(null)}
+              >
+                {/* color accent */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-px"
+                  style={{ background: `linear-gradient(90deg, transparent, ${card.color}60, transparent)` }}
+                />
+                <div
+                  className="absolute top-0 left-0 right-0 h-20 pointer-events-none"
+                  style={{ background: `radial-gradient(ellipse at 50% -30%, ${card.color}12, transparent 60%)` }}
+                />
+
+                <div className="flex justify-between items-start mb-3">
+                  <p className="text-xs font-semibold text-white/80 leading-snug pr-2">{card.title}</p>
+                  <div
+                    className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
+                  >
+                    <Lock className="w-2.5 h-2.5 text-white/25" />
+                  </div>
+                </div>
+
+                <p className="tag-pill text-white/20 mb-4 truncate">{card.link}</p>
+
+                <div className="flex flex-wrap gap-1.5 mb-4">
+                  {card.tags.map((t) => (
+                    <span
+                      key={t}
+                      className="tag-pill px-2 py-0.5 rounded-md"
+                      style={{ background: `${card.color}18`, border: `1px solid ${card.color}30`, color: card.color }}
+                    >
+                      #{t}
+                    </span>
+                  ))}
+                </div>
+
+                <div
+                  className="flex items-center justify-between pt-3"
+                  style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
                 >
-                  <div className="flex flex-col items-start">
-                    <div className="flex justify-between w-full gap-2">
-                      <h3 className="text-sm font-semibold mb-2 text-white line-clamp-2">{card.title}</h3>
-                      <div className="w-8 h-8 bg-white/10 rounded-lg flex items-center justify-center shrink-0">
-                        <Lock className="w-4 h-4 text-white/60" />
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-400 mb-3 truncate w-full">{card.link}</p>
-                  </div>
-
-                  <div className="flex gap-2 flex-wrap">
-                    {card.tags.map((tag, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-1 bg-white/10 rounded text-xs text-gray-300"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                  <span className="text-[10px] text-white/20">{card.time}</span>
+                  <ArrowUpRight
+                    className="w-3 h-3 transition-all duration-200"
+                    style={{ color: activeCard === i ? card.color : "rgba(255,255,255,0.2)" }}
+                  />
+                </div>
+              </motion.div>
+            ))}
           </motion.div>
-        </div>
+        </motion.div>
 
+        {/* scroll indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-          className="absolute bottom-8 md:bottom-10 z-50 left-1/2 transform -translate-x-1/2"
+          transition={{ delay: 1.8, duration: 0.8 }}
+          className="relative z-10 mt-14 flex flex-col items-center gap-2"
         >
           <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-            className="w-6 h-10 border-2 border-white/30 rounded-full flex justify-center"
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+            className="w-5 h-8 rounded-full flex justify-center items-start pt-1.5"
+            style={{ border: "1px solid rgba(255,255,255,0.08)" }}
           >
-            <motion.div className="w-1 h-2 bg-white rounded-full mt-2" />
+            <div className="w-px h-2 rounded-full" style={{ background: "rgba(255,255,255,0.18)" }} />
           </motion.div>
         </motion.div>
-      </motion.section>
+      </section>
 
-      <section className="relative py-12 md:py-20 px-4 sm:px-6 border-t border-white/10">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                className="text-center"
-              >
-                <div className="flex justify-center mb-2 md:mb-3 text-gray-400">{stat.icon}</div>
-                <div className="text-2xl md:text-4xl font-bold mb-1 md:mb-2">{stat.value}</div>
-                <div className="text-xs md:text-sm text-gray-500 line-clamp-2">{stat.label}</div>
-              </motion.div>
-            ))}
-          </div>
+      {/* ═══════════════ STATS ═══════════════ */}
+      <section
+        className="py-20 px-4"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+      >
+        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
+          {stats.map((s, i) => (
+            <Reveal key={i} delay={i * 0.08} className="text-center">
+              <p className="stat-num mb-2">
+                <Counter target={s.value} suffix={s.suffix} />
+              </p>
+              <p className="text-[10px] text-white/25 uppercase tracking-[0.2em] font-medium">{s.label}</p>
+            </Reveal>
+          ))}
         </div>
       </section>
 
-      <section className="relative py-16 md:py-32 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-12 md:mb-20"
-          >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Powerful Features</h2>
-            <p className="text-gray-400 text-base md:text-lg px-2">Everything you need to build your second brain</p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.05 }}
-                className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-4 md:p-6 hover:border-white/20 transition-all group"
-              >
-                <div className="w-12 h-12 bg-white/5 rounded-lg flex items-center justify-center mb-4 group-hover:bg-white/10 transition-all">
-                  {feature.icon}
-                </div>
-                <h3 className="text-lg md:text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-sm md:text-base text-gray-400">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="relative py-16 md:py-32 px-4 sm:px-6 border-t border-white/10 overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center mb-8 md:mb-16"
-          >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">Experience the Dashboard</h2>
-            <p className="text-gray-400 text-base md:text-lg px-2">
-              A glimpse into your command center for knowledge management
+      {/* ═══════════════ FEATURES ═══════════════ */}
+      <section
+        id="features"
+        className="py-28 px-4 sm:px-6"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+      >
+        <div className="max-w-4xl mx-auto">
+          <Reveal className="mb-16">
+            <p
+              className="text-[10px] font-medium tracking-[0.25em] uppercase mb-4"
+              style={{ color: "#6366f1" }}
+            >
+              Features
             </p>
-          </motion.div>
+            <h2
+              className="serif text-white mb-4"
+              style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", letterSpacing: "-0.02em", lineHeight: 1.1 }}
+            >
+              Everything you need<br />
+              <span className="italic text-white/40">to remember everything.</span>
+            </h2>
+          </Reveal>
 
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl md:rounded-2xl overflow-hidden"
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px"
+            style={{
+              background: "rgba(255,255,255,0.05)",
+              borderRadius: "20px",
+              overflow: "hidden",
+              border: "1px solid rgba(255,255,255,0.05)",
+            }}
           >
-            <div className="flex flex-col md:flex-row h-auto md:h-[600px] lg:h-[700px]">
-              <div
-                className={`${sidebarOpen ? "w-full md:w-64" : "w-full md:w-20"} bg-black border-b md:border-b-0 md:border-r border-white/10 whitespace-nowrap transition-all duration-300 flex flex-col p-4`}
-              >
-                <div className="flex items-center justify-between mb-6 md:mb-10 mt-2">
-                  {sidebarOpen && (
-                    <h1 className="text-lg md:text-xl font-bold tracking-wide text-white">Second Brain</h1>
-                  )}
-                </div>
-
-                <nav className="flex flex-row md:flex-col gap-2 md:gap-3 overflow-x-auto md:overflow-x-visible pb-4 md:pb-0">
-                  {sidebarLinks.map(({ label, icon: Icon, active }) => (
-                    <div
-                      key={label}
-                      className={`flex items-center justify-center md:justify-start gap-3 p-2 rounded-md transition-all shrink-0 ${
-                        active
-                          ? "bg-white text-black font-semibold"
-                          : "text-white hover:bg-neutral-900"
-                      }`}
-                    >
-                      <Icon className="shrink-0" size={sidebarOpen ? 20 : 24} />
-                      {sidebarOpen && <span className="truncate hidden md:inline text-sm">{label}</span>}
-                    </div>
-                  ))}
-                </nav>
-
-                <div className="mt-auto pt-4 border-t border-white/10 hidden md:block">
-                  <div className="flex items-center justify-center gap-3 p-2 rounded-md border border-neutral-800 text-white hover:bg-black/90 transition">
-                    <LogOut size={20} />
-                    {sidebarOpen && <span className="text-sm">Logout</span>}
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setSidebarOpen(!sidebarOpen)}
-                  className={`hidden md:flex absolute top-4 ${sidebarOpen ? "left-60" : "left-6"} p-2 rounded-lg bg-black transition-all z-10`}
+            {features.map((f, i) => (
+              <Reveal key={i} delay={i * 0.06}>
+                <div
+                  className="feature-card p-7 h-full group cursor-default transition-all duration-200"
+                  style={{ background: "#05050a" }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.background = "rgba(99,102,241,0.04)";
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.background = "#05050a";
+                  }}
                 >
-                  {sidebarOpen ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-                </button>
+                  <div
+                    className="feature-icon w-10 h-10 rounded-xl flex items-center justify-center mb-6 transition-all duration-300 text-white/30"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
+                  >
+                    {f.icon}
+                  </div>
+                  <h3 className="text-sm font-semibold text-white/80 mb-2.5">{f.title}</h3>
+                  <p className="text-xs text-white/30 leading-relaxed">{f.desc}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════ DASHBOARD ═══════════════ */}
+      <section
+        id="dashboard"
+        className="py-28 px-4 sm:px-6"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+      >
+        <div className="max-w-5xl mx-auto">
+          <Reveal className="mb-16">
+            <p className="text-[10px] font-medium tracking-[0.25em] uppercase mb-4" style={{ color: "#6366f1" }}>
+              Dashboard
+            </p>
+            <h2
+              className="serif text-white mb-3"
+              style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", letterSpacing: "-0.02em", lineHeight: 1.1 }}
+            >
+              Your command center
+            </h2>
+            <p className="text-sm text-white/30 max-w-sm">See your knowledge at a glance. Everything organized, searchable, and accessible.</p>
+          </Reveal>
+
+          <Reveal delay={0.1}>
+            {/* Browser chrome */}
+            <div
+              className="rounded-2xl overflow-hidden glow-ring"
+              style={{ boxShadow: "0 60px 120px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.07)" }}
+            >
+              {/* Bar */}
+              <div
+                className="flex items-center gap-3 px-4 py-3"
+                style={{ background: "#0e0e16", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+              >
+                <div className="flex gap-1.5">
+                  {["#ff5f57", "#febc2e", "#28c840"].map((c, i) => (
+                    <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: c, opacity: 0.5 }} />
+                  ))}
+                </div>
+                <div className="flex-1 flex justify-center">
+                  <span
+                    className="mono px-4 py-1 text-[10px] text-white/20 rounded-md"
+                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+                  >
+                    app.secondbrain.io/dashboard
+                  </span>
+                </div>
               </div>
 
-              <div className="flex-1 bg-gray-50 p-4 md:p-8 overflow-y-auto">
-                <div className="mb-4 md:mb-6">
-                  <h1 className="text-2xl md:text-4xl font-semibold text-gray-800 tracking-tight mb-1">
-                    Dashboard
-                  </h1>
-                  <p className="text-sm md:text-base text-gray-600">Overview of your knowledge base</p>
-                  <div className="text-xs md:text-sm text-gray-500 mt-2 opacity-85">
-                    Last updated: {new Date().toLocaleDateString()}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
-                  <div className="bg-white rounded-lg md:rounded-xl p-3 md:p-4 shadow-sm border border-gray-200">
-                    <p className="text-gray-600 font-semibold text-xs md:text-sm mb-1 md:mb-2">Total Cards</p>
-                    <h3 className="text-xl md:text-2xl font-bold text-gray-900">247</h3>
-                  </div>
-                  <div className="bg-white rounded-lg md:rounded-xl p-3 md:p-4 shadow-sm border border-gray-200">
-                    <p className="text-gray-600 font-semibold text-xs md:text-sm mb-1 md:mb-2">Unique Tags</p>
-                    <h3 className="text-xl md:text-2xl font-bold text-gray-900">38</h3>
-                  </div>
-                  <div className="bg-white rounded-lg md:rounded-xl p-3 md:p-4 shadow-sm border border-gray-200">
-                    <p className="text-gray-600 font-semibold text-xs md:text-sm mb-1 md:mb-2">Shared Cards</p>
-                    <h3 className="text-xl md:text-2xl font-bold text-gray-900">15</h3>
-                  </div>
-                  <div className="bg-white rounded-lg md:rounded-xl p-3 md:p-4 shadow-sm border border-gray-200">
-                    <p className="text-gray-600 font-semibold text-xs md:text-sm mb-1 md:mb-2">This Week</p>
-                    <h3 className="text-xl md:text-2xl font-bold text-gray-900">12</h3>
-                  </div>
-                </div>
-
-                <div className="grid lg:grid-cols-3 gap-3 md:gap-6">
-                  <div className="bg-white rounded-lg md:rounded-xl p-4 md:p-6 shadow-sm border border-gray-200 lg:col-span-2">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-base md:text-lg font-semibold text-gray-800">Recent Cards</h2>
-                      <button className="text-indigo-600 hover:text-indigo-700 font-medium text-xs md:text-sm">
-                        View All →
-                      </button>
+              <div className="flex md:h-[580px]">
+                {/* Sidebar */}
+                <div
+                  className={`hidden md:flex flex-col flex-shrink-0 border-r transition-all duration-300 ease-out ${sidebarOpen ? "w-[200px]" : "w-[60px]"}`}
+                  style={{ background: "#080810", borderColor: "rgba(255,255,255,0.05)" }}
+                >
+                  {/* Logo */}
+                  <div className="h-14 flex items-center px-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                    <div className="flex items-center gap-2.5 overflow-hidden">
+                      <div
+                        className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
+                        style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5)" }}
+                      >
+                        <Bookmark className="w-3 h-3 text-white" />
+                      </div>
+                      <AnimatePresence>
+                        {sidebarOpen && (
+                          <motion.span
+                            initial={{ opacity: 0, x: -8 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: -8 }}
+                            className="text-xs font-semibold text-white/80 whitespace-nowrap"
+                          >
+                            Second Brain
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
                     </div>
-                    <div className="space-y-2">
-                      {mockRecentCards.slice(0, 4).map((card) => (
+                  </div>
+
+                  {/* Nav */}
+                  <nav className="flex-1 p-2.5 flex flex-col gap-0.5">
+                    {sidebarLinks.map(({ label, icon: Icon, active }) => (
+                      <div
+                        key={label}
+                        className="flex items-center gap-3 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150 overflow-hidden"
+                        style={{
+                          background: active ? "rgba(99,102,241,0.15)" : "transparent",
+                          color: active ? "#818cf8" : "rgba(255,255,255,0.3)",
+                          border: active ? "1px solid rgba(99,102,241,0.25)" : "1px solid transparent",
+                        }}
+                      >
+                        <Icon size={13} className="shrink-0" />
+                        <AnimatePresence>
+                          {sidebarOpen && (
+                            <motion.span
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              exit={{ opacity: 0 }}
+                              className="text-xs font-medium whitespace-nowrap"
+                            >
+                              {label}
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ))}
+                  </nav>
+
+                  {/* Bottom */}
+                  <div className="p-2.5" style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
+                    <div className="flex items-center gap-3 px-2.5 py-2 rounded-lg cursor-pointer text-white/20 hover:text-white/50 transition-colors overflow-hidden">
+                      <LogOut size={13} className="shrink-0" />
+                      <AnimatePresence>
+                        {sidebarOpen && (
+                          <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-xs whitespace-nowrap">
+                            Logout
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  </div>
+
+                  {/* Toggle */}
+                  <button
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                    className="absolute mt-[56px] ml-[calc(var(--sw)-12px)] w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 hover:bg-white/10 z-10"
+                    style={
+                      {
+                        "--sw": sidebarOpen ? "200px" : "60px",
+                        marginLeft: sidebarOpen ? "188px" : "48px",
+                        background: "#0e0e16",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        color: "rgba(255,255,255,0.4)",
+                        position: "relative",
+                        alignSelf: "flex-start",
+                      } as React.CSSProperties
+                    }
+                  >
+                    {sidebarOpen ? <ChevronLeft size={11} /> : <ChevronRight size={11} />}
+                  </button>
+                </div>
+
+                {/* Main content — light bg to contrast dark shell */}
+                <div className="flex-1 overflow-y-auto" style={{ background: "#f8f7f5" }}>
+                  <div className="p-6">
+                    {/* Header */}
+                    <div className="mb-5">
+                      <h1 className="text-xl font-bold text-gray-900 tracking-tight">Dashboard</h1>
+                      <p className="text-xs text-gray-400 mt-0.5 mono">
+                        {new Date().toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
+                      </p>
+                    </div>
+
+                    {/* Metrics */}
+                    <div className="grid grid-cols-4 gap-2.5 mb-5">
+                      {[
+                        { label: "Total Cards", value: "247", delta: "+12" },
+                        { label: "Unique Tags", value: "38", delta: "+3" },
+                        { label: "Shared", value: "15", delta: "+1" },
+                        { label: "This Week", value: "12", delta: "+5" },
+                      ].map((m) => (
                         <div
-                          key={card.id}
-                          className="flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer group"
+                          key={m.label}
+                          className="bg-white rounded-xl p-3.5 border border-gray-100 shadow-sm"
                         >
-                          <div className="p-1.5 md:p-2 bg-white rounded-lg shadow-sm shrink-0">
-                            {getTypeIcon(card.type)}
+                          <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider mb-2">{m.label}</p>
+                          <div className="flex items-end justify-between">
+                            <p className="text-2xl font-bold text-gray-900 tracking-tight">{m.value}</p>
+                            <span className="text-[9px] font-semibold text-emerald-500 mb-0.5">{m.delta}</span>
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-gray-900 text-xs md:text-sm group-hover:text-indigo-600 transition-colors truncate">
-                              {card.title}
-                            </h4>
-                            <div className="flex items-center gap-2 mt-1 flex-wrap">
-                              <span className="text-xs text-gray-500">{card.date}</span>
-                              <span className="text-gray-300 hidden sm:inline">•</span>
-                              <div className="flex gap-1 flex-wrap">
-                                {card.tags.map((tag) => (
-                                  <span
-                                    key={tag}
-                                    className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-xs rounded font-medium"
-                                  >
-                                    {tag}
-                                  </span>
-                                ))}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Cards + Tags grid */}
+                    <div className="grid grid-cols-3 gap-2.5">
+                      {/* Recent cards */}
+                      <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm col-span-2">
+                        <div className="flex justify-between items-center mb-3.5">
+                          <h2 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Recent Cards</h2>
+                          <button className="text-[10px] font-semibold" style={{ color: "#6366f1" }}>View all →</button>
+                        </div>
+                        <div className="space-y-1">
+                          {recentCards.map((card) => (
+                            <div
+                              key={card.id}
+                              className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-indigo-50/50 cursor-pointer group transition-colors"
+                            >
+                              <div className="w-6 h-6 bg-gray-50 rounded-lg flex items-center justify-center shrink-0 text-gray-300 group-hover:text-indigo-400 transition-colors border border-gray-100">
+                                {getTypeIcon(card.type)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-medium text-gray-700 truncate group-hover:text-indigo-600 transition-colors">{card.title}</p>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                  <span className="mono text-[9px] text-gray-300">{card.date}</span>
+                                  {card.tags.map((t) => (
+                                    <span key={t} className="mono text-[9px] text-indigo-400 bg-indigo-50 px-1.5 py-px rounded font-medium">#{t}</span>
+                                  ))}
+                                </div>
+                              </div>
+                              <ArrowUpRight className="w-3 h-3 text-gray-200 group-hover:text-indigo-400 shrink-0 transition-colors" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Top tags */}
+                      <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
+                        <h2 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-4">Top Tags</h2>
+                        <div className="space-y-3.5">
+                          {topTags.map((tag, i) => (
+                            <div key={i}>
+                              <div className="flex justify-between mb-1.5">
+                                <span className="mono text-[10px] text-gray-500">#{tag.name}</span>
+                                <span className="mono text-[10px] font-bold text-gray-700">{tag.count}</span>
+                              </div>
+                              <div className="h-1 bg-gray-100 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full rounded-full"
+                                  style={{
+                                    width: `${(tag.count / tag.max) * 100}%`,
+                                    background: `hsl(${240 + i * 15}, 70%, 65%)`,
+                                  }}
+                                />
                               </div>
                             </div>
-                          </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="bg-white rounded-lg md:rounded-xl p-4 md:p-6 shadow-sm border border-gray-200">
-                    <h2 className="text-base md:text-lg font-semibold text-gray-800 mb-4">Top Tags</h2>
-                    <div className="space-y-3">
-                      {mockTopTags.map((tag, idx) => (
-                        <div key={idx}>
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-xs md:text-sm font-medium text-gray-700">{tag.name}</span>
-                            <span className="text-xs md:text-sm font-semibold text-gray-900">{tag.count}</span>
-                          </div>
-                          <div className="w-full bg-gray-100 rounded-full h-2">
-                            <div
-                              className="bg-gray-600 h-2 rounded-full transition-all"
-                              style={{ width: `${(tag.count / mockTopTags[0].count) * 100}%` }}
-                            />
-                          </div>
-                        </div>
-                      ))}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </motion.div>
+          </Reveal>
         </div>
       </section>
 
-      <section className="relative py-16 md:py-32 px-4 sm:px-6">
+      {/* ═══════════════ TESTIMONIALS ═══════════════ */}
+      <section
+        id="testimonials"
+        className="py-28 px-4 sm:px-6"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+      >
         <div className="max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            className="bg-linear-to-br from-neutral-300/5 to-white/5 border border-white/20 rounded-2xl md:rounded-3xl p-8 md:p-12 backdrop-blur-sm"
-          >
-            <Zap className="w-12 md:w-16 h-12 md:h-16 mx-auto mb-6 text-white" />
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6 px-2">
-              Start Building Your Second Brain
-            </h2>
-            <p className="text-base md:text-xl text-gray-400 mb-8 px-2">
-              Join thousands of users organizing their digital knowledge
+          <Reveal className="mb-16">
+            <p className="text-[10px] font-medium tracking-[0.25em] uppercase mb-4" style={{ color: "#6366f1" }}>
+              Testimonials
             </p>
-            <div className="flex flex-col gap-4 justify-center px-2">
-              <button onClick={() => navigtate('/auth')} className="group w-full sm:w-auto mx-auto px-8 py-3 md:py-4 bg-white text-black rounded-lg font-semibold flex items-center justify-center gap-2 hover:bg-gray-200 transition-all text-sm md:text-base">
-                Get Started Free
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform hidden sm:inline" />
-              </button>
-            </div>
-          </motion.div>
+            <h2
+              className="serif text-white"
+              style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", letterSpacing: "-0.02em", lineHeight: 1.1 }}
+            >
+              Loved by<br />
+              <span className="italic text-white/40">knowledge builders.</span>
+            </h2>
+          </Reveal>
+
+          <div className="grid sm:grid-cols-3 gap-4">
+            {testimonials.map((t, i) => (
+              <Reveal key={i} delay={i * 0.1}>
+                <motion.div
+                  whileHover={{ y: -6 }}
+                  transition={SPRING}
+                  className="rounded-2xl p-6 h-full flex flex-col group cursor-default"
+                  style={{
+                    background: "rgba(255,255,255,0.02)",
+                    border: "1px solid rgba(255,255,255,0.06)",
+                  }}
+                  onMouseEnter={e => {
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(99,102,241,0.2)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(99,102,241,0.04)";
+                  }}
+                  onMouseLeave={e => {
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.06)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.02)";
+                  }}
+                >
+                  <div className="flex gap-0.5 mb-5">
+                    {[...Array(5)].map((_, si) => (
+                      <Star key={si} className="w-3 h-3" fill="rgba(99,102,241,0.5)" stroke="none" />
+                    ))}
+                  </div>
+                  <p className="text-sm text-white/40 leading-relaxed mb-6 flex-1 italic serif">"{t.quote}"</p>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold"
+                      style={{ background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.25)", color: "#818cf8" }}
+                    >
+                      {t.name[0]}
+                    </div>
+                    <div>
+                      <p className="text-xs font-semibold text-white/70">{t.name}</p>
+                      <p className="text-[10px] text-white/25">{t.role} · {t.co}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
-      <footer className="relative border-t border-white/10 py-6 md:py-8 px-4 sm:px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center text-xs md:text-sm text-gray-500 gap-4">
-          <div className="flex items-center gap-2">
-            <BookmarkPlus className="w-4 h-4 md:w-5 md:h-5" />
-            <span>Second Brain © 2025</span>
+      {/* ═══════════════ CTA ═══════════════ */}
+      <section className="py-28 px-4">
+        <div className="max-w-2xl mx-auto">
+          <Reveal>
+            <div
+              className="relative rounded-3xl text-center overflow-hidden px-12 py-20"
+              style={{
+                background: "radial-gradient(ellipse at 50% -20%, rgba(99,102,241,0.18) 0%, rgba(5,5,10,0) 60%)",
+                border: "1px solid rgba(99,102,241,0.15)",
+              }}
+            >
+              {/* Top glow line */}
+              <div
+                className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-48"
+                style={{ background: "linear-gradient(90deg, transparent, rgba(99,102,241,0.6), transparent)" }}
+              />
+
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-8"
+                style={{
+                  background: "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(99,102,241,0.05))",
+                  border: "1px solid rgba(99,102,241,0.3)",
+                }}
+              >
+                <Zap className="w-6 h-6" style={{ color: "#818cf8" }} />
+              </div>
+
+              <h2
+                className="serif text-white mb-4"
+                style={{ fontSize: "clamp(2rem, 4.5vw, 3rem)", letterSpacing: "-0.02em", lineHeight: 1.1 }}
+              >
+                Build your second<br />
+                <span className="italic text-white/40">brain today.</span>
+              </h2>
+              <p className="text-sm text-white/30 mb-10 max-w-xs mx-auto leading-relaxed">
+                Join thousands of curious minds organizing their digital world.
+              </p>
+
+              <button
+                onClick={() => navigate("/auth")}
+                className="group inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 mb-4"
+                style={{
+                  background: "linear-gradient(135deg, #6366f1, #4f46e5)",
+                  boxShadow: "0 0 0 1px rgba(99,102,241,0.5), 0 16px 48px rgba(99,102,241,0.35)",
+                }}
+              >
+                Get Started Free
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </button>
+
+              <p className="text-[11px] text-white/20 mono">No credit card · Free forever · Open source</p>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══════════════ FOOTER ═══════════════ */}
+      <footer
+        className="py-8 px-6 sm:px-10"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+      >
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-2.5">
+            <div
+              className="w-5 h-5 rounded-md flex items-center justify-center"
+              style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5)" }}
+            >
+              <Bookmark className="w-2.5 h-2.5 text-white" />
+            </div>
+            <span className="text-xs text-white/25 font-medium">Second Brain © 2025</span>
           </div>
-          <div className="flex gap-4 md:gap-6">
-            <a href="#" className="hover:text-white transition-colors">
-              Privacy
-            </a>
-            <a href="#" className="hover:text-white transition-colors">
-              Terms
-            </a>
-            <a href="#" className="hover:text-white transition-colors">
-              Contact
-            </a>
+          <div className="flex gap-6">
+            {["Privacy", "Terms", "Contact"].map((l) => (
+              <a key={l} href="#" className="text-xs text-white/20 hover:text-white/60 transition-colors duration-200">
+                {l}
+              </a>
+            ))}
           </div>
         </div>
       </footer>
     </div>
   );
-};
-
-export default LandingPage;
+}

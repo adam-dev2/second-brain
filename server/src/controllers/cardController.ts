@@ -19,10 +19,13 @@ interface IAllCards {
   updatedAt: Date;
 }
 
+const escapeRegex =(text: string) => {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export const FetchMetrics = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
-    console.log(req.user);
 
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -167,8 +170,9 @@ export const FetchMetrics = async (req: Request, res: Response) => {
   }
 };
 
+
 export const createCard = async (req: Request, res: Response) => {
-  const { link, title, type, share, tags = [] } = req.body;
+  const { link, title, type, share, tags = [],sectionId=null } = req.body;
 
   if (!link || !title || !type) {
     return res.status(400).json({ message: "All fields are required" });
@@ -188,6 +192,7 @@ export const createCard = async (req: Request, res: Response) => {
       type,
       tags,
       share,
+      sectionId,
       status: "pending",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -220,10 +225,6 @@ export const createCard = async (req: Request, res: Response) => {
           error: message,
         });
       });
-    return res.status(201).json({
-      message: "Card created successfully (processing in background)",
-      card: newCard,
-    });
   } catch (err: unknown) {
     if (err instanceof Error) {
       console.error("Error creating card:", err);
@@ -264,7 +265,7 @@ export const EditCard = async (req: Request, res: Response) => {
       },
       { new: true }
     );
-    if (findCard.title !== title || findCard.link !== link) {
+    if (findCard.link !== link) {
       sendEvent(userID, "startCardProcessing", {
         cardId: findCard.cardId,
         title,
@@ -309,7 +310,7 @@ export const Query = async (req: Request, res: Response) => {
     return res.status(400).json({ message: "query missing" });
   }
 
-  const maxLimit = 50; // Maximum limit for search results
+  const maxLimit = 10; // Maximum limit for search results
   const finalLimit = Math.min(limit, maxLimit);
   const searchLimit = Math.min(finalLimit * page * 2, 200); // Get more results from Qdrant for better relevance
 
@@ -362,7 +363,6 @@ export const Query = async (req: Request, res: Response) => {
       }))
       .sort((a, b) => b.relevanceScore - a.relevanceScore);
 
-    // Apply pagination to the sorted results
     const totalResults = cardsWithScores.length;
     const totalPages = Math.ceil(totalResults / finalLimit);
     const startIndex = (page - 1) * finalLimit;
@@ -406,21 +406,34 @@ export const FetchAllCards = async (req: Request, res: Response) => {
     if (!userID) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const page = parseInt(req.query.page as string) || 1;     
-    const limit = parseInt(req.query.limit as string) || 10;  
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit as string) || 9);
+    const search = (req.query.search as string || "").trim();
     
     const maxLimit = 100;
     const finalLimit = Math.min(limit, maxLimit);
     const skip = (page - 1) * finalLimit;
+    const query:any = {
+      userId:userID
+    }
+
+    if (search) {
+      const safeSearch = escapeRegex(search)
+      query.$or = [
+        { title: { $regex: safeSearch, $options: "i" } },
+        { link: { $regex: safeSearch, $options: "i" } },
+        { type: { $regex: safeSearch, $options: "i" } }
+      ];
+    }
 
     const [cards, totalCards] = await Promise.all([
-      Content.find({ userId: userID })
-        .sort({ createdAt: -1 })           
+      Content.find(query)
+        .sort({ createdAt: -1 })
         .skip(skip)
         .limit(finalLimit)
         .lean(),
       
-      Content.countDocuments({ userId: userID })
+      Content.countDocuments(query)
     ]);
 
     const totalPages = Math.ceil(totalCards / finalLimit);
@@ -439,6 +452,8 @@ export const FetchAllCards = async (req: Request, res: Response) => {
     });
 
   } catch (err) {
+    console.log(err);
+    
     return res.status(500).json({ error: "Internal Server Error", details: err });
   }
 };

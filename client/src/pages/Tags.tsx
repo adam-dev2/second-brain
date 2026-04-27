@@ -10,6 +10,7 @@ import { loadingAtom } from "../store/atoms/loading";
 import axios from "axios";
 import LoadingOverlay from "../components/Loading";
 import { hideIconAtom } from "../store/atoms/hideIcons";
+import Layout from "../layouts/Layout";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface Card {
@@ -56,6 +57,11 @@ const Tags = () => {
       setLoading(true);
       try {
         const res = await axios.get(`${backendUrl}/api/v1/content/cards`, {
+          params: { 
+            page:1, 
+            limit: 100,
+            search: ''
+          },
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,
@@ -63,7 +69,7 @@ const Tags = () => {
           },
         });
         setAllCards(res.data.cards);
-        toast.success("Fetched all cards successfully");
+        // toast.success("Fetched all cards successfully");
       } catch (err) {
         console.error(err);
         toast.error("Failed to fetch cards");
@@ -79,7 +85,7 @@ const Tags = () => {
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  },[]);
 
   useEffect(() => {
     if (selected.length === 0) {
@@ -91,115 +97,133 @@ const Tags = () => {
   }, [selected, allCards]);
 
   return (
-    <>
-      {loading ? (
-        <LoadingOverlay />
-      ) : (
-        <div className="h-full w-full p-9">
-          <div className="items-center py-4">
-            <h1 className="text-3xl text-gray-800 mb-4 font-semibold">Tags</h1>
-            <div className="flex w-full justify-end-safe my-2">
-              {selected.length > 0 && (
-                <button
-                  onClick={handleClearFilter}
-                  className="px-3 py-2 bg-gray-800 text-white text-sm font-semibold hover:bg-gray-900 hover:scale-101 active:scale-95 rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2 transform transition-all"
-                >
-                  Clear Filter
-                </button>
-              )}
-            </div>
-            <div className="relative mb-4" ref={dropdownRef}>
-              <div
-                className="border border-gray-400 rounded-2xl bg-gray-50 p-2 outline-none placeholder:opacity-45 w-full cursor-text transition"
-                onClick={() => setShowDropdown(true)}
+  <Layout>
+    {loading ? (
+      <LoadingOverlay />
+    ) : (
+      <div>
+
+        {/* HEADER */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-black tracking-tight">Tags</h1>
+
+          <div className="flex justify-end mt-4">
+            {selected.length > 0 && (
+              <button
+                onClick={handleClearFilter}
+                className="px-4 py-2 text-sm rounded-full bg-white text-black font-medium hover:scale-[1.03] transition"
               >
-                <div className="flex flex-wrap gap-2">
-                  {selected.map((tag) => (
-                    <span
-                      key={tag}
-                      className="bg-gray-700 text-blue-50 px-3 py-1 rounded-xl text-sm flex items-center gap-2"
-                    >
-                      {tag}
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleTag(tag);
-                        }}
-                        className="text-xs hover:text-red-400"
-                      >
-                        <X className="cursor-pointer" size={14} />
-                      </button>
-                    </span>
-                  ))}
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onFocus={() => setShowDropdown(true)}
-                    placeholder={selected.length === 0 ? "Search or select tags..." : ""}
-                    className="bg-transparent outline-none flex-1 text-gray-700"
-                  />
+                Clear Filter
+              </button>
+            )}
+          </div>
+        </div>
 
-                  <ChevronDown />
-                </div>
-              </div>
+        {/* TAG SELECT DROPDOWN */}
+        <div className="relative mb-6" ref={dropdownRef}>
+          <div
+            onClick={() => setShowDropdown(true)}
+            className="w-full dark:bg-neutral-900 bg-white/80 border dark:border-white/[0.08] border-black/20 rounded-xl px-3 py-2 cursor-text"
+          >
+            <div className="flex flex-wrap gap-2 items-center">
 
-              {showDropdown && (
-                <div className="absolute mt-2 w-full max-h-56 overflow-y-auto rounded-xl border border-gray-300 bg-white shadow-lg z-10">
-                  {filteredTags.length > 0 ? (
-                    filteredTags.map((tag) => (
-                      <div
-                        key={tag}
-                        onClick={() => {
-                          toggleTag(tag);
-                          setSearch("");
-                        }}
-                        className={`px-4 py-2 text-sm cursor-pointer hover:bg-gray-100 ${
-                          selected.includes(tag) ? "bg-gray-200 font-medium" : ""
-                        }`}
-                      >
-                        {tag}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="px-4 py-2 text-sm text-gray-400">No matching tags</div>
-                  )}
-                </div>
-              )}
-            </div>
+              {/* SELECTED TAGS */}
+              {selected.map((tag) => (
+                <span
+                  key={tag}
+                  className="flex items-center gap-2 text-xs px-2 py-1 rounded-md dark:bg-white/[0.08] bg-black/4 text-neutral-500"
+                >
+                  {tag}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleTag(tag);
+                    }}
+                    className="hover:text-red-400"
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              ))}
 
-            <div
-              className={`grid gap-3 ${
-                isOpen
-                  ? "lg:grid-cols-2 xl:grid-cols-3 sm:grid-cols-1"
-                  : "md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-1"
-              }`}
-            >
-              {Array.isArray(filterCards) &&
-                filterCards.map((item) => (
-                  <Card
-                    key={item._id}
-                    title={item.title}
-                    link={item.link}
-                    tags={item.tags}
-                    share={item.share}
-                    createdAt={item.createdAt}
-                    updatedAt={item.updatedAt}
-                    id={item._id}
-                  />
-                ))}
+              {/* INPUT */}
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                onFocus={() => setShowDropdown(true)}
+                placeholder={
+                  selected.length === 0 ? "Search or select tags..." : ""
+                }
+                className="bg-transparent outline-none flex-1 text-sm text-neutral-500 placeholder:text-neutral-500"
+              />
+
+              <ChevronDown className="text-neutral-500" size={16} />
             </div>
           </div>
 
-          {allCards.length === 0 && (
-            <p className="text-gray-500 text-sm text-center py-8">
-              No tags, Create your first card with relevant tags!!
-            </p>
+          {/* DROPDOWN */}
+          {showDropdown && (
+            <div className="absolute mt-2 w-full max-h-56 overflow-y-auto rounded-xl border dark:border-white/[0.08] border-black/10 dark:bg-neutral-900 bg-white/80 shadow-xl z-20">
+              {filteredTags.length > 0 ? (
+                filteredTags.map((tag) => (
+                  <div
+                    key={tag}
+                    onClick={() => {
+                      toggleTag(tag);
+                      setSearch("");
+                    }}
+                    className={`px-4 py-2 text-sm cursor-pointer hover:bg-white/[0.06] ${
+                      selected.includes(tag)
+                        ? "dark:bg-white/[0.08] bg-black/10 dark:text-white text-black"
+                        : "text-neutral-500"
+                    }`}
+                  >
+                    {tag}
+                  </div>
+                ))
+              ) : (
+                <div className="px-4 py-2 text-sm text-neutral-500">
+                  No matching tags
+                </div>
+              )}
+            </div>
           )}
         </div>
-      )}
-    </>
-  );
+
+        {/* GRID */}
+        <div
+          className={`grid gap-4 ${
+            isOpen
+              ? "lg:grid-cols-2 xl:grid-cols-3 sm:grid-cols-1"
+              : "md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-1"
+          }`}
+        >
+          {Array.isArray(filterCards) &&
+            filterCards.map((item) => (
+              <Card
+                key={item._id}
+                title={item.title}
+                link={item.link}
+                tags={item.tags}
+                share={item.share}
+                createdAt={item.createdAt}
+                updatedAt={item.updatedAt}
+                id={item._id}
+              />
+            ))}
+        </div>
+
+        {/* EMPTY STATE */}
+        {allCards.length === 0 && (
+          <p className="text-neutral-500 text-sm text-center py-10">
+            No tags yet. Create your first card with tags.
+          </p>
+        )}
+      </div>
+    )}
+  </Layout>
+);
 };
 
 export default Tags;

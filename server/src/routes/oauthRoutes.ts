@@ -9,12 +9,13 @@ import {
   SignupController,
 } from "../controllers/authController.js";
 import passport from "../utils/passport.js";
+import { verifyUser } from "../controllers/verifyUserController.js";
 
 const router = express.Router();
 
-const FRONTEND_URL = process.env.FRONTEND_URL || "https://secondbrain.madebyadam.xyz";
-const JWT_SECRET = process.env.JWT_SECRET ?? "";
-const isProduction = process.env.NODE_ENV == 'development'
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173/";
+const JWT_SECRET = process.env.JWT_SECRET ?? "S3cretT";
+const isProduction = process.env.NODE_ENV == 'production'
 
 
 interface JwtUser {
@@ -23,11 +24,18 @@ interface JwtUser {
 }
 
 function setJwtCookie(res: Response, user: JwtUser) {
-  const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "7d" });
+  const token = jwt.sign(
+    { id: user._id,
+      username:user.username
+    },
+    JWT_SECRET,
+    { expiresIn: "7d" }
+  );
+
   res.cookie("token", token, {
-    httpOnly: isProduction,
+    httpOnly: true,
     secure: isProduction,
-    sameSite: "lax",
+    sameSite: isProduction?"none":"lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
     path:"/",
     ...(isProduction && { domain: ".madebyadam.xyz" }),
@@ -36,13 +44,7 @@ function setJwtCookie(res: Response, user: JwtUser) {
 
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
-router.get(
-  "/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: `${FRONTEND_URL}/`,
-    session: false,
-  }),
-  (req: Request, res: Response) => {
+router.get( "/google/callback", passport.authenticate("google", { failureRedirect: `${FRONTEND_URL}/`,session: false,}),(req: Request, res: Response) => {
     const user = req.user as any;
     if (!user) return res.redirect(`${FRONTEND_URL}/?error=no_user`);
     setJwtCookie(res, { _id: user.id, username: user.username });
@@ -60,12 +62,22 @@ router.get(
   }),
   (req: Request, res: Response) => {
     const user = req.user as any;
+    console.log(user);
+    
     if (!user) return res.redirect(`${FRONTEND_URL}/?error=no_user`);
     setJwtCookie(res, { _id: user.id, username: user.username });
     res.redirect(`${FRONTEND_URL}/home/dashboard`);
   }
 );
 
+router.get('/me',verifyUser,(req:Request,res:Response) => {
+  console.log('lmao');
+  
+  return res.status(200).json({
+    message:"Verified User",
+    user:req.user
+  })
+})
 router.post("/signup", SignupController);
 router.post("/login", LoginController);
 router.post("/forgot-password", ForgetPasswordController);

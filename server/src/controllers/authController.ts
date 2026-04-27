@@ -5,6 +5,7 @@ import { ZodError } from "zod";
 import UserModal from "../models/User.js";
 import { signupSchema, loginSchema } from "../validations/AuthSchema.js";
 import nodemailer from "nodemailer";
+import { resetPasswordTemplate } from "../utils/resetPasswordTemplate.js";
 
 interface CookieOptions {
   httpOnly: boolean;
@@ -91,12 +92,12 @@ export const LoginController = async (req: Request, res: Response) => {
         username: findUser.username,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "7d" }
     );
     const cookieOptions: CookieOptions = {
       httpOnly: true,
       secure: isProduction,
-      maxAge: 60 * 60 * 1000,
+      maxAge: 24 * 60 * 60 * 1000,
       sameSite: isProduction ? 'lax' : 'lax',  
       path: "/",
       ...(isProduction && { domain: ".madebyadam.xyz" }),
@@ -131,13 +132,10 @@ export const ForgetPasswordController = async (req: Request, res: Response) => {
     const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
 
     await transporter.sendMail({
-      from: `"Second Brain" ${process.env.EMAIL_USER}`,
+      from: `"Second Brain" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: "Reset Your Password",
-      html: `<p>Click the link below to reset your password:</p>
-        <a href="${resetLink}">${resetLink}</a>
-        <p>This link expires in 15 minutes.</p>
-      `,
+      subject: "Reset your password",
+      html: resetPasswordTemplate(resetLink),
     });
     res.json({ message: "Password reset email sent" });
   } catch (err) {
@@ -154,7 +152,7 @@ export const ResetPasswordController = async (req: Request, res: Response) => {
     console.log(user?.username);
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid or expired token" });
+      return res.status(401).json({ message: "Invalid or expired token" });
     }
     if (!newPassword) {
       return res.status(400).json({ message: "new Password is required" });
@@ -167,7 +165,7 @@ export const ResetPasswordController = async (req: Request, res: Response) => {
     return res.status(200).json({ message: "Password reset succesfully" });
   } catch (err) {
     console.log(err);
-    return res.status(400).json({ message: "Invalid or expired token" });
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 

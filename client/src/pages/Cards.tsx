@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Card from "../components/Card";
-import { Share2, Plus, Move } from "lucide-react";
+import { Share2, Plus } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
@@ -16,17 +16,18 @@ import { sharelink } from "../store/atoms/sharelink";
 import { hideIconAtom } from "../store/atoms/hideIcons";
 import { handleError } from "../utils/handleError";
 import CardSkeleton from "../components/CardSkeleton";
+import Pagination from "../components/Pagination"; // ← import
+import Layout from "../layouts/Layout";
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
-interface IOrgCard {
-  _id: string;
-  title: string;
-  link: string;
-  tags: string[];
-  share: boolean;
-  type: string;
-  createdAt: string;
-  updatedAt: string;
+interface PaginationMeta {
+  totalCards: number;
+  totalPages: number;
+  currentPage: number;
+  limit: number;
+  hasNextPage: boolean;
+  hasPrevPage: boolean;
 }
 
 const Cards = () => {
@@ -38,87 +39,93 @@ const Cards = () => {
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
   const [search, setSearch] = useState("");
-  const [originalCards, setOriginalCards] = useState<IOrgCard[]>([]);
   const isOpen = useRecoilValue(sidebarAtom);
   const searchModal = useRecoilValue(searchModalAtom);
   const setSearchModal = useSetRecoilState(searchModalAtom);
   const setHideIcons = useSetRecoilState(hideIconAtom);
+  const [debouncedSearch,setDebouncedSearch] = useState("");
+  
+  const [pagination, setPagination] = useState<PaginationMeta | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const loadStartTime = useRef<number>(Date.now());
 
-  const handleClick = () => {
-    setModal((prev) => !prev);
-  };
-  let processingToastId: string | undefined;
+  
+
+  const handleClick = () => setModal((prev) => !prev);
+
+  const processingToastId = useRef<string | undefined>(undefined)
   useEffect(() => {
-    const es = new EventSource(`${backendUrl}/events`, {
-      withCredentials: true,
-    });
-
+    const es = new EventSource(`${backendUrl}/api/v1/events`, { withCredentials: true });
     es.addEventListener("startCardProcessing", (e) => {
       const data = JSON.parse(e.data);
-      processingToastId = toast.loading(`${data.message}`, {
-        position: "top-right",
-      });
+      processingToastId.current = toast.loading(`${data.message}`, { position: "top-right" });
     });
-
     es.addEventListener("cardProcessed", (e) => {
       const data = JSON.parse(e.data);
-      console.log("Card Processed succesfull", data);
-      toast.success(`${data.message}`, {
-        id: processingToastId,
-        position: "top-right",
-      });
+      toast.success(`${data.message}`, { id: processingToastId.current, position: "top-right" });
     });
-
     es.addEventListener("cardFailed", (e) => {
       const data = JSON.parse(e.data);
-      console.log("Card processing failed");
-      toast.error(`${data.message}`, {
-        id: processingToastId,
-        position: "top-right",
-      });
+      toast.error(`${data.message}`, { id: processingToastId.current, position: "top-right" });
     });
-
     return () => es.close();
-  }, []);
+  },[]);
+
   useEffect(() => {
-    console.log(searchModal);
+    const handler = setTimeout(() => {
+      setDebouncedSearch(search);
+      setCurrentPage(1); // reset page on new search
+    }, 400);
+
+    return () => clearTimeout(handler);
+  }, [search]);
+
+  const fetchCards = async (page: number, searchQuery = "") => {
     setHideIcons(true);
     const token = Cookies.get("token");
-    const fetchCards = async () => {
-      setLoading(true);
-      try {
-        const res = await axios.get(`${backendUrl}/api/v1/content/cards`, {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-        setAllCards(res.data.cards);
-        setOriginalCards(res.data.cards);
-        toast.success("Fetched all cards successfully");
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to fetch cards");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCards();
-  }, [setAllCards]);
+    setLoading(true);
+    loadStartTime.current = Date.now();
+
+    try {
+      const res = await axios.get(`${backendUrl}/api/v1/content/cards`, {
+        params: { 
+          page, 
+          limit: 9,
+          search: searchQuery
+        },
+        withCredentials: true,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      setAllCards(res.data.cards);
+      setPagination(res.data.pagination);
+
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to fetch cards");
+    } finally {
+      const elapsed = Date.now() - loadStartTime.current;
+      const remaining = Math.max(0, 1000 - elapsed);
+      setTimeout(() => setLoading(false), remaining);
+    }
+  };
+
+  useEffect(() => {
+    fetchCards(currentPage, debouncedSearch);
+  }, [currentPage, debouncedSearch]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setSearch("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearch(value);
-    console.log(value.length, value.trim() !== "");
-    if (value.trim() !== "") {
-      const filtered = originalCards.filter((item) =>
-        item.title.toLowerCase().includes(value.toLowerCase())
-      );
-      setAllCards(filtered);
-    } else {
-      setAllCards(originalCards);
-    }
+    const str = e.target.value.trim();
+    setSearch(str);
   };
 
   const handleShare = async () => {
@@ -127,15 +134,12 @@ const Cards = () => {
     try {
       const res = await axios.get(`${backendUrl}/api/v1/brain/share`, {
         withCredentials: true,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
-      console.log(res.data.ShareableLink);
-      toast.success("Shareable Link generated");
+      // toast.success("Shareable Link generated");
       setSearchModal(true);
-      setShareLink(`https://secondbrain.madebyadam.xyz/${res.data.ShareableLink}`);
+      const baseUrl = window.location.origin;
+      setShareLink(`${baseUrl}/${res.data.ShareableLink}`);
     } catch (err: unknown) {
       handleError(err, "Error while sharing brain");
       throw err;
@@ -145,71 +149,104 @@ const Cards = () => {
   };
 
   if (loading) {
-    return <CardSkeleton/>;
+    return <CardSkeleton />;
   }
+
   return (
-    <>
-        <div className="min-h-screen w-full p-9">
-          <div className="">
-            <h1 className="text-4xl font-semibold text-gray-800 tracking-tight py-4">
-              Cards
-            </h1>
-            <div className="flex items-center justify-between pb-4">
-              <div className="flex justify-start  md:justify-end-safe w-full mr-4">
-                <input
-                  value={search}
-                  type="text"
-                  className="border border-gray-400 rounded-2xl bg-gray-50 p-2 outline-none placeholder:opacity-45  focus-within:scale-103 transition "
-                  placeholder="eg: Title"
-                  onChange={handleSearch}
-                />
-              </div>
-              <div className={`flex flex-row items-center gap-3`}>
-                <button
-                  onClick={handleClick}
-                  className="cursor-pointer flex items-center gap-2 bg-zinc-900 text-gray-100 hover:text-gray-800 hover:border hover:border-gray-700 font-medium rounded-full py-2 px-4 hover:bg-zinc-200 hover:scale-[1.01] transition-all duration-200"
-                >
-                  <Plus size={20} />
-                  <span >Add</span>
-                </button>
-                <button
-                  onClick={handleShare}
-                  className="cursor-pointer flex items-center gap-2 bg-red-50 text-red-400 font-medium rounded-full py-2 px-4 border border-red-400 hover:bg-red-100 hover:text-red-500 hover:scale-[1.03] transition-all duration-200"
-                >
-                  <Share2 size={20} />
-                  <span >Share</span>
-                </button>
-              </div>
+    <Layout>
+      <div>
+
+        {/* HEADER */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-black tracking-tight">Cards</h1>
+
+          <div className="flex items-center justify-between mt-4 gap-4 flex-wrap">
+
+            {/* SEARCH */}
+            <div className="flex-1 min-w-[200px]">
+              <input
+                value={search}
+                type="text"
+                className="w-full dark:bg-neutral-900 bg-white/60 border dark:border-white/8 border-black/20 rounded-xl px-4 py-2 text-sm outline-none placeholder:text-neutral-500 dark:focus:border-white/20 focus:border-black/20 transition"
+                placeholder="Search cards..."
+                onChange={handleSearch}
+              />
             </div>
+
+            {/* ACTIONS */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleClick}
+                className="flex items-center gap-2 dark:bg-white bg-black/90 dark:text-black text-white text-sm font-medium px-4 py-2 rounded-full hover:scale-[1.03] transition-all"
+              >
+                <Plus size={18} />
+                Add
+              </button>
+
+              <button
+                onClick={handleShare}
+                className="flex dark:bg-black text-neutral-900 bg-white/80 items-center gap-2 border dark:border-black/80 dark:text-white/80 cursor-pointer text-sm px-4 py-2 rounded-full dark:hover:bg-white/10 hover:-black/70 hover:scale-[1.03] transition"
+              >
+                <Share2 size={18} />
+                Share
+              </button>
+            </div>
+
           </div>
-          <div
-            className={`grid gap-3 ${isOpen ? "lg:grid-cols-2 xl:grid-cols-3 sm:grid-cols-1" : "md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-1"}`}
-          >
-            {Array.isArray(allCards) &&
-              allCards.map((item, idx) => {
-                return (
-                  <Card
-                    key={idx}
-                    title={item.title}
-                    link={item.link}
-                    tags={item.tags}
-                    share={item.share}
-                    createdAt={item.createdAt}
-                    updatedAt={item.updatedAt}
-                    id={item._id}
-                  />
-                );
-              })}
-          </div>
-          {modal && <AddCard />}
-          {searchModal && <ShareModal />}
-          {allCards.length === 0 && (
-            <p className="text-gray-500 text-sm text-center py-8">
-              No cards yet. Create your first card!
-            </p>
-          )}
         </div>
-    </>
+
+        {/* GRID */}
+        <div
+          className={`grid gap-4 ${
+            isOpen
+              ? "lg:grid-cols-2 xl:grid-cols-3 sm:grid-cols-1"
+              : "md:grid-cols-2 lg:grid-cols-3 sm:grid-cols-1"
+          }`}
+        >
+          {Array.isArray(allCards) &&
+            allCards.map((item) => (
+              <Card
+                key={item._id}
+                title={item.title}
+                link={item.link}
+                tags={item.tags}
+                share={item.share}
+                createdAt={item.createdAt}
+                updatedAt={item.updatedAt}
+                id={item._id}
+              />
+            ))}
+        </div>
+
+        {/* PAGINATION */}
+        {pagination && (
+          <div className="mt-6">
+            <Pagination
+              currentPage={pagination.currentPage}
+              totalPages={pagination.totalPages}
+              totalItems={pagination.totalCards}
+              limit={pagination.limit}
+              hasNextPage={pagination.hasNextPage}
+              hasPrevPage={pagination.hasPrevPage}
+              onPageChange={handlePageChange}
+              itemLabel="cards"
+            />
+          </div>
+        )}
+
+        {/* MODALS */}
+        {modal && <AddCard id={null} />}
+        {searchModal && <ShareModal />}
+
+        {/* EMPTY STATE */}
+        {allCards.length === 0 && (
+          <p className="text-neutral-500 text-sm text-center py-10">
+            No cards yet. Create your first card!
+          </p>
+        )}
+
+      </div>
+    </Layout>
   );
 };
 

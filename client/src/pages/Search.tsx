@@ -7,13 +7,15 @@ import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { sidebarAtom } from "../store/atoms/sidebar";
 import { hideIconAtom } from "../store/atoms/hideIcons";
-import { Search as SearchIcon, ExternalLink, Lock, Globe } from "lucide-react";
+import { Search as SearchIcon } from "lucide-react";
 import { handleError } from "../utils/handleError";
 import SearchResultsSkeleton from "../components/SearchResultsSkeleton";
+import Layout from "../layouts/Layout";
+import Card from "../components/Card";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface CardData {
-  _id: string;
+  id: string;
   title: string;
   link: string;
   tags: string[];
@@ -47,7 +49,7 @@ const Search = () => {
 
   useEffect(() => {
     setHideIcons(true);
-  }, []);
+  },[]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value);
 
@@ -104,264 +106,164 @@ const Search = () => {
   };
 
   return (
-    <>
-      {loading ? (
-        <SearchResultsSkeleton />
-      ) : (
-        <div className="w-full p-9 pt-20">
-          <div className="mb-8 ">
-            <div className="flex gap-3 mb-4 ">
-              <div className="h-full">
-                <h1 className="text-4xl font-bold text-gray-900 tracking-tight flex items-center gap-2">
-                  Elastic Search
-                </h1>
-                <p className="text-gray-600 mt-1">Find cards by meaning, not just keywords</p>
+  <Layout>
+    {loading ? (
+      <SearchResultsSkeleton />
+    ) : (
+      <div>
+
+        {/* HEADER */}
+        <div className="mb-10">
+          <h1 className="text-3xl font-black tracking-tight mb-2 text-neutral-900 dark:text-white">
+            Elastic Search
+          </h1>
+          <p className="text-neutral-500 dark:text-neutral-500 text-sm">
+            Find cards by meaning, not just keywords
+          </p>
+
+          {/* SEARCH BAR */}
+          <div className="mt-6 bg-neutral-100 dark:bg-neutral-900 border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-3">
+            <div className="flex gap-3 flex-wrap">
+
+              <div className="flex-1 relative">
+                <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 dark:text-neutral-500" />
+                <input
+                  onKeyDown={handleKeyDown}
+                  value={search}
+                  type="text"
+                  className="w-full pl-10 pr-3 py-3 bg-transparent outline-none text-sm text-neutral-900 dark:text-white placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
+                  placeholder="Ask anything... e.g., 'authentication security patterns'"
+                  onChange={handleChange}
+                />
               </div>
-            </div>
 
-            <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-200 p-2 hover:shadow-2xl transition-shadow">
-              <div className="flex gap-3">
-                <div className="flex-1 relative">
-                  <SearchIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    onKeyDown={handleKeyDown}
-                    value={search}
-                    type="text"
-                    className="w-full pl-12 pr-4 py-4 bg-transparent outline-none text-gray-900 placeholder:text-gray-400 text-lg"
-                    placeholder="Ask anything... e.g., 'authentication security patterns'"
-                    onChange={handleChange}
-                  />
-                </div>
-
-                <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-200">
-                  <span className="text-gray-700 text-sm font-medium whitespace-nowrap">Top</span>
-                  <input
-                    type="number"
-                    min="1"
-                    max="50"
-                    value={limit}
-                    onChange={(e) => setLimit(e.target.value)}
-                    className="w-12 bg-white border border-gray-200 rounded-lg px-2 py-1 outline-none text-center text-gray-800 font-medium"
-                  />
-                </div>
-
-                <button
-                  onClick={handleSearch}
-                  className="hidden md:flex px-8 py-4 bg-gray-800 text-white text-lg font-semibold hover:bg-gray-900 hover:scale-105 active:scale-95 transition-all rounded-xl shadow-lg hover:shadow-xl items-center gap-2"
-                >
-                  <SearchIcon className="w-5 h-5" />
-                  Search
-                </button>
+              {/* LIMIT */}
+              <div className="flex items-center gap-2 px-3 py-2 bg-black/[0.04] dark:bg-white/[0.06] rounded-xl border border-black/[0.08] dark:border-white/[0.08]">
+                <span className="text-neutral-500 dark:text-neutral-400 text-xs">Top</span>
+                <input
+                  type="number"
+                  min="1"
+                  max="50"
+                  value={limit}
+                  onChange={(e) => setLimit(e.target.value)}
+                  className="w-12 bg-transparent border border-black/[0.08] dark:border-white/[0.08] rounded px-1 py-0.5 outline-none text-center text-neutral-900 dark:text-white text-xs"
+                />
               </div>
-            </div>
-               <div className="w-full flex gap-3 justify-end mt-3">
-                <div className="md:hidden flex h-14 items-center gap-2 px-4 py-2 bg-gray-100 rounded-xl border border-gray-400 w-28 shadow-2xl">
-                  <span className="text-gray-700 text-sm font-medium whitespace-nowrap">Top</span>
-                  <input
-                    type="number"
-                    min="1"
-                    max="50"
-                    value={limit}
-                    onChange={(e) => setLimit(e.target.value)}
-                    className="w-12 bg-white border border-gray-200 rounded-lg px-2 py-1 outline-none text-center text-gray-800 font-medium"
-                  />
-                </div>
-                <button
-                  onClick={handleSearch}
-                  className="md:hidden h-14 px-6 bg-gray-800 text-white text-lg font-semibold hover:bg-gray-900 hover:scale-105 active:scale-95 transition-all rounded-xl shadow-lg hover:shadow-xl flex items-center gap-2"
-                >
-                  <SearchIcon className="w-5 h-5" />
-                  Search
-                </button>
-               </div>
-          </div>
 
-          {hasSearched && (
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                Search Results
-                {queryCards.length > 0 && (
-                  <span className="text-lg font-normal text-gray-600">
-                    ({queryCards.length} {queryCards.length === 1 ? "result" : "results"})
-                  </span>
-                )}
-              </h2>
-              {queryCards.length > 0 && (
-                <p className="text-gray-600 mt-1">Sorted by relevance using AI semantic matching</p>
-              )}
-            </div>
-          )}
-          {!hasSearched && (
-            <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-300">
-              <SearchIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Start exploring your saved content
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Powered by Elastic — search deeply across titles, tags, and text in real time.
-              </p>
-            </div>
-          )}
-          {hasSearched && queryCards.length === 0 ? (
-            <div className="text-center py-16 bg-white rounded-2xl border-2 border-dashed border-gray-300">
-              <SearchIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No Results Found</h3>
-              <p className="text-gray-600 mb-4">
-                Try adjusting your search query or check your spelling
-              </p>
+              {/* BUTTON */}
               <button
-                onClick={() => setHasSearched(false)}
-                className="text-gray-800 hover:text-gray-900 font-medium underline"
+                onClick={handleSearch}
+                className="px-5 py-3 bg-neutral-900 dark:bg-white text-white dark:text-black text-sm font-medium rounded-xl hover:scale-[1.03] transition"
               >
-                Try a different search
+                Search
               </button>
             </div>
-          ) : (
-            <div
-              className={`grid gap-4 ${
-                isOpen
-                  ? "lg:grid-cols-2 xl:grid-cols-3 sm:grid-cols-1"
-                  : "md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 sm:grid-cols-1"
-              }`}
-            >
-              {queryCards.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="group bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-gray-400 shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col relative overflow-hidden"
-                >
-                  <div className="absolute top-4 right-4 w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
-                    {idx + 1}
-                  </div>
-
-                  {item.relevanceScore && (
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gray-100">
-                      <div
-                        className="h-full bg-gray-800 transition-all"
-                        style={{ width: `${item.relevanceScore * 100}%` }}
-                      ></div>
-                    </div>
-                  )}
-
-                  <div className="flex items-start justify-between gap-3 flex-1 mt-2 ">
-                    <h1 className="flex-1 text-xl font-bold text-gray-900 line-clamp-2 group-hover:text-gray-700 transition-colors text-wrap">
-                      {item.title}
-                    </h1>
-                  </div>
-
-                  <div className="flex items-center justify-between mt-4 gap-3">
-                    <a
-                      href={item.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gray-700 hover:text-gray-900 text-sm truncate flex-1 hover:underline transition-colors font-medium flex items-center gap-1.5 group/link"
-                    >
-                      <ExternalLink className="w-4 h-4 group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform" />
-                      Visit Link
-                    </a>
-                    <span
-                      className={`px-3 py-1.5 text-xs font-bold rounded-full whitespace-nowrap flex items-center gap-1.5 shadow-sm ${
-                        item.share ? "bg-gray-800 text-white" : "bg-gray-200 text-gray-800"
-                      }`}
-                    >
-                      {item.share ? (
-                        <>
-                          <Globe className="w-3 h-3" />
-                          Public
-                        </>
-                      ) : (
-                        <>
-                          <Lock className="w-3 h-3" />
-                          Private
-                        </>
-                      )}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2 mt-4">
-                    {item.tags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="bg-gray-100 text-gray-700 text-xs font-semibold rounded-lg px-3 py-1.5 border border-gray-300 hover:border-gray-400 hover:shadow-md transition-all cursor-pointer"
-                      >
-                        #{tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex justify-between items-center text-xs text-gray-500 pt-4 mt-4 border-t border-gray-200">
-                    <span className="flex items-center gap-1.5 font-medium">
-                      <span className="text-gray-400">Created:</span>
-                      <span className="text-gray-700">{item.createdAt?.slice(0, 10)}</span>
-                    </span>
-                    <span className="flex items-center gap-1.5 font-medium">
-                      <span className="text-gray-400">Updated:</span>
-                      <span className="text-gray-700">{item.updatedAt?.slice(0, 10)}</span>
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Pagination Controls */}
-          {hasSearched && pagination && pagination.totalPages > 1 && (
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-white rounded-2xl p-6 border-2 border-gray-200 shadow-lg">
-              <div className="text-sm text-gray-600">
-                Showing {((pagination.currentPage - 1) * pagination.limit) + 1} to {Math.min(pagination.currentPage * pagination.limit, pagination.totalResults)} of {pagination.totalResults} results
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => handlePageChange(pagination.currentPage - 1)}
-                  disabled={!pagination.hasPrevPage}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Previous
-                </button>
-
-                <div className="flex items-center gap-1">
-                  {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (pagination.totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (pagination.currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (pagination.currentPage >= pagination.totalPages - 2) {
-                      pageNum = pagination.totalPages - 4 + i;
-                    } else {
-                      pageNum = pagination.currentPage - 2 + i;
-                    }
-
-                    return (
-                      <button
-                        key={pageNum}
-                        onClick={() => handlePageChange(pageNum)}
-                        className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                          pageNum === pagination.currentPage
-                            ? "bg-gray-800 text-white"
-                            : "text-gray-700 bg-gray-100 hover:bg-gray-200"
-                        }`}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <button
-                  onClick={() => handlePageChange(pagination.currentPage + 1)}
-                  disabled={!pagination.hasNextPage}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
-      )}
-    </>
-  );
+
+        {/* RESULTS HEADER */}
+        {hasSearched && (
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">
+              Search Results{" "}
+              {queryCards.length > 0 && (
+                <span className="text-neutral-400 dark:text-neutral-500 text-sm">
+                  ({queryCards.length})
+                </span>
+              )}
+            </h2>
+            {queryCards.length > 0 && (
+              <p className="text-neutral-500 text-sm mt-1">
+                Sorted by relevance using AI semantic matching
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* EMPTY (BEFORE SEARCH) */}
+        {!hasSearched && (
+          <div className="text-center py-16 border border-dashed border-black/[0.08] dark:border-white/[0.08] rounded-2xl">
+            <SearchIcon className="w-10 h-10 text-neutral-300 dark:text-neutral-600 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-neutral-900 dark:text-white mb-2">
+              Start exploring your content
+            </h3>
+            <p className="text-neutral-500 text-sm">
+              Search across titles, tags, and more
+            </p>
+          </div>
+        )}
+
+        {/* NO RESULTS */}
+        {hasSearched && queryCards.length === 0 && (
+          <div className="text-center py-16 border border-dashed border-black/[0.08] dark:border-white/[0.08] rounded-2xl">
+            <SearchIcon className="w-10 h-10 text-neutral-300 dark:text-neutral-600 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-neutral-900 dark:text-white mb-2">
+              No Results Found
+            </h3>
+            <p className="text-neutral-500 text-sm mb-4">
+              Try adjusting your search
+            </p>
+            <button
+              onClick={() => setHasSearched(false)}
+              className="text-sm text-neutral-500 dark:text-neutral-300 underline"
+            >
+              Try again
+            </button>
+          </div>
+        )}
+
+        {/* RESULTS GRID */}
+        {hasSearched && queryCards.length > 0 && (
+          <div
+            className={`grid gap-4 ${
+              isOpen
+                ? "lg:grid-cols-2 xl:grid-cols-3"
+                : "md:grid-cols-2 lg:grid-cols-3"
+            }`}
+          >
+            {queryCards.map((item, idx) => (
+              <Card key={idx} {...item} />
+            ))}
+          </div>
+        )}
+
+        {/* PAGINATION */}
+        {hasSearched && pagination && pagination.totalPages > 1 && (
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-neutral-100 dark:bg-neutral-900 border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5">
+
+            <div className="text-xs text-neutral-400 dark:text-neutral-500">
+              Showing{" "}
+              {(pagination.currentPage - 1) * pagination.limit + 1} to{" "}
+              {Math.min(
+                pagination.currentPage * pagination.limit,
+                pagination.totalResults
+              )}{" "}
+              of {pagination.totalResults}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => handlePageChange(pagination.currentPage - 1)}
+                disabled={!pagination.hasPrevPage}
+                className="px-3 py-1.5 text-xs rounded bg-black/[0.06] dark:bg-white/[0.06] text-neutral-700 dark:text-white disabled:opacity-40 hover:bg-black/[0.1] dark:hover:bg-white/[0.1] transition-colors"
+              >
+                Prev
+              </button>
+              <button
+                onClick={() => handlePageChange(pagination.currentPage + 1)}
+                disabled={!pagination.hasNextPage}
+                className="px-3 py-1.5 text-xs rounded bg-black/[0.06] dark:bg-white/[0.06] text-neutral-700 dark:text-white disabled:opacity-40 hover:bg-black/[0.1] dark:hover:bg-white/[0.1] transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
+
+      </div>
+    )}
+  </Layout>
+);
 };
 
 export default Search;
