@@ -1,14 +1,17 @@
 import { AlertTriangle } from "lucide-react";
+import { useRecoilValue } from "recoil";
+import { deleteSectionAtom } from "../store/atoms/deleteSection";
 
 interface Props {
   onClose: () => void;
-  onDeleteAll: () => void;
-  onMoveAndDelete: () => void;
+  onDeleteAll: (deleteAll:boolean) => void;
+  onMoveAndDelete: (deleteAll:boolean) => void;
 }
 
 const DeleteConfirmation = ({onClose, onDeleteAll, onMoveAndDelete}: Props) => {
-
-
+  const deleteSection = useRecoilValue(deleteSectionAtom);
+  
+  
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
@@ -41,7 +44,7 @@ const DeleteConfirmation = ({onClose, onDeleteAll, onMoveAndDelete}: Props) => {
         <div className="space-y-3 mt-5">
           {/* DELETE ALL */}
           <button
-            onClick={onDeleteAll}
+            onClick={() => {onDeleteAll(true)}}
             className="w-full text-left p-4 rounded-xl border
             border-red-300 dark:border-red-500/30
             bg-red-50 dark:bg-red-500/10
@@ -58,7 +61,7 @@ const DeleteConfirmation = ({onClose, onDeleteAll, onMoveAndDelete}: Props) => {
 
           {/* SAFE OPTION */}
           <button
-            onClick={onMoveAndDelete}
+            onClick={() => {onMoveAndDelete(false)}}
             className="w-full text-left p-4 rounded-xl border
             border-black/10 dark:border-white/10
             bg-neutral-50 dark:bg-neutral-800
@@ -79,9 +82,9 @@ const DeleteConfirmation = ({onClose, onDeleteAll, onMoveAndDelete}: Props) => {
           <button
             onClick={onClose}
             className="px-4 py-2 text-sm rounded-lg
-            border border-black/10 dark:border-white/10
+            border border-black/30 dark:border-white/20
             hover:bg-neutral-100 dark:hover:bg-neutral-800
-            transition"
+            transition text-black/80 dark:text-white/80 cursor-pointer"
           >
             Cancel
           </button>

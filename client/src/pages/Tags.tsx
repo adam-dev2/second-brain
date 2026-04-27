@@ -57,7 +57,11 @@ const Tags = () => {
       setLoading(true);
       try {
         const res = await axios.get(`${backendUrl}/api/v1/content/cards`, {
-          params:{limit:100},
+          params: { 
+            page:1, 
+            limit: 100,
+            search: ''
+          },
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,

@@ -19,6 +19,10 @@ interface IAllCards {
   updatedAt: Date;
 }
 
+const escapeRegex =(text: string) => {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export const FetchMetrics = async (req: Request, res: Response) => {
   try {
     const userId = req.user?.id;
@@ -404,7 +408,7 @@ export const FetchAllCards = async (req: Request, res: Response) => {
     }
     const page = Math.max(1, parseInt(req.query.page as string) || 1);
     const limit = Math.max(1, parseInt(req.query.limit as string) || 9);
-    const search = (req.query.search as string).trim();
+    const search = (req.query.search as string || "").trim();
     
     const maxLimit = 100;
     const finalLimit = Math.min(limit, maxLimit);
@@ -414,10 +418,11 @@ export const FetchAllCards = async (req: Request, res: Response) => {
     }
 
     if (search) {
+      const safeSearch = escapeRegex(search)
       query.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { link: { $regex: search, $options: "i" } },
-        { type: { $regex: search, $options: "i" } }
+        { title: { $regex: safeSearch, $options: "i" } },
+        { link: { $regex: safeSearch, $options: "i" } },
+        { type: { $regex: safeSearch, $options: "i" } }
       ];
     }
 
@@ -447,6 +452,8 @@ export const FetchAllCards = async (req: Request, res: Response) => {
     });
 
   } catch (err) {
+    console.log(err);
+    
     return res.status(500).json({ error: "Internal Server Error", details: err });
   }
 };

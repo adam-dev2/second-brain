@@ -1,9 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { NavLink, useLocation } from "react-router-dom"; // ✅ added useLocation
+import { NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Layers, ChevronDown, Plus, Hash, Check, Trash2 } from "lucide-react";
 import axios from "axios";
-import toast from "react-hot-toast";
 import { handleError } from "../utils/handleError";
 import Cookies from "js-cookie";
 import { useRecoilValue, useSetRecoilState } from "recoil";
@@ -31,7 +30,7 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
   const sections = useRecoilValue(sectionsAtom);
   const inputRef = useRef<HTMLInputElement>(null);
   const location = useLocation();
-  const setDeleteSection = useSetRecoilState(deleteSectionAtom)
+  const setDeleteSection = useSetRecoilState(deleteSectionAtom);
 
   useEffect(() => {
     if (adding) {
@@ -57,10 +56,6 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
     };
     fetchSections();
   }, [setSections]);
-
-  const handleDelete = () => {
-    setDeleteSection(true)
-  }
 
   const handleAddClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -89,7 +84,6 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
         }
       );
       setSections((prev) => [...prev, response.data.section]);
-      toast.success("Section added successfully");
     } catch (err) {
       handleError(err, "Error while adding section");
     }
@@ -184,9 +178,7 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
                 <p className="text-xs text-neutral-500 px-9 py-2">No sections yet</p>
               )}
 
-              {/* Section items */}
               {sections.map((section, i) => {
-                // ✅ useLocation-based active check — no more flicker
                 const isActive = location.pathname === `/home/sections/${section.id}`;
                 return (
                   <motion.div
@@ -216,8 +208,18 @@ const SectionsNav = ({ isOpen }: SectionsNavProps) => {
                           </div>
                           <Trash2
                             size={14}
-                            className="text-red-400 hover:text-red-500 transition-colors"
-                            onClick={handleDelete}
+                            className="text-red-400 hover:text-red-500 transition-colors cursor-pointer"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setDeleteSection((prev) => ({
+                                deletion:!prev.deletion,
+                                sectionId:section.id
+                              }));
+
+                              console.log(section.id);
+                              
+                            }}
                           />
                         </div>
                       ) : (

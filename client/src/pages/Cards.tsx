@@ -124,7 +124,8 @@ const Cards = () => {
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
+    const str = e.target.value.trim();
+    setSearch(str);
   };
 
   const handleShare = async () => {
@@ -184,7 +185,7 @@ const Cards = () => {
 
               <button
                 onClick={handleShare}
-                className="flex items-center gap-2 border dark:border-white/20 border-black/30 dark:text-white text-black text-sm px-4 py-2 rounded-full dark:hover:bg-white/90 hover:scale-[1.03] bg-white/10 transition cursor-pointer"
+                className="flex dark:bg-black text-neutral-900 bg-white/80 items-center gap-2 border dark:border-black/80 dark:text-white/80 cursor-pointer text-sm px-4 py-2 rounded-full dark:hover:bg-white/10 hover:-black/70 hover:scale-[1.03] transition"
               >
                 <Share2 size={18} />
                 Share

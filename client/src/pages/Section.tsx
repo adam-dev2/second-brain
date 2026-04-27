@@ -170,58 +170,6 @@ const Section = () => {
     }
   };
 
-  const handleOnClose = () => {
-    setDeleteSection((prev) => !prev);
-  }
-  const handleDeleteAll = () => {
-
-  }
-
-  const handleMoveAndDelete = async (sectionId:string) => {
-    const token = Cookies.get("token");
-    setLoading(true);
-    if(!sectionId) {
-      toast.error("Section Id is required");
-      return
-    }
-    try{
-      const response = await axios.delete(
-        `${backendUrl}/api/v1/section/${sectionId}`,
-        {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      handleOnClose()
-      console.log(response.data.message);
-      toast.success("Deleted successfully");
-      const updatedSections = sections.filter(
-      (section) => section.id !== sectionId
-    );
-    setSections(updatedSections);
-    if (updatedSections.length === 0) {
-      navigate("/home/dashboard");
-      return;
-    }
-    const currentIndex = sections.findIndex(
-      (section) => section.id === sectionId
-    );
-    const targetIndex = currentIndex > 0 ? currentIndex - 1 : 0;
-    const targetSection = updatedSections[targetIndex];
-
-    navigate(targetSection.path);
-    }catch (err: unknown) {
-      handleError(err, "Error while sharing brain");
-      throw err;
-    } finally {
-      setLoading(false);
-      handleOnClose();
-    }
-  }
-
   if (loading) {
     return <CardSkeleton />;
   }
@@ -305,12 +253,6 @@ const Section = () => {
       )}
 
     </div>
-      {deleteSection && <DeleteConfirmation 
-        onClose={handleOnClose} 
-        onDeleteAll={handleDeleteAll} 
-        onMoveAndDelete={() => {handleMoveAndDelete(id!)}} 
-      />
-      }
   </Layout>
 );
 };

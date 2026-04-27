@@ -21,6 +21,11 @@ const handleMessage = (res:Response,status:number,message:Object|string) => {
     }
     return res.status(status).json(message)
 }
+
+const deleteCard = async(userId:string,cardId:string) => {
+    return Content.findOneAndDelete({_id:cardId,userId})
+}
+
 export const createSection = async(req:Request,res:Response) => {
     handleUserId(req,res)
     const {name} = req.body;
@@ -201,14 +206,10 @@ export const fetchSectionCardsbyId = async(req:Request,res:Response) => {
     }
 }
 
-const deleteCard = async(userId:string,cardId:string) => {
-    return Content.findOneAndDelete({_id:cardId,userId})
-}
-
 export const deleteSectionWithCards = async(req:Request,res:Response) => {
-    const {sectionId,cardIds} = req.body;
+    const {sectionId,cardIds = []} = req.body;
     const userId = req.user?.id!
-    if(!sectionId || cardIds.length === 0) {
+    if(!sectionId) {
         handleMessage(res,400,"Both SectionId and CardId's are required");
     }
     try {
@@ -216,10 +217,14 @@ export const deleteSectionWithCards = async(req:Request,res:Response) => {
         if(!findSectionandDelete) {
             handleMessage(res,404,'Section with this ID not found');
         }
-
-        await Promise.all(
-            cardIds.map((cardId: string) => deleteCard(userId, cardId))
-        )
+        console.log(cardIds);
+        
+        if(cardIds.length !== 0){
+            await Promise.all(
+                cardIds.map((cardId: string) => deleteCard(userId, cardId))
+            )
+        }
+        handleMessage(res,200,"Section Deleted Succesfully")
     }catch(err) {
         handleError(res,err);
     }
