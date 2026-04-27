@@ -62,7 +62,7 @@ const Section = () => {
     setCacheSectionCards(sectionCards);
   }, [sectionCards]);
   useEffect(() => {
-    const es = new EventSource(`${backendUrl}/events`, {
+    const es = new EventSource(`${backendUrl}/api/v1/events`, {
       withCredentials: true,
     });
 
