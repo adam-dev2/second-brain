@@ -303,16 +303,13 @@ export const EditCard = async (req: Request, res: Response) => {
 
 export const Query = async (req: Request, res: Response) => {
   const query = req.body.query;
-  const page = parseInt(req.query.page as string) || 1;
   const limit = parseInt(req.query.limit as string) || 10;
 
   if (!query) {
     return res.status(400).json({ message: "query missing" });
   }
 
-  const maxLimit = 10; // Maximum limit for search results
-  const finalLimit = Math.min(limit, maxLimit);
-  const searchLimit = Math.min(finalLimit * page * 2, 200); // Get more results from Qdrant for better relevance
+  const finalLimit = Math.min(limit, 200);
 
   try {
     const userID = req.user?.id;
@@ -324,65 +321,34 @@ export const Query = async (req: Request, res: Response) => {
 
     const searchResults = await qdrantClient.search(COLLECTION_NAME, {
       vector: queryEmbeddings,
-      limit: searchLimit,
+      limit: finalLimit,
       filter: {
-        must: [
-          {
-            key: "userId",
-            match: { value: userID },
-          },
-        ],
+        must: [{ key: "userId", match: { value: userID } }],
       },
     });
 
-    type TitlesType = string[];
-    const titles: TitlesType = [];
-    searchResults.forEach((res) => {
-      const title = (res.payload as { title?: string })?.title;
-      if (typeof title === "string") {
-        titles.push(title);
-      }
-    });
+    const titles: string[] = searchResults
+      .map((res) => (res.payload as { title?: string })?.title)
+      .filter((title): title is string => typeof title === "string");
 
-    const queryCards = await Content.find({
-      title: { $in: titles },
-      userId: userID,
-    });
+    const queryCards = await Content.find({ title: { $in: titles }, userId: userID });
 
-    const titleScoreMap = new Map();
-    searchResults.forEach((res) => {
-      if (res.payload?.title) {
-        titleScoreMap.set(res.payload.title, res.score);
-      }
-    });
+    const titleScoreMap = new Map(
+      searchResults
+        .filter((res) => res.payload?.title)
+        .map((res) => [res.payload!.title, res.score])
+    );
 
-    const cardsWithScores = queryCards
+    const sortedCards = queryCards
       .map((card) => ({
         ...card.toObject(),
         relevanceScore: titleScoreMap.get(card.title) || 0,
       }))
       .sort((a, b) => b.relevanceScore - a.relevanceScore);
 
-    const totalResults = cardsWithScores.length;
-    const totalPages = Math.ceil(totalResults / finalLimit);
-    const startIndex = (page - 1) * finalLimit;
-    const endIndex = startIndex + finalLimit;
-    const paginatedResults = cardsWithScores.slice(startIndex, endIndex);
-
-    return res.status(200).json({
-      queryCards: paginatedResults,
-      pagination: {
-        totalResults,
-        totalPages,
-        currentPage: page,
-        limit: finalLimit,
-        hasNextPage: page < totalPages,
-        hasPrevPage: page > 1
-      }
-    });
+    return res.status(200).json({ queryCards: sortedCards });
   } catch (err: unknown) {
     let errorMessage = "Unknown error";
-
     if (err instanceof Error) {
       errorMessage = err.message;
       console.error(err.stack || err.message);
@@ -392,11 +358,7 @@ export const Query = async (req: Request, res: Response) => {
     } else {
       console.error("Unknown error", err);
     }
-
-    return res.status(500).json({
-      error: "Internal Server Error",
-      details: errorMessage,
-    });
+    return res.status(500).json({ error: "Internal Server Error", details: errorMessage });
   }
 };
 

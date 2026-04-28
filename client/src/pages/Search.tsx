@@ -26,25 +26,15 @@ interface CardData {
   relevanceScore?: number;
 }
 
-interface PaginationData {
-  totalResults: number;
-  totalPages: number;
-  currentPage: number;
-  limit: number;
-  hasNextPage: boolean;
-  hasPrevPage: boolean;
-}
-
 const Search = () => {
   const search = useRecoilValue(searchAtom);
   const setSearch = useSetRecoilState(searchAtom);
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
   const [queryCards, setQueryCards] = useState<CardData[]>([]);
-  const [pagination, setPagination] = useState<PaginationData | null>(null);
   const isOpen = useRecoilValue(sidebarAtom);
   const setHideIcons = useSetRecoilState(hideIconAtom);
-  const [limit, setLimit] = useState("10");
+  const [limit, setLimit] = useState("5");
   const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
@@ -80,13 +70,10 @@ const Search = () => {
         }
       );
       setQueryCards(res.data.queryCards);
-      setPagination(res.data.pagination);
-      toast.success(`Found ${res.data.pagination.totalResults} relevant results`);
     } catch (err: unknown) {
       handleError(err, "Error while fetching query results");
       console.log(err);
       setQueryCards([]);
-      setPagination(null);
     } finally {
       setLoading(false);
     }
@@ -100,10 +87,6 @@ const Search = () => {
   };
 
   const handleSearch = () => fetchQuery(1); // Reset to first page on new search
-
-  const handlePageChange = (page: number) => {
-    fetchQuery(page);
-  };
 
   return (
   <Layout>
@@ -143,7 +126,7 @@ const Search = () => {
                 <input
                   type="number"
                   min="1"
-                  max="50"
+                  max="20"
                   value={limit}
                   onChange={(e) => setLimit(e.target.value)}
                   className="w-12 bg-transparent border border-black/[0.08] dark:border-white/[0.08] rounded px-1 py-0.5 outline-none text-center text-neutral-900 dark:text-white text-xs"
@@ -226,40 +209,6 @@ const Search = () => {
             ))}
           </div>
         )}
-
-        {/* PAGINATION */}
-        {hasSearched && pagination && pagination.totalPages > 1 && (
-          <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 bg-neutral-100 dark:bg-neutral-900 border border-black/[0.08] dark:border-white/[0.08] rounded-2xl p-5">
-
-            <div className="text-xs text-neutral-400 dark:text-neutral-500">
-              Showing{" "}
-              {(pagination.currentPage - 1) * pagination.limit + 1} to{" "}
-              {Math.min(
-                pagination.currentPage * pagination.limit,
-                pagination.totalResults
-              )}{" "}
-              of {pagination.totalResults}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => handlePageChange(pagination.currentPage - 1)}
-                disabled={!pagination.hasPrevPage}
-                className="px-3 py-1.5 text-xs rounded bg-black/[0.06] dark:bg-white/[0.06] text-neutral-700 dark:text-white disabled:opacity-40 hover:bg-black/[0.1] dark:hover:bg-white/[0.1] transition-colors"
-              >
-                Prev
-              </button>
-              <button
-                onClick={() => handlePageChange(pagination.currentPage + 1)}
-                disabled={!pagination.hasNextPage}
-                className="px-3 py-1.5 text-xs rounded bg-black/[0.06] dark:bg-white/[0.06] text-neutral-700 dark:text-white disabled:opacity-40 hover:bg-black/[0.1] dark:hover:bg-white/[0.1] transition-colors"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
-
       </div>
     )}
   </Layout>
