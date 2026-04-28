@@ -1,7 +1,8 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface AuthUser {
@@ -25,6 +26,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
+  
+
+  const processingToastId = useRef<string | undefined>(undefined)
+  useEffect(() => {
+  if (!authenticated) return; // 🔥 THIS IS THE FIX
+
+  const es = new EventSource(`${backendUrl}/api/v1/events`, {
+    withCredentials: true,
+  });
+
+  es.addEventListener("startCardProcessing", (e) => {
+    const data = JSON.parse(e.data);
+    processingToastId.current = toast.loading(data.message);
+  });
+
+  es.addEventListener("cardProcessed", (e) => {
+    const data = JSON.parse(e.data);
+    toast.success(data.message, { id: processingToastId.current });
+  });
+
+  es.addEventListener("cardFailed", (e) => {
+    const data = JSON.parse(e.data);
+    toast.error(data.message, { id: processingToastId.current });
+  });
+
+  return () => es.close();
+}, [authenticated]);
+
 
   const verifyUser = async () => {
     try {

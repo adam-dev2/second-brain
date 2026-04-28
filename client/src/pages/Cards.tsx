@@ -53,24 +53,7 @@ const Cards = () => {
 
   const handleClick = () => setModal((prev) => !prev);
 
-  const processingToastId = useRef<string | undefined>(undefined)
-  useEffect(() => {
-    const es = new EventSource(`${backendUrl}/api/v1/events`, { withCredentials: true });
-    es.addEventListener("startCardProcessing", (e) => {
-      const data = JSON.parse(e.data);
-      processingToastId.current = toast.loading(`${data.message}`, { position: "top-right" });
-    });
-    es.addEventListener("cardProcessed", (e) => {
-      const data = JSON.parse(e.data);
-      toast.success(`${data.message}`, { id: processingToastId.current, position: "top-right" });
-    });
-    es.addEventListener("cardFailed", (e) => {
-      const data = JSON.parse(e.data);
-      toast.error(`${data.message}`, { id: processingToastId.current, position: "top-right" });
-    });
-    return () => es.close();
-  },[]);
-
+  
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(search);
