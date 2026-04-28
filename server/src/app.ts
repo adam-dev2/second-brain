@@ -1,6 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import express from "express";
 import ConnectDB from "./config/db.js";
 import { ConnectQdrant } from "./config/QdrantConfig.js";

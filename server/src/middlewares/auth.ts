@@ -1,10 +1,7 @@
 import UserModal from "../models/User.js";
 import type { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import dotenv from "dotenv";
 import "express";
-
-dotenv.config();
 
 declare module "express-serve-static-core" {
   interface Request {
