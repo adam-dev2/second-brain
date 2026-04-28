@@ -5,20 +5,14 @@ import {
   Search, Tag, Share2, Lock, BarChart3, Clock, Zap, Github,
   ArrowRight, LogOut, ChevronLeft, ChevronRight,
   LayoutDashboard, FileStack, Tags, FileText, Video,
-  Twitter, Link2, Bookmark, Settings, Sparkles, Star,
+  Twitter, Link2, Bookmark,Layers, Sparkles, Star,
   ArrowUpRight,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-/* ─── Typography via Google Fonts ─── */
-// Add to your index.html or _document.tsx:
-// <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
-
-/* ─── Constants ─── */
 const SPRING = { type: "spring", stiffness: 320, damping: 28 } as const;
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
-/* ─── Helpers ─── */
 function useReveal(delay = 0) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-60px 0px" });
@@ -107,15 +101,15 @@ export default function LandingPage() {
   ];
 
   const sampleCards = [
-    { title: "Design Inspiration Board", link: "dribbble.com/shots/12345", tags: ["design", "ui", "inspiration"], time: "2d ago", color: "#6366f1" },
-    { title: "Next.js Performance Tips", link: "vercel.com/blog/nextjs-performance", tags: ["nextjs", "performance"], time: "5d ago", color: "#0ea5e9" },
-    { title: "Building a Second Brain", link: "aliabdaal.com/second-brain", tags: ["productivity", "learning"], time: "1w ago", color: "#10b981" },
+    { title: "Design Inspiration Board", link: "dribbble.com/shots/12345", tags: ["design", "ui", "inspiration"], time: "2d ago", color: "#ffffff" },
+    { title: "Next.js Performance Tips", link: "vercel.com/blog/nextjs-performance", tags: ["nextjs", "performance"], time: "5d ago", color: "#aaaaaa" },
+    { title: "Building a Second Brain", link: "aliabdaal.com/second-brain", tags: ["productivity", "learning"], time: "1w ago", color: "#666666" },
   ];
 
   const testimonials = [
-    { quote: "This changed how I manage knowledge. Everything I save is now actually findable.", name: "Alex Chen", role: "Product Designer", co: "Figma" },
-    { quote: "The search speed is insane. I went from losing bookmarks to actually using them daily.", name: "Priya Sharma", role: "Software Engineer", co: "Stripe" },
-    { quote: "Finally a tool that doesn't feel like a chore. The tagging UX is incredibly smart.", name: "Jordan Miles", role: "Content Creator", co: "YouTube" },
+    { quote: "This changed how I manage knowledge. Everything I save is now actually findable.", name: "Rat", role: "Analyst", co: "BT Group" },
+    { quote: "The search speed is insane. I went from losing bookmarks to actually using them daily.", name: "Sarthak", role: "Software Engineer", co: "TCS" },
+    { quote: "Finally a tool that doesn't feel like a chore. The tagging UX is incredibly smart.", name: "Harsh", role: "Content Creator", co: "YouTube" },
   ];
 
   const sidebarLinks = [
@@ -123,7 +117,7 @@ export default function LandingPage() {
     { label: "Cards", icon: FileStack, active: false },
     { label: "Tags", icon: Tags, active: false },
     { label: "Search", icon: Search, active: false },
-    { label: "Settings", icon: Settings, active: false },
+    { label: "Sections", icon: Layers, active: false },
   ];
 
   const recentCards = [
@@ -155,7 +149,7 @@ export default function LandingPage() {
     <div
       className="min-h-screen text-white overflow-x-hidden"
       style={{
-        background: "#05050a",
+        background: "#080808",
         fontFamily: "'DM Sans', system-ui, sans-serif",
       }}
     >
@@ -174,26 +168,26 @@ export default function LandingPage() {
           inset: 0;
           pointer-events: none;
           z-index: 0;
-          opacity: 0.025;
+          opacity: 0.04;
           background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
           background-size: 180px 180px;
         }
 
         .grid-bg {
           background-image:
-            linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+            linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
           background-size: 40px 40px;
         }
 
         .glow-ring {
-          box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 0 40px rgba(99,102,241,0.08);
+          box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 0 60px rgba(255,255,255,0.04);
         }
 
         .feature-card:hover .feature-icon {
-          background: rgba(99,102,241,0.15);
-          border-color: rgba(99,102,241,0.3);
-          color: #818cf8;
+          background: rgba(255,255,255,0.08);
+          border-color: rgba(255,255,255,0.2);
+          color: rgba(255,255,255,0.8);
         }
 
         .stat-num {
@@ -201,7 +195,7 @@ export default function LandingPage() {
           font-size: clamp(2.5rem, 6vw, 4rem);
           letter-spacing: -0.02em;
           line-height: 1;
-          background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.55) 100%);
+          background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.4) 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -214,16 +208,11 @@ export default function LandingPage() {
 
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 4px; }
 
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-8px); }
-        }
-        @keyframes pulse-ring {
-          0% { transform: scale(0.95); opacity: 0.4; }
-          70% { transform: scale(1.1); opacity: 0; }
-          100% { transform: scale(0.95); opacity: 0; }
         }
         .float { animation: float 4s ease-in-out infinite; }
         .float-delay { animation: float 4s ease-in-out infinite 1.3s; }
@@ -243,8 +232,8 @@ export default function LandingPage() {
         <div
           className="flex items-center justify-between px-6 sm:px-10 py-4 mx-auto max-w-6xl"
           style={{
-            borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "1px solid transparent",
-            background: scrolled ? "rgba(5,5,10,0.85)" : "transparent",
+            borderBottom: scrolled ? "1px solid rgba(255,255,255,0.07)" : "1px solid transparent",
+            background: scrolled ? "rgba(8,8,8,0.88)" : "transparent",
             backdropFilter: scrolled ? "blur(24px) saturate(180%)" : "none",
             transition: "all 0.4s ease",
           }}
@@ -254,21 +243,21 @@ export default function LandingPage() {
             <div className="relative">
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)" }}
+                style={{ background: "#ffffff" }}
               >
-                <Bookmark className="w-3.5 h-3.5 text-white" />
+                <Bookmark className="w-3.5 h-3.5 text-black" />
               </div>
             </div>
             <span className="text-sm font-semibold tracking-tight text-white/90">Second Brain</span>
           </div>
 
           {/* Nav links */}
-          <nav className="hidden md:flex items-center gap-8 text-xs text-white/40 font-medium">
+          <nav className="hidden md:flex items-center gap-8 text-xs text-white/35 font-medium">
             {["Features", "Dashboard", "Testimonials"].map((l) => (
               <a
                 key={l}
                 href={`#${l.toLowerCase()}`}
-                className="hover:text-white/90 transition-colors duration-200 tracking-wide"
+                className="hover:text-white/80 transition-colors duration-200 tracking-wide"
               >
                 {l}
               </a>
@@ -278,19 +267,19 @@ export default function LandingPage() {
           {/* CTA */}
           <button
             onClick={() => navigate("/auth")}
-            className="group flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200"
+            className="group flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-medium transition-all duration-200 cursor-pointer"
             style={{
-              background: "rgba(99,102,241,0.12)",
-              border: "1px solid rgba(99,102,241,0.25)",
-              color: "#a5b4fc",
+              background: "rgba(255,255,255,0.08)",
+              border: "1px solid rgba(255,255,255,0.15)",
+              color: "rgba(255,255,255,0.8)",
             }}
             onMouseEnter={e => {
-              (e.target as HTMLElement).closest('button')!.style.background = "rgba(99,102,241,0.2)";
-              (e.target as HTMLElement).closest('button')!.style.borderColor = "rgba(99,102,241,0.5)";
+              (e.target as HTMLElement).closest('button')!.style.background = "rgba(255,255,255,0.14)";
+              (e.target as HTMLElement).closest('button')!.style.borderColor = "rgba(255,255,255,0.3)";
             }}
             onMouseLeave={e => {
-              (e.target as HTMLElement).closest('button')!.style.background = "rgba(99,102,241,0.12)";
-              (e.target as HTMLElement).closest('button')!.style.borderColor = "rgba(99,102,241,0.25)";
+              (e.target as HTMLElement).closest('button')!.style.background = "rgba(255,255,255,0.08)";
+              (e.target as HTMLElement).closest('button')!.style.borderColor = "rgba(255,255,255,0.15)";
             }}
           >
             Get started <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
@@ -306,11 +295,11 @@ export default function LandingPage() {
         {/* Radial vignette */}
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse 80% 70% at 50% 100%, #05050a 10%, transparent 70%)" }}
+          style={{ background: "radial-gradient(ellipse 80% 70% at 50% 100%, #080808 10%, transparent 70%)" }}
         />
         <div
           className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse 80% 60% at 50% -20%, rgba(99,102,241,0.08) 0%, transparent 60%)" }}
+          style={{ background: "radial-gradient(ellipse 80% 60% at 50% -20%, rgba(255,255,255,0.04) 0%, transparent 60%)" }}
         />
 
         <motion.div
@@ -327,9 +316,9 @@ export default function LandingPage() {
             <div
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[11px] font-medium tracking-wider"
               style={{
-                background: "rgba(99,102,241,0.08)",
-                border: "1px solid rgba(99,102,241,0.2)",
-                color: "#818cf8",
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.12)",
+                color: "rgba(255,255,255,0.55)",
               }}
             >
               <Sparkles className="w-3 h-3" />
@@ -359,7 +348,7 @@ export default function LandingPage() {
                 style={{
                   fontSize: "clamp(64px, 12vw, 136px)",
                   letterSpacing: "-0.03em",
-                  WebkitTextStroke: "1.5px rgba(255,255,255,0.2)",
+                  WebkitTextStroke: "1.5px rgba(255,255,255,0.18)",
                   color: "transparent",
                 }}
               >
@@ -373,7 +362,7 @@ export default function LandingPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.48, ease: EASE_OUT }}
-            className="text-center text-base text-white/40 font-light max-w-[360px] leading-relaxed mb-10"
+            className="text-center text-base text-white/35 font-light max-w-[360px] leading-relaxed mb-10"
           >
             Stop losing what matters. Save, tag, search, and share your entire knowledge base — all in one place.
           </motion.p>
@@ -387,8 +376,12 @@ export default function LandingPage() {
           >
             <button
               onClick={() => navigate("/auth")}
-              className="group flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all duration-200"
-              style={{ background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)", boxShadow: "0 0 0 1px rgba(99,102,241,0.5), 0 8px 32px rgba(99,102,241,0.3)" }}
+              className="group flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200"
+              style={{
+                background: "#ffffff",
+                color: "#080808",
+                boxShadow: "0 0 0 1px rgba(255,255,255,0.5), 0 8px 32px rgba(255,255,255,0.12)",
+              }}
             >
               <Github className="w-4 h-4" />
               Continue with GitHub
@@ -396,8 +389,12 @@ export default function LandingPage() {
             </button>
             <button
               onClick={() => navigate("/auth")}
-              className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm font-medium text-white/70 transition-all duration-200 hover:text-white"
-              style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.09)" }}
+              className="flex items-center gap-2.5 px-6 py-3 rounded-xl text-sm font-medium transition-all duration-200"
+              style={{
+                background: "rgba(255,255,255,0.05)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                color: "rgba(255,255,255,0.6)",
+              }}
             >
               <FcGoogle className="w-4 h-4" />
               Continue with Google
@@ -416,7 +413,7 @@ export default function LandingPage() {
                 key={i}
                 className={`relative rounded-2xl p-5 cursor-pointer overflow-hidden float${i === 1 ? "-delay" : i === 2 ? "-delay2" : ""}`}
                 style={{
-                  background: "rgba(255,255,255,0.025)",
+                  background: "rgba(255,255,255,0.03)",
                   border: "1px solid rgba(255,255,255,0.07)",
                 }}
                 whileHover={{ y: -6, scale: 1.02 }}
@@ -424,34 +421,34 @@ export default function LandingPage() {
                 onHoverStart={() => setActiveCard(i)}
                 onHoverEnd={() => setActiveCard(null)}
               >
-                {/* color accent */}
+                {/* white accent line */}
                 <div
                   className="absolute top-0 left-0 right-0 h-px"
-                  style={{ background: `linear-gradient(90deg, transparent, ${card.color}60, transparent)` }}
-                />
-                <div
-                  className="absolute top-0 left-0 right-0 h-20 pointer-events-none"
-                  style={{ background: `radial-gradient(ellipse at 50% -30%, ${card.color}12, transparent 60%)` }}
+                  style={{ background: `linear-gradient(90deg, transparent, ${card.color}40, transparent)` }}
                 />
 
                 <div className="flex justify-between items-start mb-3">
-                  <p className="text-xs font-semibold text-white/80 leading-snug pr-2">{card.title}</p>
+                  <p className="text-xs font-semibold text-white/75 leading-snug pr-2">{card.title}</p>
                   <div
                     className="w-6 h-6 rounded-lg flex items-center justify-center shrink-0"
-                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
                   >
-                    <Lock className="w-2.5 h-2.5 text-white/25" />
+                    <Lock className="w-2.5 h-2.5 text-white/20" />
                   </div>
                 </div>
 
-                <p className="tag-pill text-white/20 mb-4 truncate">{card.link}</p>
+                <p className="tag-pill text-white/18 mb-4 truncate" style={{ color: "rgba(255,255,255,0.18)" }}>{card.link}</p>
 
                 <div className="flex flex-wrap gap-1.5 mb-4">
                   {card.tags.map((t) => (
                     <span
                       key={t}
                       className="tag-pill px-2 py-0.5 rounded-md"
-                      style={{ background: `${card.color}18`, border: `1px solid ${card.color}30`, color: card.color }}
+                      style={{
+                        background: "rgba(255,255,255,0.06)",
+                        border: "1px solid rgba(255,255,255,0.1)",
+                        color: "rgba(255,255,255,0.5)",
+                      }}
                     >
                       #{t}
                     </span>
@@ -462,10 +459,10 @@ export default function LandingPage() {
                   className="flex items-center justify-between pt-3"
                   style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
                 >
-                  <span className="text-[10px] text-white/20">{card.time}</span>
+                  <span className="text-[10px] text-white/18" style={{ color: "rgba(255,255,255,0.18)" }}>{card.time}</span>
                   <ArrowUpRight
                     className="w-3 h-3 transition-all duration-200"
-                    style={{ color: activeCard === i ? card.color : "rgba(255,255,255,0.2)" }}
+                    style={{ color: activeCard === i ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.15)" }}
                   />
                 </div>
               </motion.div>
@@ -484,9 +481,9 @@ export default function LandingPage() {
             animate={{ y: [0, 6, 0] }}
             transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
             className="w-5 h-8 rounded-full flex justify-center items-start pt-1.5"
-            style={{ border: "1px solid rgba(255,255,255,0.08)" }}
+            style={{ border: "1px solid rgba(255,255,255,0.07)" }}
           >
-            <div className="w-px h-2 rounded-full" style={{ background: "rgba(255,255,255,0.18)" }} />
+            <div className="w-px h-2 rounded-full" style={{ background: "rgba(255,255,255,0.15)" }} />
           </motion.div>
         </motion.div>
       </section>
@@ -494,7 +491,7 @@ export default function LandingPage() {
       {/* ═══════════════ STATS ═══════════════ */}
       <section
         className="py-20 px-4"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
       >
         <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((s, i) => (
@@ -502,7 +499,7 @@ export default function LandingPage() {
               <p className="stat-num mb-2">
                 <Counter target={s.value} suffix={s.suffix} />
               </p>
-              <p className="text-[10px] text-white/25 uppercase tracking-[0.2em] font-medium">{s.label}</p>
+              <p className="text-[10px] text-white/22 uppercase tracking-[0.2em] font-medium" style={{ color: "rgba(255,255,255,0.22)" }}>{s.label}</p>
             </Reveal>
           ))}
         </div>
@@ -512,13 +509,13 @@ export default function LandingPage() {
       <section
         id="features"
         className="py-28 px-4 sm:px-6"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
       >
         <div className="max-w-4xl mx-auto">
           <Reveal className="mb-16">
             <p
               className="text-[10px] font-medium tracking-[0.25em] uppercase mb-4"
-              style={{ color: "#6366f1" }}
+              style={{ color: "rgba(255,255,255,0.4)" }}
             >
               Features
             </p>
@@ -527,39 +524,39 @@ export default function LandingPage() {
               style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", letterSpacing: "-0.02em", lineHeight: 1.1 }}
             >
               Everything you need<br />
-              <span className="italic text-white/40">to remember everything.</span>
+              <span className="italic text-white/35">to remember everything.</span>
             </h2>
           </Reveal>
 
           <div
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px"
             style={{
-              background: "rgba(255,255,255,0.05)",
+              background: "rgba(255,255,255,0.06)",
               borderRadius: "20px",
               overflow: "hidden",
-              border: "1px solid rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.06)",
             }}
           >
             {features.map((f, i) => (
               <Reveal key={i} delay={i * 0.06}>
                 <div
                   className="feature-card p-7 h-full group cursor-default transition-all duration-200"
-                  style={{ background: "#05050a" }}
+                  style={{ background: "#080808" }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.background = "rgba(99,102,241,0.04)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.03)";
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.background = "#05050a";
+                    (e.currentTarget as HTMLElement).style.background = "#080808";
                   }}
                 >
                   <div
-                    className="feature-icon w-10 h-10 rounded-xl flex items-center justify-center mb-6 transition-all duration-300 text-white/30"
-                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
+                    className="feature-icon w-10 h-10 rounded-xl flex items-center justify-center mb-6 transition-all duration-300 text-white/25"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)" }}
                   >
                     {f.icon}
                   </div>
-                  <h3 className="text-sm font-semibold text-white/80 mb-2.5">{f.title}</h3>
-                  <p className="text-xs text-white/30 leading-relaxed">{f.desc}</p>
+                  <h3 className="text-sm font-semibold text-white/75 mb-2.5">{f.title}</h3>
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.28)" }}>{f.desc}</p>
                 </div>
               </Reveal>
             ))}
@@ -571,11 +568,14 @@ export default function LandingPage() {
       <section
         id="dashboard"
         className="py-28 px-4 sm:px-6"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
       >
         <div className="max-w-5xl mx-auto">
           <Reveal className="mb-16">
-            <p className="text-[10px] font-medium tracking-[0.25em] uppercase mb-4" style={{ color: "#6366f1" }}>
+            <p
+              className="text-[10px] font-medium tracking-[0.25em] uppercase mb-4"
+              style={{ color: "rgba(255,255,255,0.4)" }}
+            >
               Dashboard
             </p>
             <h2
@@ -584,31 +584,31 @@ export default function LandingPage() {
             >
               Your command center
             </h2>
-            <p className="text-sm text-white/30 max-w-sm">See your knowledge at a glance. Everything organized, searchable, and accessible.</p>
+            <p className="text-sm max-w-sm" style={{ color: "rgba(255,255,255,0.28)" }}>See your knowledge at a glance. Everything organized, searchable, and accessible.</p>
           </Reveal>
 
           <Reveal delay={0.1}>
             {/* Browser chrome */}
             <div
-              className="rounded-2xl overflow-hidden glow-ring"
-              style={{ boxShadow: "0 60px 120px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.07)" }}
+              className="rounded-2xl overflow-hidden"
+              style={{ boxShadow: "0 60px 120px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.08)" }}
             >
               {/* Bar */}
               <div
                 className="flex items-center gap-3 px-4 py-3"
-                style={{ background: "#0e0e16", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+                style={{ background: "#111111", borderBottom: "1px solid rgba(255,255,255,0.06)" }}
               >
                 <div className="flex gap-1.5">
-                  {["#ff5f57", "#febc2e", "#28c840"].map((c, i) => (
-                    <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: c, opacity: 0.5 }} />
+                  {["rgba(255,255,255,0.25)", "rgba(255,255,255,0.18)", "rgba(255,255,255,0.12)"].map((c, i) => (
+                    <div key={i} className="w-2.5 h-2.5 rounded-full" style={{ background: c }} />
                   ))}
                 </div>
                 <div className="flex-1 flex justify-center">
                   <span
-                    className="mono px-4 py-1 text-[10px] text-white/20 rounded-md"
-                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}
+                    className="mono px-4 py-1 text-[10px] rounded-md"
+                    style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.2)" }}
                   >
-                    app.secondbrain.io/dashboard
+                    secondbrain.madebyadam.xyz/dashboard
                   </span>
                 </div>
               </div>
@@ -617,16 +617,16 @@ export default function LandingPage() {
                 {/* Sidebar */}
                 <div
                   className={`hidden md:flex flex-col flex-shrink-0 border-r transition-all duration-300 ease-out ${sidebarOpen ? "w-[200px]" : "w-[60px]"}`}
-                  style={{ background: "#080810", borderColor: "rgba(255,255,255,0.05)" }}
+                  style={{ background: "#0d0d0d", borderColor: "rgba(255,255,255,0.06)" }}
                 >
                   {/* Logo */}
-                  <div className="h-14 flex items-center px-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+                  <div className="h-14 flex items-center px-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                     <div className="flex items-center gap-2.5 overflow-hidden">
                       <div
                         className="w-6 h-6 rounded-md flex items-center justify-center shrink-0"
-                        style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5)" }}
+                        style={{ background: "#ffffff" }}
                       >
-                        <Bookmark className="w-3 h-3 text-white" />
+                        <Bookmark className="w-3 h-3 text-black" />
                       </div>
                       <AnimatePresence>
                         {sidebarOpen && (
@@ -634,7 +634,8 @@ export default function LandingPage() {
                             initial={{ opacity: 0, x: -8 }}
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -8 }}
-                            className="text-xs font-semibold text-white/80 whitespace-nowrap"
+                            className="text-xs font-semibold whitespace-nowrap"
+                            style={{ color: "rgba(255,255,255,0.75)" }}
                           >
                             Second Brain
                           </motion.span>
@@ -650,9 +651,9 @@ export default function LandingPage() {
                         key={label}
                         className="flex items-center gap-3 px-2.5 py-2 rounded-lg cursor-pointer transition-all duration-150 overflow-hidden"
                         style={{
-                          background: active ? "rgba(99,102,241,0.15)" : "transparent",
-                          color: active ? "#818cf8" : "rgba(255,255,255,0.3)",
-                          border: active ? "1px solid rgba(99,102,241,0.25)" : "1px solid transparent",
+                          background: active ? "rgba(255,255,255,0.08)" : "transparent",
+                          color: active ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.28)",
+                          border: active ? "1px solid rgba(255,255,255,0.12)" : "1px solid transparent",
                         }}
                       >
                         <Icon size={13} className="shrink-0" />
@@ -673,8 +674,8 @@ export default function LandingPage() {
                   </nav>
 
                   {/* Bottom */}
-                  <div className="p-2.5" style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-                    <div className="flex items-center gap-3 px-2.5 py-2 rounded-lg cursor-pointer text-white/20 hover:text-white/50 transition-colors overflow-hidden">
+                  <div className="p-2.5" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+                    <div className="flex items-center gap-3 px-2.5 py-2 rounded-lg cursor-pointer transition-colors overflow-hidden" style={{ color: "rgba(255,255,255,0.18)" }}>
                       <LogOut size={13} className="shrink-0" />
                       <AnimatePresence>
                         {sidebarOpen && (
@@ -689,25 +690,22 @@ export default function LandingPage() {
                   {/* Toggle */}
                   <button
                     onClick={() => setSidebarOpen(!sidebarOpen)}
-                    className="absolute mt-[56px] ml-[calc(var(--sw)-12px)] w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 hover:bg-white/10 z-10"
-                    style={
-                      {
-                        "--sw": sidebarOpen ? "200px" : "60px",
-                        marginLeft: sidebarOpen ? "188px" : "48px",
-                        background: "#0e0e16",
-                        border: "1px solid rgba(255,255,255,0.1)",
-                        color: "rgba(255,255,255,0.4)",
-                        position: "relative",
-                        alignSelf: "flex-start",
-                      } as React.CSSProperties
-                    }
+                    className="w-6 h-6 rounded-full flex items-center justify-center transition-all duration-200 z-10"
+                    style={{
+                      marginLeft: sidebarOpen ? "188px" : "48px",
+                      background: "#111111",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      color: "rgba(255,255,255,0.35)",
+                      position: "relative",
+                      alignSelf: "flex-start",
+                    } as React.CSSProperties}
                   >
                     {sidebarOpen ? <ChevronLeft size={11} /> : <ChevronRight size={11} />}
                   </button>
                 </div>
 
-                {/* Main content — light bg to contrast dark shell */}
-                <div className="flex-1 overflow-y-auto" style={{ background: "#f8f7f5" }}>
+                {/* Main content — light bg for contrast */}
+                <div className="flex-1 overflow-y-auto" style={{ background: "#f5f5f3" }}>
                   <div className="p-6">
                     {/* Header */}
                     <div className="mb-5">
@@ -732,7 +730,7 @@ export default function LandingPage() {
                           <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-wider mb-2">{m.label}</p>
                           <div className="flex items-end justify-between">
                             <p className="text-2xl font-bold text-gray-900 tracking-tight">{m.value}</p>
-                            <span className="text-[9px] font-semibold text-emerald-500 mb-0.5">{m.delta}</span>
+                            <span className="text-[9px] font-semibold text-gray-500 mb-0.5">{m.delta}</span>
                           </div>
                         </div>
                       ))}
@@ -744,27 +742,27 @@ export default function LandingPage() {
                       <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm col-span-2">
                         <div className="flex justify-between items-center mb-3.5">
                           <h2 className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Recent Cards</h2>
-                          <button className="text-[10px] font-semibold" style={{ color: "#6366f1" }}>View all →</button>
+                          <button className="text-[10px] font-semibold text-gray-700">View all →</button>
                         </div>
                         <div className="space-y-1">
                           {recentCards.map((card) => (
                             <div
                               key={card.id}
-                              className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-indigo-50/50 cursor-pointer group transition-colors"
+                              className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-gray-50 cursor-pointer group transition-colors"
                             >
-                              <div className="w-6 h-6 bg-gray-50 rounded-lg flex items-center justify-center shrink-0 text-gray-300 group-hover:text-indigo-400 transition-colors border border-gray-100">
+                              <div className="w-6 h-6 bg-gray-50 rounded-lg flex items-center justify-center shrink-0 text-gray-300 group-hover:text-gray-600 transition-colors border border-gray-100">
                                 {getTypeIcon(card.type)}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-xs font-medium text-gray-700 truncate group-hover:text-indigo-600 transition-colors">{card.title}</p>
+                                <p className="text-xs font-medium text-gray-700 truncate group-hover:text-gray-900 transition-colors">{card.title}</p>
                                 <div className="flex items-center gap-1.5 mt-0.5">
                                   <span className="mono text-[9px] text-gray-300">{card.date}</span>
                                   {card.tags.map((t) => (
-                                    <span key={t} className="mono text-[9px] text-indigo-400 bg-indigo-50 px-1.5 py-px rounded font-medium">#{t}</span>
+                                    <span key={t} className="mono text-[9px] text-gray-500 bg-gray-100 px-1.5 py-px rounded font-medium">#{t}</span>
                                   ))}
                                 </div>
                               </div>
-                              <ArrowUpRight className="w-3 h-3 text-gray-200 group-hover:text-indigo-400 shrink-0 transition-colors" />
+                              <ArrowUpRight className="w-3 h-3 text-gray-200 group-hover:text-gray-500 shrink-0 transition-colors" />
                             </div>
                           ))}
                         </div>
@@ -785,7 +783,7 @@ export default function LandingPage() {
                                   className="h-full rounded-full"
                                   style={{
                                     width: `${(tag.count / tag.max) * 100}%`,
-                                    background: `hsl(${240 + i * 15}, 70%, 65%)`,
+                                    background: `rgba(0,0,0,${0.2 + i * 0.12})`,
                                   }}
                                 />
                               </div>
@@ -806,11 +804,14 @@ export default function LandingPage() {
       <section
         id="testimonials"
         className="py-28 px-4 sm:px-6"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
       >
         <div className="max-w-4xl mx-auto">
           <Reveal className="mb-16">
-            <p className="text-[10px] font-medium tracking-[0.25em] uppercase mb-4" style={{ color: "#6366f1" }}>
+            <p
+              className="text-[10px] font-medium tracking-[0.25em] uppercase mb-4"
+              style={{ color: "rgba(255,255,255,0.4)" }}
+            >
               Testimonials
             </p>
             <h2
@@ -818,7 +819,7 @@ export default function LandingPage() {
               style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)", letterSpacing: "-0.02em", lineHeight: 1.1 }}
             >
               Loved by<br />
-              <span className="italic text-white/40">knowledge builders.</span>
+              <span className="italic" style={{ color: "rgba(255,255,255,0.3)" }}>knowledge builders.</span>
             </h2>
           </Reveal>
 
@@ -831,33 +832,37 @@ export default function LandingPage() {
                   className="rounded-2xl p-6 h-full flex flex-col group cursor-default"
                   style={{
                     background: "rgba(255,255,255,0.02)",
-                    border: "1px solid rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.07)",
                   }}
                   onMouseEnter={e => {
-                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(99,102,241,0.2)";
-                    (e.currentTarget as HTMLElement).style.background = "rgba(99,102,241,0.04)";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.15)";
+                    (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.04)";
                   }}
                   onMouseLeave={e => {
-                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.06)";
+                    (e.currentTarget as HTMLElement).style.borderColor = "rgba(255,255,255,0.07)";
                     (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.02)";
                   }}
                 >
                   <div className="flex gap-0.5 mb-5">
                     {[...Array(5)].map((_, si) => (
-                      <Star key={si} className="w-3 h-3" fill="rgba(99,102,241,0.5)" stroke="none" />
+                      <Star key={si} className="w-3 h-3" fill="rgba(255,255,255,0.3)" stroke="none" />
                     ))}
                   </div>
-                  <p className="text-sm text-white/40 leading-relaxed mb-6 flex-1 italic serif">"{t.quote}"</p>
+                  <p className="text-sm leading-relaxed mb-6 flex-1 italic serif" style={{ color: "rgba(255,255,255,0.35)" }}>"{t.quote}"</p>
                   <div className="flex items-center gap-3">
                     <div
                       className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold"
-                      style={{ background: "rgba(99,102,241,0.15)", border: "1px solid rgba(99,102,241,0.25)", color: "#818cf8" }}
+                      style={{
+                        background: "rgba(255,255,255,0.07)",
+                        border: "1px solid rgba(255,255,255,0.12)",
+                        color: "rgba(255,255,255,0.6)",
+                      }}
                     >
                       {t.name[0]}
                     </div>
                     <div>
-                      <p className="text-xs font-semibold text-white/70">{t.name}</p>
-                      <p className="text-[10px] text-white/25">{t.role} · {t.co}</p>
+                      <p className="text-xs font-semibold" style={{ color: "rgba(255,255,255,0.65)" }}>{t.name}</p>
+                      <p className="text-[10px]" style={{ color: "rgba(255,255,255,0.22)" }}>{t.role} · {t.co}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -874,24 +879,24 @@ export default function LandingPage() {
             <div
               className="relative rounded-3xl text-center overflow-hidden px-12 py-20"
               style={{
-                background: "radial-gradient(ellipse at 50% -20%, rgba(99,102,241,0.18) 0%, rgba(5,5,10,0) 60%)",
-                border: "1px solid rgba(99,102,241,0.15)",
+                background: "radial-gradient(ellipse at 50% -20%, rgba(255,255,255,0.06) 0%, rgba(8,8,8,0) 60%)",
+                border: "1px solid rgba(255,255,255,0.1)",
               }}
             >
               {/* Top glow line */}
               <div
                 className="absolute top-0 left-1/2 -translate-x-1/2 h-px w-48"
-                style={{ background: "linear-gradient(90deg, transparent, rgba(99,102,241,0.6), transparent)" }}
+                style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)" }}
               />
 
               <div
                 className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-8"
                 style={{
-                  background: "linear-gradient(135deg, rgba(99,102,241,0.2), rgba(99,102,241,0.05))",
-                  border: "1px solid rgba(99,102,241,0.3)",
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.12)",
                 }}
               >
-                <Zap className="w-6 h-6" style={{ color: "#818cf8" }} />
+                <Zap className="w-6 h-6" style={{ color: "rgba(255,255,255,0.6)" }} />
               </div>
 
               <h2
@@ -899,25 +904,26 @@ export default function LandingPage() {
                 style={{ fontSize: "clamp(2rem, 4.5vw, 3rem)", letterSpacing: "-0.02em", lineHeight: 1.1 }}
               >
                 Build your second<br />
-                <span className="italic text-white/40">brain today.</span>
+                <span className="italic" style={{ color: "rgba(255,255,255,0.3)" }}>brain today.</span>
               </h2>
-              <p className="text-sm text-white/30 mb-10 max-w-xs mx-auto leading-relaxed">
+              <p className="text-sm mb-10 max-w-xs mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.28)" }}>
                 Join thousands of curious minds organizing their digital world.
               </p>
 
               <button
                 onClick={() => navigate("/auth")}
-                className="group inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl text-sm font-semibold text-white transition-all duration-200 mb-4"
+                className="group inline-flex items-center gap-2.5 px-7 py-3.5 rounded-xl text-sm font-semibold duration-200 mb-4 hover:scale-[1.03] cursor-pointer transform transition"
                 style={{
-                  background: "linear-gradient(135deg, #6366f1, #4f46e5)",
-                  boxShadow: "0 0 0 1px rgba(99,102,241,0.5), 0 16px 48px rgba(99,102,241,0.35)",
+                  background: "#ffffff",
+                  color: "#080808",
+                  boxShadow: "0 0 0 1px rgba(255,255,255,0.5), 0 16px 48px rgba(255,255,255,0.1)",
                 }}
               >
                 Get Started Free
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </button>
 
-              <p className="text-[11px] text-white/20 mono">No credit card · Free forever · Open source</p>
+              <p className="text-[11px] mono block" style={{ color: "rgba(255,255,255,0.2)" }}>No credit card · Free forever · Open source</p>
             </div>
           </Reveal>
         </div>
@@ -926,21 +932,21 @@ export default function LandingPage() {
       {/* ═══════════════ FOOTER ═══════════════ */}
       <footer
         className="py-8 px-6 sm:px-10"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}
+        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
       >
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2.5">
             <div
               className="w-5 h-5 rounded-md flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, #6366f1, #4f46e5)" }}
+              style={{ background: "#ffffff" }}
             >
-              <Bookmark className="w-2.5 h-2.5 text-white" />
+              <Bookmark className="w-2.5 h-2.5 text-black" />
             </div>
-            <span className="text-xs text-white/25 font-medium">Second Brain © 2025</span>
+            <span className="text-xs font-medium" style={{ color: "rgba(255,255,255,0.22)" }}>Second Brain © 2025</span>
           </div>
           <div className="flex gap-6">
             {["Privacy", "Terms", "Contact"].map((l) => (
-              <a key={l} href="#" className="text-xs text-white/20 hover:text-white/60 transition-colors duration-200">
+              <a key={l} href="#" className="text-xs transition-colors duration-200" style={{ color: "rgba(255,255,255,0.18)" }}>
                 {l}
               </a>
             ))}
