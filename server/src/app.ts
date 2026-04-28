@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import ConnectDB from "./config/db.js";
 import { ConnectQdrant } from "./config/QdrantConfig.js";
@@ -10,6 +13,7 @@ import brainRoutes from "./routes/brainRoutes.js";
 import sectionRoutes from "./routes/sectionRoutes.js"
 import eventRoutes from "./routes/eventRoutes.js";
 import cookieParser from "cookie-parser";
+
 
 const app = express();
 

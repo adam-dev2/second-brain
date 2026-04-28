@@ -4,6 +4,9 @@ import { Strategy as GitHubStrategy } from "passport-github2";
 import type { Profile, VerifyCallback } from "passport-google-oauth20";
 import UserModal from "../models/User.js";
 
+import dotenv from "dotenv";
+dotenv.config();
+
 passport.use(
   new GoogleStrategy(
     {
