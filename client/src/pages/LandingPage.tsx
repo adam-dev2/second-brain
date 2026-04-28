@@ -44,29 +44,6 @@ function Reveal({
   );
 }
 
-/* ─── Animated counter ─── */
-function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true });
-
-  useEffect(() => {
-    if (!inView) return;
-    const duration = 1400;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const p = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - p, 3);
-      setCount(Math.floor(ease * target));
-      if (p < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }, [inView, target]);
-
-  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
-}
-
-/* ════════════════════════════════════════ LANDING PAGE ═════════════════════ */
 export default function LandingPage() {
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
@@ -92,14 +69,6 @@ export default function LandingPage() {
     { icon: <BarChart3 className="w-4 h-4" />, title: "KPI Dashboard", desc: "Beautiful analytics on your saving habits, top domains, and activity streaks." },
     { icon: <Clock className="w-4 h-4" />, title: "Recent Activity", desc: "Your 5 most recent bookmarks pinned for one-tap access. Always within reach." },
   ];
-
-  const stats = [
-    { label: "Bookmarks saved", value: 10000, suffix: "+" },
-    { label: "Active users", value: 2500, suffix: "+" },
-    { label: "Shared brains", value: 1200, suffix: "+" },
-    { label: "Tags created", value: 50000, suffix: "+" },
-  ];
-
   const sampleCards = [
     { title: "Design Inspiration Board", link: "dribbble.com/shots/12345", tags: ["design", "ui", "inspiration"], time: "2d ago", color: "#ffffff" },
     { title: "Next.js Performance Tips", link: "vercel.com/blog/nextjs-performance", tags: ["nextjs", "performance"], time: "5d ago", color: "#aaaaaa" },
@@ -487,24 +456,6 @@ export default function LandingPage() {
           </motion.div>
         </motion.div>
       </section>
-
-      {/* ═══════════════ STATS ═══════════════ */}
-      <section
-        className="py-20 px-4"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
-      >
-        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
-          {stats.map((s, i) => (
-            <Reveal key={i} delay={i * 0.08} className="text-center">
-              <p className="stat-num mb-2">
-                <Counter target={s.value} suffix={s.suffix} />
-              </p>
-              <p className="text-[10px] text-white/22 uppercase tracking-[0.2em] font-medium" style={{ color: "rgba(255,255,255,0.22)" }}>{s.label}</p>
-            </Reveal>
-          ))}
-        </div>
-      </section>
-
       {/* ═══════════════ FEATURES ═══════════════ */}
       <section
         id="features"
