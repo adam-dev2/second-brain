@@ -244,8 +244,8 @@ We welcome contributions! Second Brain is an open-source project that benefits f
 
 ### Ways to Contribute
 
-- **🐛 Bug Reports**: Found a bug? [Open an issue](https://github.com/your-repo/issues)
-- **✨ Feature Requests**: Have an idea? [Suggest it](https://github.com/your-repo/issues)
+- **🐛 Bug Reports**: Found a bug? [Open an issue](https://github.com/adam-dev2/second-brain/issues)
+- **✨ Feature Requests**: Have an idea? [Suggest it](https://github.com/adam-dev2/second-brain/issues)
 - **💻 Code Contributions**: Fix bugs or add features
 - **📖 Documentation**: Improve docs or add examples
 - **🧪 Testing**: Add tests or improve test coverage
