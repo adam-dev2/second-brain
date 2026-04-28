@@ -87,7 +87,7 @@ const AddCard = (props:Iprops) => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const token = Cookies.get("token");
-    // setLoading(true);
+    setLoading(true);
     if(!formData.title || !formData.link || !formData.tags){
       return toast.error('all fields are required')
     }
