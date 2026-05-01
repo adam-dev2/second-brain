@@ -14,6 +14,7 @@ import { searchModalAtom } from "../store/atoms/searchModal";
 import ShareModal from "../components/ShareModal";
 import { sharelink } from "../store/atoms/sharelink";
 import { hideIconAtom } from "../store/atoms/hideIcons";
+import { cardsRefreshAtom } from "../store/atoms/cardsRefresh";
 import { handleError } from "../utils/handleError";
 import CardSkeleton from "../components/CardSkeleton";
 import Pagination from "../components/Pagination"; // ← import
@@ -47,6 +48,7 @@ const Cards = () => {
   
   const [pagination, setPagination] = useState<PaginationMeta | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const cardsRefresh = useRecoilValue(cardsRefreshAtom);
   const loadStartTime = useRef<number>(Date.now());
 
   
@@ -86,6 +88,13 @@ const Cards = () => {
       setAllCards(res.data.cards);
       setPagination(res.data.pagination);
 
+      if (
+        res.data.pagination?.totalPages &&
+        page > res.data.pagination.totalPages
+      ) {
+        setCurrentPage(res.data.pagination.totalPages || 1);
+      }
+
     } catch (err) {
       console.error(err);
       toast.error("Failed to fetch cards");
@@ -98,7 +107,7 @@ const Cards = () => {
 
   useEffect(() => {
     fetchCards(currentPage, debouncedSearch);
-  }, [currentPage, debouncedSearch]);
+  }, [currentPage, debouncedSearch, cardsRefresh]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);

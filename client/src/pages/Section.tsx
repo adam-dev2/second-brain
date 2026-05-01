@@ -48,7 +48,6 @@ const Section = () => {
   const loadStartTime = useRef<number>(Date.now());
   const sectionCards = useRecoilValue(secitonCardsAtom);
   const setSectionCards = useSetRecoilState(secitonCardsAtom);
-  const processingToastId = useRef<string | undefined>(undefined);
   const sections = useRecoilValue(sectionsAtom)
   const [cacheSectionCards, setCacheSectionCards] = useState<ISectionCard[]>([]);
   const navigate = useNavigate();
@@ -61,37 +60,6 @@ const Section = () => {
   useEffect(() => {
     setCacheSectionCards(sectionCards);
   }, [sectionCards]);
-  useEffect(() => {
-    const es = new EventSource(`${backendUrl}/api/v1/events`, {
-      withCredentials: true,
-    });
-
-    es.addEventListener("startCardProcessing", (e) => {
-      const data = JSON.parse(e.data);
-      processingToastId.current = toast.loading(`${data.message}`, {
-        position: "top-right",
-      });
-    });
-
-    es.addEventListener("cardProcessed", (e) => {
-      const data = JSON.parse(e.data);
-      console.log("Card Processed succesfull", data);
-      toast.success(`${data.message}`, {
-        id: processingToastId.current,
-        position: "top-right",
-      });
-    });
-
-    es.addEventListener("cardFailed", (e) => {
-      const data = JSON.parse(e.data);
-      console.log("Card processing failed");
-      toast.error(`${data.message}`, {
-        id: processingToastId.current,
-        position: "top-right",
-      });
-    })
-    return () => es.close();
-  },[]);
   useEffect(() => {
     setHideIcons(true);
     const token = Cookies.get("token");

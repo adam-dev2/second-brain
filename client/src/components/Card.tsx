@@ -13,6 +13,7 @@ import { handleError } from "../utils/handleError";
 import { useEffect, useRef, useState } from "react";
 import { sectionsAtom } from "../store/atoms/sections";
 import { secitonCardsAtom } from "../store/atoms/sectionCards";
+import { cardsRefreshAtom } from "../store/atoms/cardsRefresh";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 export interface Iprops {
@@ -40,6 +41,7 @@ const Card = (props: Iprops) => {
   const sections = useRecoilValue(sectionsAtom);
   const setSectionCards = useSetRecoilState(secitonCardsAtom);
   const sectionCards = useRecoilValue(secitonCardsAtom);
+  const setCardsRefresh = useSetRecoilState(cardsRefreshAtom);
   const sheetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -135,7 +137,8 @@ const Card = (props: Iprops) => {
       });
       setAllCards(allCards.filter((item) => item._id !== props.id));
       setSectionCards(sectionCards.filter((item) => item.id !== props.id));
-      toast.success("Card Deleted successfully");
+      setCardsRefresh((prev) => prev + 1);
+      toast.success("Card deleted successfully");
     } catch (err: unknown) {
       handleError(err, "Failed to Delete Card");
     } finally {
