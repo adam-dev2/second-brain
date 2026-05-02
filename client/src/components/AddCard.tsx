@@ -140,7 +140,6 @@ const AddCard = (props:Iprops) => {
         button: "Save Card",
       });
       setModal(false);
-      toast.success("Card saved successfully!");
     } catch (err: unknown) {
       console.log(err);
       handleError(err, "Failed to Save card");
