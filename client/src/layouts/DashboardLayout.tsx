@@ -8,7 +8,6 @@ import Cookies from "js-cookie";
 import { loadingAtom } from "../store/atoms/loading";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { secitonCardsAtom } from "../store/atoms/sectionCards";
 import { sectionsAtom } from "../store/atoms/sections";
 import { handleError } from "../utils/handleError";
 
@@ -20,7 +19,6 @@ const DashboardLayout = () => {
   const deleteSection = useRecoilValue(deleteSectionAtom);
   const setDeleteSection = useSetRecoilState(deleteSectionAtom);
   const setLoading = useSetRecoilState(loadingAtom);
-  const sectionCards = useRecoilValue(secitonCardsAtom);
   const sections = useRecoilValue(sectionsAtom);
   const setSections = useSetRecoilState(sectionsAtom);
   const navigate = useNavigate();
@@ -49,11 +47,9 @@ const DashboardLayout = () => {
       try{
         let response;
         if(deleteAll) {
-          const cardsIds = sectionCards
           response = await axios.post(`${backendUrl}/api/v1/section/delete-all`,
             {
-              sectionId,
-              cardsIds
+              sectionId
             },
             {
             withCredentials:true,
