@@ -201,11 +201,6 @@ export const createCard = async (req: Request, res: Response) => {
     const savedCard = await newCard.save();
     res.status(201).json({ message: "Card saved successfully", card: savedCard });
 
-    sendSocketEvent(userID, "startCardProcessing", {
-      cardId: qdrantID,
-      title,
-      message: "Your Card is processing",
-    });
     processCard(qdrantID, userID, title, link)
       .then(async () => {
         console.log(`[bg] Process done for ${qdrantID}`);

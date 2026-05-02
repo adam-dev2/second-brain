@@ -53,20 +53,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error("Socket connect error", error);
     });
 
-    socket.on("startCardProcessing", (data) => {
-      processingToastId.current = toast.loading(data.message);
+    socket.on("cardStatusUpdate", (data) => {
+      if (processingToastId.current) {
+        toast.loading(data.message, { id: processingToastId.current });
+      } else {
+        processingToastId.current = toast.loading(data.message);
+      }
     });
 
     socket.on("cardProcessed", (data) => {
       toast.success(data.message, { id: processingToastId.current });
+      processingToastId.current = undefined;
     });
 
     socket.on("cardFailed", (data) => {
-      toast.error(data.message, { id: processingToastId.current });
+      toast.error(`Failed to process card: ${data.error}`, { id: processingToastId.current });
+      processingToastId.current = undefined;
     });
 
     return () => {
-      socket.off("startCardProcessing");
+      socket.off("cardStatusUpdate");
       socket.off("cardProcessed");
       socket.off("cardFailed");
       socket.off("connect_error");
