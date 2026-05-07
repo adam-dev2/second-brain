@@ -6,16 +6,7 @@ import UserModal from "../models/User.js";
 import { signupSchema, loginSchema } from "../validations/AuthSchema.js";
 import nodemailer from "nodemailer";
 import { resetPasswordTemplate } from "../utils/resetPasswordTemplate.js";
-
-interface CookieOptions {
-  httpOnly: boolean;
-  secure: boolean;
-  maxAge: number;
-  sameSite: "none"|"lax";
-  path?:string;
-  domain?:string;
-}
-const isProduction = process.env.NODE_ENV === 'production'
+import {cookieOptions} from "../validations/cookieOptions.js";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -94,14 +85,6 @@ export const LoginController = async (req: Request, res: Response) => {
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
-    const cookieOptions: CookieOptions = {
-      httpOnly: true,
-      secure: isProduction,
-      maxAge: 24 * 60 * 60 * 1000,
-      sameSite: isProduction ? 'lax' : 'lax',  
-      path: "/",
-      ...(isProduction && { domain: ".madebyadam.xyz" }),
-    };
     res.cookie("token", token, cookieOptions);
     res.status(200).json({ message: "Logged in successfully" });
   } catch (err) {
@@ -173,11 +156,7 @@ export const LogoutController = async (req: Request, res: Response) => {
   console.log("ASdasdajsh");
   
   try {
-    res.clearCookie("token", {
-      httpOnly: isProduction,
-      secure: isProduction,
-      sameSite: "none",
-    });
+    res.clearCookie("token", cookieOptions);
     return res.status(200).json({ message: "Logged out successfully" });
   } catch (err) {
     return res.status(500).json({ error: "Internal Server Error", err });

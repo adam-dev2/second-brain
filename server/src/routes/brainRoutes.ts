@@ -4,7 +4,7 @@ import { GetShareBrain, ShareBrain } from "../controllers/shareController.js";
 
 const router = express.Router();
 
-router.get("/share", AuthMiddleware, ShareBrain);
+router.post("/share", AuthMiddleware, ShareBrain);
 router.get("/:shareLink", GetShareBrain);
 
 export default router;

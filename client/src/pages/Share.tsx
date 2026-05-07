@@ -45,8 +45,7 @@ const Share = () => {
           "Content-Type": "application/json",
         },
       });
-      console.log(res.data.ShareableCards);
-      setCards(res.data.ShareableCards);
+      setCards(res.data.cards);
       setPagination(res.data.pagination);
       // toast.success(`Fetched ${res.data.ShareableCards.length} cards`);
     } catch (err) {

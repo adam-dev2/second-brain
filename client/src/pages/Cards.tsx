@@ -115,13 +115,18 @@ const Cards = () => {
     const token = Cookies.get("token");
     setLoading(true);
     try {
-      const res = await axios.get(`${backendUrl}/api/v1/brain/share`, {
+      const res = await axios.post(`${backendUrl}/api/v1/brain/share`,
+        {
+          sectionId:null
+        },
+        {
         withCredentials: true,
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
       // toast.success("Shareable Link generated");
       setSearchModal(true);
       const baseUrl = window.location.origin;
+      
       setShareLink(`${baseUrl}/${res.data.ShareableLink}`);
     } catch (err: unknown) {
       handleError(err, "Error while sharing brain");

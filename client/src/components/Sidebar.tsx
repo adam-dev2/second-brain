@@ -34,12 +34,9 @@ const Sidebar = () => {
   const location = useLocation();
 
   const handleLogout = async () => {
-    setLoading(true);
 
     try {
       await logout();
-
-      // toast.success("Logged out successfully");
       navigate("/auth");
 
       setFormData({

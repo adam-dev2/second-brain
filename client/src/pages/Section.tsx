@@ -147,16 +147,20 @@ const Section = () => {
     const token = Cookies.get("token");
     setLoading(true);
     try {
-      const res = await axios.get(`${backendUrl}/api/v1/brain/share`, {
+      const res = await axios.post(`${backendUrl}/api/v1/brain/share`,
+        {
+          sectionId:id
+        },
+        {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
-      console.log(res.data.ShareableLink);
       setSearchModal(true);
-      setShareLink(`${backendUrl}/${res.data.ShareableLink}`);
+      const baseUrl = window.location.origin;
+      setShareLink(`${baseUrl}/${res.data.ShareableLink}`);
     } catch (err: unknown) {
       handleError(err, "Error while sharing brain");
       throw err;
@@ -185,7 +189,7 @@ const Section = () => {
             <input
               value={search}
               type="text"
-              className="w-full dark:bg-neutral-900 bg-white/80 border dark:border-white/[0.08] border-black/20 rounded-xl px-4 py-2 text-sm outline-none placeholder:text-neutral-500 dark:focus:border-white/20 focus:border-black/20 transition"
+              className="w-full dark:bg-neutral-900 bg-white/80 border dark:border-white/8 border-black/20 rounded-xl px-4 py-2 text-sm outline-none placeholder:text-neutral-500 dark:focus:border-white/20 focus:border-black/20 transition"
               placeholder="Search cards..."
               onChange={handleSearch}
             />

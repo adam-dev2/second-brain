@@ -10,12 +10,12 @@ import {
 } from "../controllers/authController.js";
 import passport from "../utils/passport.js";
 import { verifyUser } from "../controllers/verifyUserController.js";
+import { cookieOptions } from "../validations/cookieOptions.js";
 
 const router = express.Router();
 
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173/";
 const JWT_SECRET = process.env.JWT_SECRET ?? "S3cretT";
-const isProduction = process.env.NODE_ENV == 'production'
 
 
 interface JwtUser {
@@ -32,14 +32,7 @@ function setJwtCookie(res: Response, user: JwtUser) {
     { expiresIn: "7d" }
   );
 
-  res.cookie("token", token, {
-    httpOnly: true,
-    secure: isProduction,
-    sameSite: isProduction?"none":"lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-    path:"/",
-    ...(isProduction && { domain: ".madebyadam.xyz" }),
-  });
+  res.cookie("token", token, cookieOptions);
 }
 
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));

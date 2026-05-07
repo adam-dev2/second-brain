@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --config jest.config.cjs",
-    "dev": "tsx src/server.ts",
+    "dev": "tsx watch src/server.ts",
     "lint": "eslint . --ext .ts --fix",
     "format": "prettier --write src",
     "build": "tsc -b"
