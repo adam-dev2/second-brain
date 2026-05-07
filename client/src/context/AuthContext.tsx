@@ -3,6 +3,8 @@ import type { ReactNode } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { io, type Socket } from "socket.io-client";
+import Cookies from "js-cookie";
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 interface AuthUser {
@@ -28,31 +30,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authenticated, setAuthenticated] = useState(false);
   
 
-  const processingToastId = useRef<string | undefined>(undefined)
+  const processingToastId = useRef<string | undefined>(undefined);
+  const socketRef = useRef<Socket | null>(null);
+
   useEffect(() => {
-  if (!authenticated) return; // 🔥 THIS IS THE FIX
+    if (!authenticated) return;
 
-  const es = new EventSource(`${backendUrl}/api/v1/events`, {
-    withCredentials: true,
-  });
+    const token = Cookies.get("token");
+    const socket = io(backendUrl, {
+      withCredentials: true,
+      transports: ["websocket"],
+      auth: { token },
+    });
 
-  es.addEventListener("startCardProcessing", (e) => {
-    const data = JSON.parse(e.data);
-    processingToastId.current = toast.loading(data.message);
-  });
+    socketRef.current = socket;
 
-  es.addEventListener("cardProcessed", (e) => {
-    const data = JSON.parse(e.data);
-    toast.success(data.message, { id: processingToastId.current });
-  });
+    socket.on("connect", () => {
+      console.log("Socket connected", socket.id);
+    });
 
-  es.addEventListener("cardFailed", (e) => {
-    const data = JSON.parse(e.data);
-    toast.error(data.message, { id: processingToastId.current });
-  });
+    socket.on("connect_error", (error) => {
+      console.error("Socket connect error", error);
+    });
 
-  return () => es.close();
-}, [authenticated]);
+    socket.on("cardStatusUpdate", (data) => {
+      if (processingToastId.current) {
+        toast.loading(data.message, { id: processingToastId.current });
+      } else {
+        processingToastId.current = toast.loading(data.message);
+      }
+    });
+
+    socket.on("cardProcessed", (data) => {
+      toast.success(data.message, { id: processingToastId.current });
+      processingToastId.current = undefined;
+    });
+
+    socket.on("cardFailed", (data) => {
+      toast.error(`Failed to process card: ${data.error}`, { id: processingToastId.current });
+      processingToastId.current = undefined;
+    });
+
+    return () => {
+      socket.off("cardStatusUpdate");
+      socket.off("cardProcessed");
+      socket.off("cardFailed");
+      socket.off("connect_error");
+      socket.disconnect();
+      socketRef.current = null;
+    };
+  }, [authenticated]);
 
 
   const verifyUser = async () => {

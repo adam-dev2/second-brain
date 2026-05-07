@@ -207,24 +207,21 @@ export const fetchSectionCardsbyId = async(req:Request,res:Response) => {
 }
 
 export const deleteSectionWithCards = async(req:Request,res:Response) => {
-    const {sectionId,cardIds = []} = req.body;
+    const {sectionId} = req.body;
     const userId = req.user?.id!
     if(!sectionId) {
-        handleMessage(res,400,"Both SectionId and CardId's are required");
+        handleMessage(res,400,"SectionId is required");
     }
     try {
-        const findSectionandDelete = await Section.findByIdAndDelete(sectionId);
+        const findSectionandDelete = await Section.findOneAndDelete({_id: sectionId, userId});
         if(!findSectionandDelete) {
-            handleMessage(res,404,'Section with this ID not found');
+            handleMessage(res,404,'Section with this ID not found or not owned by user');
         }
-        console.log(cardIds);
         
-        if(cardIds.length !== 0){
-            await Promise.all(
-                cardIds.map((cardId: string) => deleteCard(userId, cardId))
-            )
-        }
-        handleMessage(res,200,"Section Deleted Succesfully")
+        // Delete all cards in the section
+        await Content.deleteMany({sectionId, userId});
+        
+        handleMessage(res,200,"Section and all its cards deleted successfully")
     }catch(err) {
         handleError(res,err);
     }

@@ -4,7 +4,7 @@ import { getEmbedding } from "../utils/embeddings.js";
 import { COLLECTION_NAME, qdrantClient } from "../utils/qDrant.js";
 import Content from "../models/Content.js";
 import { processCard } from "../services/processor.js";
-import { sendEvent } from "../utils/sseManager.js";
+import { sendSocketEvent } from "../utils/socketManager.js";
 
 interface IAllCards {
   userId: string;
@@ -198,18 +198,15 @@ export const createCard = async (req: Request, res: Response) => {
       updatedAt: new Date().toISOString(),
     });
 
-    await newCard.save();
-    sendEvent(userID, "startCardProcessing", {
-      cardId: qdrantID,
-      title,
-      message: "Your Card is processing",
-    });
+    const savedCard = await newCard.save();
+    res.status(201).json({ message: "Card saved successfully", card: savedCard });
+
     processCard(qdrantID, userID, title, link)
       .then(async () => {
         console.log(`[bg] Process done for ${qdrantID}`);
         await Content.updateOne({ cardId: qdrantID }, { status: "completed" });
 
-        sendEvent(userID, "cardProcessed", {
+        sendSocketEvent(userID, "cardProcessed", {
           cardId: qdrantID,
           title,
           message: "Your Card has finished processing",
@@ -219,7 +216,7 @@ export const createCard = async (req: Request, res: Response) => {
         const message = err instanceof Error ? err.message : String(err);
 
         console.error(`[bg] Failed to process ${qdrantID}:`, message);
-        sendEvent(userID, "cardFailed", {
+        sendSocketEvent(userID, "cardFailed", {
           title: title,
           cardId: qdrantID,
           error: message,
@@ -266,7 +263,7 @@ export const EditCard = async (req: Request, res: Response) => {
       { new: true }
     );
     if (findCard.link !== link) {
-      sendEvent(userID, "startCardProcessing", {
+      sendSocketEvent(userID, "startCardProcessing", {
         cardId: findCard.cardId,
         title,
         message: "Your Card is processing",
@@ -274,7 +271,7 @@ export const EditCard = async (req: Request, res: Response) => {
       processCard(findCard.cardId, userID, title, link)
         .then(() => {
           console.log(`[bg] Reprocessed ${findCard.cardId}`);
-          sendEvent(userID, "cardProcessed", {
+          sendSocketEvent(userID, "cardProcessed", {
             cardId: findCard.cardId,
             title,
             message: "Your Card has finished processing",
@@ -284,7 +281,7 @@ export const EditCard = async (req: Request, res: Response) => {
           const message = err instanceof Error ? err.message : String(err);
 
           console.error(`[bg] Failed to process ${findCard.cardId}:`, message);
-          sendEvent(userID, "cardFailed", {
+          sendSocketEvent(userID, "cardFailed", {
             title: findCard.title,
             cardId: findCard.cardId,
             error: message,

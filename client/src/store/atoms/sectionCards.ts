@@ -1,17 +1,17 @@
-import {atom} from 'recoil';
+import { atom } from "recoil";
 
-export const secitonCardsAtom = atom({
-    key:'SectionCards',
-    default:[
-        {
-            id:"",
-            title:"",
-            link:"",
-            tags:[],
-            share:false,
-            sectionId:"",
-            createdAt:"",
-            updatedAt:""
-        }
-    ]
-})
+export interface SectionCard {
+  id: string;
+  title: string;
+  link: string;
+  tags: string[];
+  share: boolean;
+  sectionId: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const secitonCardsAtom = atom<SectionCard[]>({
+  key: "SectionCards",
+  default: [],
+});
