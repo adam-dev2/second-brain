@@ -3,7 +3,9 @@ node_modules
 /dist
 __tests__
 jest.config.cjs
-
+Dockerfile
+exp.py
+tsconfig.tsbuildinfo
 src/config/redis.ts
 src/queues/
 src/services/agenda.ts
