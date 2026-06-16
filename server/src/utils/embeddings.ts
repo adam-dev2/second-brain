@@ -1,4 +1,5 @@
 import axios from "axios";
+import fs from 'fs';
 
 export const getEmbedding = async (text: string, attempt = 1): Promise<number[]> => {
   try {
