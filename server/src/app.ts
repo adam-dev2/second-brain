@@ -26,7 +26,8 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:4173",
   "https://secondbrain.madebyadam.xyz",
-  "https://secondbrain.thisisadam.xyz"
+  "https://secondbrain.thisisadam.xyz",
+  "https://secondbrain.adamhq.site"
 ];
 
 app.use(
