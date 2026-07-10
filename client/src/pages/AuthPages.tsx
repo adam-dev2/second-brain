@@ -235,7 +235,7 @@ const AuthPages = () => {
                     {icon}
                     <span className="text-sm font-medium text-neutral-300">{label}</span>
                     {lastProvider === provider && (
-                      <div className="absolute -top-1.5 -right-1.5 bg-green-500 text-[9px] text-white font-semibold px-1.5 py-0.5 rounded-full leading-none shadow-lg">
+                      <div className="absolute -top-1.5 -right-1.5 bg-green-500 text-[15px] text-white font-semibold px-1.5 py-0.5 rounded-full leading-none shadow-lg">
                         Last
                       </div>
                     )}

@@ -5,7 +5,7 @@ import {
   Search, Tag, Share2, Lock, BarChart3, Clock, Zap, Github,
   ArrowRight, LogOut, ChevronLeft, ChevronRight,
   LayoutDashboard, FileStack, Tags, FileText, Video,
-  Twitter, Link2, Bookmark,Layers, Sparkles, Star,
+  Twitter, Link2, Bookmark, Layers, Sparkles, Star,
   ArrowUpRight,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -559,7 +559,7 @@ export default function LandingPage() {
                     className="mono px-4 py-1 text-[10px] rounded-md"
                     style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)", color: "rgba(255,255,255,0.2)" }}
                   >
-                    secondbrain.madebyadam.xyz/dashboard
+                    secondbrain.adamhq.site/dashboard
                   </span>
                 </div>
               </div>
