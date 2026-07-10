@@ -1,4 +1,4 @@
-import React, { useState, type FormEvent } from "react";
+import React, { useEffect, useState, type FormEvent } from "react";
 import { Mail, Lock, User, ArrowRight, EyeOff, Eye } from "lucide-react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -22,6 +22,14 @@ const AuthPages = () => {
   const setFormData = useSetRecoilState(SignupFormAtom);
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
+  const [provider, setProvider] = useState<string | null>(null);
+
+  useEffect(() => {
+    const provider = localStorage.getItem('lastProvider');
+    if (provider) {
+      setProvider(provider);
+    }
+  }, [])
 
   const handleToggle = () => setToggle((t) => !t);
 
@@ -195,6 +203,7 @@ const AuthPages = () => {
                 {[
                   {
                     label: "Google",
+                    provider: "google",
                     handler: handleGoogle,
                     icon: (
                       <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
@@ -207,6 +216,7 @@ const AuthPages = () => {
                   },
                   {
                     label: "GitHub",
+                    provider: "github",
                     handler: handleGithub,
                     icon: (
                       <svg className="w-4 h-4 text-white shrink-0" fill="currentColor" viewBox="0 0 24 24">
@@ -214,16 +224,21 @@ const AuthPages = () => {
                       </svg>
                     ),
                   },
-                ].map(({ label, handler, icon }) => (
+                ].map(({ label, provider: btnProvider, handler, icon }) => (
                   <motion.button
                     key={label}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.96 }}
                     onClick={handler}
-                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-900 border border-white/[0.08] hover:border-white/20 hover:bg-neutral-800 transition-all duration-200 cursor-pointer"
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-neutral-900 border border-white/[0.08] hover:border-white/20 hover:bg-neutral-800 transition-all duration-200 cursor-pointer relative"
                   >
                     {icon}
                     <span className="text-sm font-medium text-neutral-300">{label}</span>
+                    {provider === btnProvider && (
+                      <div className="absolute -top-1.5 -right-1.5 bg-green-500 text-[9px] text-white font-semibold px-1.5 py-0.5 rounded-full leading-none shadow-lg">
+                        Last
+                      </div>
+                    )}
                   </motion.button>
                 ))}
               </div>

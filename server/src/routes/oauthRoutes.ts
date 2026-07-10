@@ -25,8 +25,9 @@ interface JwtUser {
 
 function setJwtCookie(res: Response, user: JwtUser) {
   const token = jwt.sign(
-    { id: user._id,
-      username:user.username
+    {
+      id: user._id,
+      username: user.username
     },
     JWT_SECRET,
     { expiresIn: "7d" }
@@ -37,12 +38,12 @@ function setJwtCookie(res: Response, user: JwtUser) {
 
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
 
-router.get( "/google/callback", passport.authenticate("google", { failureRedirect: `${FRONTEND_URL}/`,session: false,}),(req: Request, res: Response) => {
-    const user = req.user as any;
-    if (!user) return res.redirect(`${FRONTEND_URL}/?error=no_user`);
-    setJwtCookie(res, { _id: user.id, username: user.username });
-    res.redirect(`${FRONTEND_URL}/home/dashboard`);
-  }
+router.get("/google/callback", passport.authenticate("google", { failureRedirect: `${FRONTEND_URL}/`, session: false, }), (req: Request, res: Response) => {
+  const user = req.user as any;
+  if (!user) return res.redirect(`${FRONTEND_URL}/?error=no_user`);
+  setJwtCookie(res, { _id: user.id, username: user.username });
+  res.redirect(`${FRONTEND_URL}/home/dashboard?provider=google`);
+}
 );
 
 router.get("/github", passport.authenticate("github", { scope: ["user:email"] }));
@@ -56,19 +57,19 @@ router.get(
   (req: Request, res: Response) => {
     const user = req.user as any;
     console.log(user);
-    
+
     if (!user) return res.redirect(`${FRONTEND_URL}/?error=no_user`);
     setJwtCookie(res, { _id: user.id, username: user.username });
-    res.redirect(`${FRONTEND_URL}/home/dashboard`);
+    res.redirect(`${FRONTEND_URL}/home/dashboard?provider=github`);
   }
 );
 
-router.get('/me',verifyUser,(req:Request,res:Response) => {
+router.get('/me', verifyUser, (req: Request, res: Response) => {
   console.log('lmao');
-  
+
   return res.status(200).json({
-    message:"Verified User",
-    user:req.user
+    message: "Verified User",
+    user: req.user
   })
 })
 router.post("/signup", SignupController);

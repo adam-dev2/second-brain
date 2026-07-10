@@ -1,6 +1,6 @@
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { FileText, Video, Twitter, Link2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { loadingAtom } from "../store/atoms/loading";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -43,8 +43,19 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
+  const [searchParams] = useSearchParams();
 
   const [metrics, setMetrics] = useState<MetricsData | null>(null);
+
+  useEffect(() => {
+    const provider = searchParams.get("provider");
+    if (provider) {
+      localStorage.setItem('lastProvider', provider)
+    }
+
+  }, [searchParams])
+
+
   useEffect(() => {
     const fetchMetrics = async () => {
       const token = Cookies.get("token");
@@ -57,22 +68,22 @@ const Dashboard = () => {
             "Content-Type": "application/json",
           },
         });
-        
+
         setMetrics(res.data.metrics);
       } catch (err: unknown) {
-        
+
         handleError(err, "Error while fetching metrics");
         console.error(err);
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchMetrics();
-  },[]);
-  
-  
-  
+  }, []);
+
+
+
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -107,9 +118,9 @@ const Dashboard = () => {
       {/* STATS */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
         {[
-          { label: "Total Cards",     value: stats.totalCards },
-          { label: "Unique Tags",     value: stats.tags },
-          { label: "Shared Cards",    value: stats.aiSearches },
+          { label: "Total Cards", value: stats.totalCards },
+          { label: "Unique Tags", value: stats.tags },
+          { label: "Shared Cards", value: stats.aiSearches },
           { label: "Added This Week", value: stats.thisWeek },
         ].map(({ label, value }) => (
           <div
@@ -203,9 +214,8 @@ const Dashboard = () => {
                   </div>
                   <div className="h-1 bg-white/[0.06] rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-500 ${
-                        idx === 0 ? "dark:bg-white bg-black/80" : "dark:bg-white/30 bg-black/20"
-                      }`}
+                      className={`h-full rounded-full transition-all duration-500 ${idx === 0 ? "dark:bg-white bg-black/80" : "dark:bg-white/30 bg-black/20"
+                        }`}
                       style={{ width: `${(tag.count / topTags[0].count) * 100}%` }}
                     />
                   </div>
@@ -220,8 +230,8 @@ const Dashboard = () => {
         </div>
 
       </div>
-      </Layout>
-);
+    </Layout>
+  );
 };
 
 export default Dashboard;
