@@ -22,12 +22,12 @@ const AuthPages = () => {
   const setFormData = useSetRecoilState(SignupFormAtom);
   const loading = useRecoilValue(loadingAtom);
   const setLoading = useSetRecoilState(loadingAtom);
-  const [provider, setProvider] = useState<string | null>(null);
+  const [lastProvider, setLastProvider] = useState<string | null>(null);
 
   useEffect(() => {
     const provider = localStorage.getItem('lastProvider');
     if (provider) {
-      setProvider(provider);
+      setLastProvider(provider);
     }
   }, [])
 
@@ -224,7 +224,7 @@ const AuthPages = () => {
                       </svg>
                     ),
                   },
-                ].map(({ label, provider: btnProvider, handler, icon }) => (
+                ].map(({ label, provider, handler, icon }) => (
                   <motion.button
                     key={label}
                     whileHover={{ scale: 1.02 }}
@@ -234,7 +234,7 @@ const AuthPages = () => {
                   >
                     {icon}
                     <span className="text-sm font-medium text-neutral-300">{label}</span>
-                    {provider === btnProvider && (
+                    {lastProvider === provider && (
                       <div className="absolute -top-1.5 -right-1.5 bg-green-500 text-[9px] text-white font-semibold px-1.5 py-0.5 rounded-full leading-none shadow-lg">
                         Last
                       </div>
