@@ -4,7 +4,7 @@ export const resetPasswordTemplate = (resetLink: string) => `
       
       <tr>
         <td style="text-align: center; padding-bottom: 20px;">
-          <h2 style="margin: 0; color: #333;">Second Brain asjhdkjahsdlhqlwjhe</h2>
+          <h2 style="margin: 0; color: #333;">Second Brain</h2>
         </td>
       </tr>
 
